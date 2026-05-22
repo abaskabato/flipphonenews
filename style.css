@@ -1,0 +1,132 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.flip-phone-container {
+    perspective: 1000px;
+}
+
+.flip-phone {
+    position: relative;
+    width: 320px;
+    height: 580px;
+    transform-style: preserve-3d;
+    transition: transform 0.6s;
+    cursor: pointer;
+}
+
+.flip-phone:hover {
+    transform: rotateY(180deg);
+}
+
+.flip-phone-front,
+.flip-phone-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    border-radius: 20px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+}
+
+.flip-phone-front {
+    background: linear-gradient(to bottom, #2c3e50, #4a6572);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.flip-phone-back {
+    background: linear-gradient(to bottom, #1a2a6c, #b21f1f);
+    transform: rotateY(180deg);
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.phone-logo {
+    font-size: 28px;
+    font-weight: bold;
+    color: #ecf0f1;
+    margin-bottom: 20px;
+    letter-spacing: 2px;
+}
+
+.phone-time {
+    font-size: 18px;
+    color: #bdc3c7;
+    font-weight: 300;
+}
+
+.news-title {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    padding: 15px;
+    margin: 10px 0;
+    color: #ecf0f1;
+    font-size: 16px;
+    line-height: 1.5;
+    transition: all 0.3s ease;
+}
+
+.news-title:hover {
+    background: rgba(255, 255, 255, 0.15);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+/* Scrollbar styling */
+.flip-phone-back::-webkit-scrollbar {
+    width: 8px;
+}
+
+.flip-phone-back::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+}
+
+.flip-phone-back::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
+}
+
+.flip-phone-back::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
+}
+
+/* Responsive design */
+@media (max-width: 400px) {
+    .flip-phone {
+        width: 280px;
+        height: 500px;
+    }
+    
+    .phone-logo {
+        font-size: 24px;
+    }
+    
+    .phone-time {
+        font-size: 16px;
+    }
+    
+    .news-title {
+        font-size: 14px;
+        padding: 12px;
+    }
+}
