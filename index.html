@@ -8,80 +8,337 @@
 </head>
 <body>
     <div class="scene">
-        <div class="phone">
-            <div class="closed">
-                <div class="top-section">
-                    <div class="ant"></div>
-                    <div class="ext-display">
-                        <span class="ext-t">10:30</span>
-                    </div>
-                    <div class="grille"></div>
-                    <div class="badge">M</div>
-                </div>
-                <div class="bot-section">
-                    <div class="vent"></div>
-                </div>
-            </div>
-            <div class="open">
-                <div class="screen-section">
-                    <div class="screen-bezel">
-                        <div class="lcd">
-                            <div class="lcd-hdr">
-                                <span>FLIPNEWS</span>
-                                <span>[===]</span>
-                            </div>
-                            <div class="lcd-body">
-                                <div>&#9656; BREAKING: Major Event Unfolds</div>
-                                <div>&#9656; Weather: Sunny Across Nation</div>
-                                <div>&#9656; Sports: Championship Decided</div>
-                                <div>&#9656; Tech: AI Breakthrough Announced</div>
-                                <div>&#9656; World: Peace Summit Concludes</div>
-                                <div>&#9656; Health: Study on Exercise</div>
-                                <div>&#9656; Business: Markets Rally Today</div>
-                                <div>&#9656; Science: Mars Discovery Made</div>
-                                <div>&#9656; Food: Best New Restaurants</div>
-                                <div>&#9656; US: Policy Changes Announced</div>
-                            </div>
-                            <div class="lcd-ftr">
-                                <span>MENU</span>
-                                <span>BACK</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="hinge-gap">
-                    <div class="hinge-part"></div>
-                </div>
-                <div class="keypad-section">
-                    <div class="nav-area">
-                        <div class="n-up">&#9650;</div>
-                        <div class="n-mid">
-                            <div class="n-l">&#9664;</div>
-                            <div class="n-ok">OK</div>
-                            <div class="n-r">&#9654;</div>
-                        </div>
-                        <div class="n-dn">&#9660;</div>
-                    </div>
-                    <div class="num-area">
-                        <div class="nbtn"><span>1</span></div>
-                        <div class="nbtn"><span>2</span><small>ABC</small></div>
-                        <div class="nbtn"><span>3</span><small>DEF</small></div>
-                        <div class="nbtn"><span>4</span><small>GHI</small></div>
-                        <div class="nbtn"><span>5</span><small>JKL</small></div>
-                        <div class="nbtn"><span>6</span><small>MNO</small></div>
-                        <div class="nbtn"><span>7</span><small>PQRS</small></div>
-                        <div class="nbtn"><span>8</span><small>TUV</small></div>
-                        <div class="nbtn"><span>9</span><small>WXYZ</small></div>
-                        <div class="nbtn"><span>*</span></div>
-                        <div class="nbtn"><span>0</span></div>
-                        <div class="nbtn"><span>#</span></div>
-                    </div>
-                    <div class="call-area">
-                        <div class="snd">SEND</div>
-                        <div class="end">END</div>
-                    </div>
-                </div>
-            </div>
+        <div class="phone" id="phone">
+            <!-- SVG Flip Phone -->
+            <svg viewBox="0 0 340 520" xmlns="http://www.w3.org/2000/svg" class="phone-svg">
+                <defs>
+                    <!-- Body gradient -->
+                    <linearGradient id="bodyGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#d4d4d4"/>
+                        <stop offset="25%" stop-color="#c0c0c0"/>
+                        <stop offset="50%" stop-color="#a8a8a8"/>
+                        <stop offset="75%" stop-color="#b8b8b8"/>
+                        <stop offset="100%" stop-color="#c8c8c8"/>
+                    </linearGradient>
+
+                    <!-- Dark body gradient for lower -->
+                    <linearGradient id="bodyDark" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#b0b0b0"/>
+                        <stop offset="30%" stop-color="#989898"/>
+                        <stop offset="70%" stop-color="#888888"/>
+                        <stop offset="100%" stop-color="#a0a0a0"/>
+                    </linearGradient>
+
+                    <!-- Screen bezel gradient -->
+                    <linearGradient id="bezelGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                        <stop offset="0%" stop-color="#1a1a1a"/>
+                        <stop offset="50%" stop-color="#0d0d0d"/>
+                        <stop offset="100%" stop-color="#1a1a1a"/>
+                    </linearGradient>
+
+                    <!-- LCD gradient -->
+                    <linearGradient id="lcdGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                        <stop offset="0%" stop-color="#0a1a0a"/>
+                        <stop offset="100%" stop-color="#061206"/>
+                    </linearGradient>
+
+                    <!-- Key gradient -->
+                    <linearGradient id="keyGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#f5f5f5"/>
+                        <stop offset="40%" stop-color="#e0e0e0"/>
+                        <stop offset="100%" stop-color="#c0c0c0"/>
+                    </linearGradient>
+
+                    <!-- Key press gradient -->
+                    <linearGradient id="keyPressGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#e0e0e0"/>
+                        <stop offset="100%" stop-color="#b8b8b8"/>
+                    </linearGradient>
+
+                    <!-- OK button gradient -->
+                    <linearGradient id="okGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#2a5a8a"/>
+                        <stop offset="100%" stop-color="#1a3a6a"/>
+                    </linearGradient>
+
+                    <!-- Send button gradient -->
+                    <linearGradient id="sendGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                        <stop offset="0%" stop-color="#44bb55"/>
+                        <stop offset="100%" stop-color="#228833"/>
+                    </linearGradient>
+
+                    <!-- End button gradient -->
+                    <linearGradient id="endGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                        <stop offset="0%" stop-color="#ee4444"/>
+                        <stop offset="100%" stop-color="#b02222"/>
+                    </linearGradient>
+
+                    <!-- Antenna gradient -->
+                    <linearGradient id="antGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" stop-color="#888"/>
+                        <stop offset="50%" stop-color="#ccc"/>
+                        <stop offset="100%" stop-color="#888"/>
+                    </linearGradient>
+
+                    <!-- Hinge gradient -->
+                    <linearGradient id="hingeGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                        <stop offset="0%" stop-color="#777"/>
+                        <stop offset="50%" stop-color="#aaa"/>
+                        <stop offset="100%" stop-color="#777"/>
+                    </linearGradient>
+
+                    <!-- Shadows -->
+                    <filter id="dropShadow" x="-10%" y="-10%" width="130%" height="130%">
+                        <feDropShadow dx="0" dy="8" stdDeviation="12" flood-opacity="0.4"/>
+                    </filter>
+
+                    <filter id="keyShadow" x="-20%" y="-20%" width="150%" height="150%">
+                        <feDropShadow dx="0" dy="2" stdDeviation="2" flood-opacity="0.25"/>
+                    </filter>
+
+                    <filter id="innerShadow">
+                        <feGaussianBlur in="SourceAlpha" stdDeviation="3" result="blur"/>
+                        <feOffset dx="0" dy="2" result="offsetBlur"/>
+                        <feComposite in="SourceGraphic" in2="offsetBlur" operator="out"/>
+                    </filter>
+
+                    <!-- Scan lines pattern -->
+                    <pattern id="scanlines" width="4" height="4" patternUnits="userSpaceOnUse">
+                        <rect width="4" height="2" fill="rgba(0,0,0,0.08)"/>
+                        <rect y="2" width="4" height="2" fill="transparent"/>
+                    </pattern>
+
+                    <!-- Clip paths -->
+                    <clipPath id="screenClip">
+                        <rect x="63" y="28" width="214" height="190" rx="6"/>
+                    </clipPath>
+                </defs>
+
+                <!-- ===== CLOSED STATE ===== -->
+                <g id="closedState">
+                    <!-- Antenna back -->
+                    <rect x="210" y="-2" width="6" height="24" rx="3" fill="url(#antGrad)" transform="rotate(-6, 213, 10)"/>
+
+                    <!-- Phone body (closed) -->
+                    <rect x="20" y="0" width="300" height="260" rx="24" fill="url(#bodyGrad)" filter="url(#dropShadow)" stroke="#999" stroke-width="1"/>
+
+                    <!-- Top half details -->
+                    <rect x="20" y="0" width="300" height="155" rx="24" fill="url(#bodyGrad)"/>
+                    <rect x="20" y="120" width="300" height="35" fill="url(#bodyGrad)"/>
+                    
+                    <!-- Subtle edge highlight on top -->
+                    <rect x="24" y="2" width="292" height="2" rx="1" fill="rgba(255,255,255,0.4)"/>
+
+                    <!-- External LCD bezel -->
+                    <rect x="115" y="30" width="110" height="40" rx="6" fill="#1a1a1a" stroke="#666" stroke-width="1.5"/>
+                    <rect x="119" y="34" width="102" height="32" rx="4" fill="url(#lcdGrad)"/>
+
+                    <!-- LCD time -->
+                    <text x="170" y="54" font-family="'Courier New', monospace" font-size="16" font-weight="bold" fill="#0f0" text-anchor="middle" letter-spacing="3">10:30</text>
+
+                    <!-- Speaker grille -->
+                    <rect x="145" y="90" width="8" height="3" rx="1.5" fill="#888"/>
+                    <rect x="157" y="90" width="8" height="3" rx="1.5" fill="#888"/>
+                    <rect x="169" y="90" width="8" height="3" rx="1.5" fill="#888"/>
+                    <rect x="181" y="90" width="8" height="3" rx="1.5" fill="#888"/>
+
+                    <!-- Motorola M logo -->
+                    <text x="170" y="130" font-family="Arial" font-size="32" font-weight="bold" fill="#666" text-anchor="middle">M</text>
+
+                    <!-- Bottom half details -->
+                    <rect x="20" y="155" width="300" height="105" rx="7" fill="url(#bodyDark)"/>
+                    
+                    <!-- Battery cover line -->
+                    <rect x="80" y="200" width="180" height="1" fill="#888"/>
+                    
+                    <!-- Vent slits -->
+                    <rect x="100" y="220" width="6" height="2" rx="1" fill="#777"/>
+                    <rect x="115" y="220" width="6" height="2" rx="1" fill="#777"/>
+                    <rect x="130" y="220" width="6" height="2" rx="1" fill="#777"/>
+                    <rect x="145" y="220" width="6" height="2" rx="1" fill="#777"/>
+                    <rect x="160" y="220" width="6" height="2" rx="1" fill="#777"/>
+                    <rect x="175" y="220" width="6" height="2" rx="1" fill="#777"/>
+                    <rect x="190" y="220" width="6" height="2" rx="1" fill="#777"/>
+                    <rect x="205" y="220" width="6" height="2" rx="1" fill="#777"/>
+                    <rect x="220" y="220" width="6" height="2" rx="1" fill="#777"/>
+                    <rect x="235" y="220" width="6" height="2" rx="1" fill="#777"/>
+
+                    <!-- Bottom edge highlight -->
+                    <rect x="24" y="256" width="292" height="2" rx="1" fill="rgba(255,255,255,0.15)"/>
+                </g>
+
+                <!-- ===== OPEN STATE ===== -->
+                <g id="openState">
+                    <!-- Antenna back -->
+                    <rect x="210" y="-2" width="6" height="24" rx="3" fill="url(#antGrad)" transform="rotate(-6, 213, 10)"/>
+
+                    <!-- === SCREEN HALF (TOP) === -->
+                    <g>
+                        <rect x="20" y="0" width="300" height="265" rx="24" fill="url(#bodyGrad)" filter="url(#dropShadow)" stroke="#999" stroke-width="0.8"/>
+                        <rect x="20" y="0" width="300" height="265" rx="24" fill="url(#bodyGrad)"/>
+                        
+                        <!-- Edge highlight -->
+                        <rect x="24" y="2" width="292" height="2" rx="1" fill="rgba(255,255,255,0.4)"/>
+
+                        <!-- Screen bezel -->
+                        <rect x="48" y="18" width="244" height="214" rx="12" fill="url(#bezelGrad)" stroke="#444" stroke-width="1.5"/>
+                        <rect x="52" y="22" width="236" height="206" rx="8" fill="url(#bezelGrad)"/>
+
+                        <!-- LCD screen -->
+                        <rect x="63" y="28" width="214" height="190" rx="6" fill="url(#lcdGrad)"/>
+                        
+                        <!-- Scan lines -->
+                        <rect x="63" y="28" width="214" height="190" rx="6" fill="url(#scanlines)"/>
+
+                        <!-- Screen glare -->
+                        <ellipse cx="120" cy="80" rx="80" ry="60" fill="rgba(0,255,0,0.03)"/>
+
+                        <!-- LCD header -->
+                        <text x="78" y="44" font-family="'Courier New', monospace" font-size="10" font-weight="bold" fill="#0f0">FLIPNEWS</text>
+                        <text x="252" y="44" font-family="'Courier New', monospace" font-size="9" fill="#0f0">[===]</text>
+                        <line x1="73" y1="49" x2="267" y2="49" stroke="rgba(0,255,0,0.12)" stroke-width="0.5"/>
+
+                        <!-- News headlines (using clipPath) -->
+                        <g clip-path="url(#screenClip)">
+                            <!-- News items - visible portion -->
+                            <text x="73" y="64" font-family="'Courier New', monospace" font-size="10" fill="#0f0">&#x25B6; BREAKING: Major Event Unfolds</text>
+                            <rect x="73" y="66" width="194" height="14" rx="2" fill="rgba(0,30,0,0.15)"/>
+                            
+                            <text x="73" y="82" font-family="'Courier New', monospace" font-size="10" fill="#0f0">&#x25B6; Weather: Sunny Nationwide</text>
+                            <rect x="73" y="82" width="194" height="14" rx="2" fill="rgba(0,30,0,0.15)"/>
+                            
+                            <text x="73" y="100" font-family="'Courier New', monospace" font-size="10" fill="#0f0">&#x25B6; Sports: Championship Decided</text>
+                            <rect x="73" y="100" width="194" height="14" rx="2" fill="rgba(0,30,0,0.15)"/>
+                            
+                            <text x="73" y="118" font-family="'Courier New', monospace" font-size="10" fill="#0f0">&#x25B6; Tech: New AI Breakthrough</text>
+                            <rect x="73" y="118" width="194" height="14" rx="2" fill="rgba(0,30,0,0.15)"/>
+                            
+                            <text x="73" y="136" font-family="'Courier New', monospace" font-size="10" fill="#0f0">&#x25B6; World: Summit Concludes</text>
+                            <rect x="73" y="136" width="194" height="14" rx="2" fill="rgba(0,30,0,0.15)"/>
+                            
+                            <text x="73" y="154" font-family="'Courier New', monospace" font-size="10" fill="#0f0">&#x25B6; Health: Study on Exercise</text>
+                            <rect x="73" y="154" width="194" height="14" rx="2" fill="rgba(0,30,0,0.15)"/>
+                            
+                            <text x="73" y="172" font-family="'Courier New', monospace" font-size="10" fill="#0f0">&#x25B6; Business: Markets Rally</text>
+                            <rect x="73" y="172" width="194" height="14" rx="2" fill="rgba(0,30,0,0.15)"/>
+                            
+                            <text x="73" y="190" font-family="'Courier New', monospace" font-size="10" fill="#0f0">&#x25B6; Science: Mars Discovery</text>
+                            <rect x="73" y="190" width="194" height="14" rx="2" fill="rgba(0,30,0,0.15)"/>
+                            
+                            <text x="73" y="208" font-family="'Courier New', monospace" font-size="10" fill="#0f0">&#x25B6; Food: Best New Restaurants</text>
+                            <rect x="73" y="208" width="194" height="14" rx="2" fill="rgba(0,30,0,0.15)"/>
+                        </g>
+
+                        <!-- Screen footer -->
+                        <line x1="73" y1="206" x2="267" y2="206" stroke="rgba(0,255,0,0.12)" stroke-width="0.5"/>
+                        <rect x="73" y="210" width="36" height="12" rx="2" fill="none" stroke="rgba(0,255,0,0.15)" stroke-width="0.5"/>
+                        <text x="80" y="218" font-family="'Courier New', monospace" font-size="8" fill="#0f0">MENU</text>
+                        <rect x="225" y="210" width="36" height="12" rx="2" fill="none" stroke="rgba(0,255,0,0.15)" stroke-width="0.5"/>
+                        <text x="234" y="218" font-family="'Courier New', monospace" font-size="8" fill="#0f0">BACK</text>
+                    </g>
+
+                    <!-- === HINGE === -->
+                    <rect x="70" y="265" width="200" height="10" rx="5" fill="url(#hingeGrad)" stroke="#666" stroke-width="0.5"/>
+                    <circle cx="80" cy="270" r="6" fill="#666" stroke="#888" stroke-width="0.5"/>
+                    <circle cx="260" cy="270" r="6" fill="#666" stroke="#888" stroke-width="0.5"/>
+
+                    <!-- === KEYPAD HALF (BOTTOM) === -->
+                    <g>
+                        <rect x="20" y="275" width="300" height="245" rx="5" fill="url(#bodyDark)" filter="url(#dropShadow)" stroke="#999" stroke-width="0.8"/>
+                        <rect x="20" y="275" width="300" height="245" rx="5" fill="url(#bodyDark)"/>
+                        <rect x="20" y="275" width="300" height="245" rx="18" fill="url(#bodyDark)" stroke="#888" stroke-width="0.5"/>
+                        
+                        <!-- Bottom edge highlight -->
+                        <rect x="24" y="516" width="292" height="2" rx="1" fill="rgba(255,255,255,0.12)"/>
+
+                        <!-- === D-PAD === -->
+                        <g transform="translate(0, 290)">
+                            <!-- Up -->
+                            <rect x="155" y="0" width="30" height="16" rx="3" fill="#666" stroke="#777" stroke-width="0.5" filter="url(#keyShadow)"/>
+                            <text x="170" y="12" font-size="10" fill="#bbb" text-anchor="middle">&#x25B2;</text>
+
+                            <!-- Middle row -->
+                            <g transform="translate(0, 18)">
+                                <!-- Left -->
+                                <rect x="138" y="6" width="16" height="30" rx="3" fill="#666" stroke="#777" stroke-width="0.5" filter="url(#keyShadow)"/>
+                                <text x="146" y="26" font-size="10" fill="#bbb" text-anchor="middle">&#x25C0;</text>
+
+                                <!-- OK button -->
+                                <rect x="158" y="4" width="24" height="34" rx="5" fill="url(#okGrad)" stroke="#4a8aba" stroke-width="0.8" filter="url(#keyShadow)"/>
+                                <text x="170" y="26" font-size="10" font-weight="bold" fill="#8ac0f0" text-anchor="middle">OK</text>
+
+                                <!-- Right -->
+                                <rect x="186" y="6" width="16" height="30" rx="3" fill="#666" stroke="#777" stroke-width="0.5" filter="url(#keyShadow)"/>
+                                <text x="194" y="26" font-size="10" fill="#bbb" text-anchor="middle">&#x25B6;</text>
+                            </g>
+
+                            <!-- Down -->
+                            <rect x="155" y="54" width="30" height="16" rx="3" fill="#666" stroke="#777" stroke-width="0.5" filter="url(#keyShadow)"/>
+                            <text x="170" y="66" font-size="10" fill="#bbb" text-anchor="middle">&#x25BC;</text>
+                        </g>
+
+                        <!-- === NUMERIC KEYPAD === -->
+                        <g transform="translate(0, 385)">
+                            <!-- Row 1 -->
+                            <rect x="55" y="0" width="64" height="50" rx="7" fill="url(#keyGrad)" stroke="#999" stroke-width="0.5" filter="url(#keyShadow)"/>
+                            <text x="87" y="24" font-size="17" font-weight="bold" fill="#222" text-anchor="middle">1</text>
+
+                            <rect x="128" y="0" width="64" height="50" rx="7" fill="url(#keyGrad)" stroke="#999" stroke-width="0.5" filter="url(#keyShadow)"/>
+                            <text x="160" y="22" font-size="17" font-weight="bold" fill="#222" text-anchor="middle">2</text>
+                            <text x="160" y="36" font-size="7" fill="#666" text-anchor="middle">ABC</text>
+
+                            <rect x="201" y="0" width="64" height="50" rx="7" fill="url(#keyGrad)" stroke="#999" stroke-width="0.5" filter="url(#keyShadow)"/>
+                            <text x="233" y="22" font-size="17" font-weight="bold" fill="#222" text-anchor="middle">3</text>
+                            <text x="233" y="36" font-size="7" fill="#666" text-anchor="middle">DEF</text>
+
+                            <!-- Row 2 -->
+                            <rect x="55" y="56" width="64" height="50" rx="7" fill="url(#keyGrad)" stroke="#999" stroke-width="0.5" filter="url(#keyShadow)"/>
+                            <text x="87" y="78" font-size="17" font-weight="bold" fill="#222" text-anchor="middle">4</text>
+                            <text x="87" y="92" font-size="7" fill="#666" text-anchor="middle">GHI</text>
+
+                            <rect x="128" y="56" width="64" height="50" rx="7" fill="url(#keyGrad)" stroke="#999" stroke-width="0.5" filter="url(#keyShadow)"/>
+                            <text x="160" y="78" font-size="17" font-weight="bold" fill="#222" text-anchor="middle">5</text>
+                            <text x="160" y="92" font-size="7" fill="#666" text-anchor="middle">JKL</text>
+
+                            <rect x="201" y="56" width="64" height="50" rx="7" fill="url(#keyGrad)" stroke="#999" stroke-width="0.5" filter="url(#keyShadow)"/>
+                            <text x="233" y="78" font-size="17" font-weight="bold" fill="#222" text-anchor="middle">6</text>
+                            <text x="233" y="92" font-size="7" fill="#666" text-anchor="middle">MNO</text>
+
+                            <!-- Row 3 -->
+                            <rect x="55" y="112" width="64" height="50" rx="7" fill="url(#keyGrad)" stroke="#999" stroke-width="0.5" filter="url(#keyShadow)"/>
+                            <text x="87" y="134" font-size="17" font-weight="bold" fill="#222" text-anchor="middle">7</text>
+                            <text x="87" y="148" font-size="7" fill="#666" text-anchor="middle">PQRS</text>
+
+                            <rect x="128" y="112" width="64" height="50" rx="7" fill="url(#keyGrad)" stroke="#999" stroke-width="0.5" filter="url(#keyShadow)"/>
+                            <text x="160" y="134" font-size="17" font-weight="bold" fill="#222" text-anchor="middle">8</text>
+                            <text x="160" y="148" font-size="7" fill="#666" text-anchor="middle">TUV</text>
+
+                            <rect x="201" y="112" width="64" height="50" rx="7" fill="url(#keyGrad)" stroke="#999" stroke-width="0.5" filter="url(#keyShadow)"/>
+                            <text x="233" y="134" font-size="17" font-weight="bold" fill="#222" text-anchor="middle">9</text>
+                            <text x="233" y="148" font-size="7" fill="#666" text-anchor="middle">WXYZ</text>
+
+                            <!-- Row 4 -->
+                            <rect x="55" y="168" width="64" height="50" rx="7" fill="url(#keyGrad)" stroke="#999" stroke-width="0.5" filter="url(#keyShadow)"/>
+                            <text x="87" y="198" font-size="17" font-weight="bold" fill="#222" text-anchor="middle">*</text>
+
+                            <rect x="128" y="168" width="64" height="50" rx="7" fill="url(#keyGrad)" stroke="#999" stroke-width="0.5" filter="url(#keyShadow)"/>
+                            <text x="160" y="198" font-size="17" font-weight="bold" fill="#222" text-anchor="middle">0</text>
+
+                            <rect x="201" y="168" width="64" height="50" rx="7" fill="url(#keyGrad)" stroke="#999" stroke-width="0.5" filter="url(#keyShadow)"/>
+                            <text x="233" y="198" font-size="17" font-weight="bold" fill="#222" text-anchor="middle">#</text>
+                        </g>
+
+                        <!-- === CALL BUTTONS === -->
+                        <g transform="translate(55, 450)">
+                            <rect x="0" y="0" width="100" height="34" rx="7" fill="url(#sendGrad)" stroke="#55cc66" stroke-width="0.5" filter="url(#keyShadow)"/>
+                            <text x="50" y="21" font-size="12" font-weight="bold" fill="#fff" text-anchor="middle">SEND</text>
+
+                            <rect x="115" y="0" width="100" height="34" rx="7" fill="url(#endGrad)" stroke="#ee5555" stroke-width="0.5" filter="url(#keyShadow)"/>
+                            <text x="165" y="21" font-size="12" font-weight="bold" fill="#fff" text-anchor="middle">END</text>
+                        </g>
+                    </g>
+                </g>
+            </svg>
         </div>
         <div class="hint">hover to flip open</div>
     </div>

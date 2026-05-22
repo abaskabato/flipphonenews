@@ -17,551 +17,87 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 30px;
+    gap: 24px;
 }
 
 .phone {
-    position: relative;
     width: 340px;
-    height: 460px;
+    cursor: pointer;
+    transition: transform 0.3s;
 }
 
-/* ===== CLOSED STATE (shown by default) ===== */
-.closed {
-    position: absolute;
-    top: 0;
-    left: 0;
+.phone:hover {
+    transform: scale(1.02);
+}
+
+.phone-svg {
     width: 100%;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    border-radius: 24px 24px 18px 18px;
-    background: linear-gradient(
-        170deg,
-        #c0c0c0 0%,
-        #d4d4d4 10%,
-        #b8b8b8 30%,
-        #a0a0a0 50%,
-        #b0b0b0 70%,
-        #c8c8c8 90%,
-        #b0b0b0 100%
-    );
-    border: 1px solid #888;
-    box-shadow:
-        0 12px 50px rgba(0,0,0,0.5),
-        0 2px 0 rgba(255,255,255,0.3) inset,
-        0 -2px 0 rgba(0,0,0,0.1) inset;
-    overflow: hidden;
-    z-index: 2;
-    transition: opacity 0.3s, transform 0.3s;
+    height: auto;
+    display: block;
 }
 
-.phone:hover .closed {
-    opacity: 0;
-    transform: scale(0.95);
-    pointer-events: none;
-}
-
-.top-section {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding-top: 18px;
-    position: relative;
-    background: linear-gradient(180deg, #c8c8c8, #b0b0b0);
-    border-radius: 24px 24px 0 0;
-}
-
-.ant {
-    position: absolute;
-    top: -4px;
-    right: 40px;
-    width: 6px;
-    height: 20px;
-    background: linear-gradient(to right, #999, #bbb, #999);
-    border-radius: 3px;
-    transform: rotate(-6deg);
-    box-shadow: 0 -2px 4px rgba(0,0,0,0.2);
-}
-
-.ext-display {
-    width: 80px;
-    height: 32px;
-    background: linear-gradient(135deg, #0a1a0a, #0d2d0d);
-    border: 2px solid #666;
-    border-radius: 6px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow:
-        inset 0 0 8px rgba(0,0,0,0.6),
-        0 2px 4px rgba(0,0,0,0.2);
-}
-
-.ext-t {
-    font-family: 'Courier New', monospace;
-    font-size: 16px;
-    font-weight: bold;
-    color: #0f0;
-    letter-spacing: 3px;
-    text-shadow: 0 0 4px rgba(0,255,0,0.2);
-}
-
-.grille {
-    width: 44px;
-    height: 5px;
-    margin-top: 12px;
-    display: flex;
-    gap: 3px;
-    justify-content: center;
-}
-
-.grille::before,
-.grille::after {
-    content: '';
-    width: 3px;
-    height: 100%;
-    background: #888;
-    border-radius: 1px;
-}
-
-.badge {
-    font-size: 30px;
-    font-weight: bold;
-    color: #666;
-    margin-top: 14px;
-    letter-spacing: -2px;
-    text-shadow: 0 1px 2px rgba(0,0,0,0.15);
-}
-
-.bot-section {
-    height: 38%;
-    background: linear-gradient(180deg, #a8a8a8, #b8b8b8, #a0a0a0);
-    border-top: 1px solid #999;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 0 0 18px 18px;
-    padding: 0 40px;
-}
-
-.vent {
-    width: 100%;
-    height: 3px;
-    background: repeating-linear-gradient(
-        90deg,
-        #888 0px,
-        #888 4px,
-        transparent 4px,
-        transparent 8px
-    );
-    border-radius: 1px;
-}
-
-/* ===== OPEN STATE (shown on hover) ===== */
-.open {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    opacity: 0;
-    transform: scale(0.9);
-    transition: opacity 0.3s, transform 0.3s;
-    pointer-events: none;
-}
-
-.phone:hover .open {
+/* Closed state shown by default */
+#closedState {
     opacity: 1;
-    transform: scale(1);
-    pointer-events: auto;
+    transition: opacity 0.35s, transform 0.35s;
 }
 
-/* Screen section */
-.screen-section {
-    flex: 1;
-    background: linear-gradient(
-        170deg,
-        #c0c0c0 0%,
-        #d0d0d0 15%,
-        #b8b8b8 40%,
-        #a8a8a8 60%,
-        #b8b8b8 85%,
-        #c0c0c0 100%
-    );
-    border: 1px solid #888;
-    border-radius: 24px 24px 4px 4px;
-    box-shadow:
-        0 8px 30px rgba(0,0,0,0.4),
-        0 2px 0 rgba(255,255,255,0.3) inset;
-    padding: 16px;
-    display: flex;
-    flex-direction: column;
-    position: relative;
+/* Open state hidden by default */
+#openState {
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.35s, transform 0.35s;
 }
 
-.ant2 {
-    position: absolute;
-    top: -4px;
-    right: 40px;
-    width: 6px;
-    height: 20px;
-    background: linear-gradient(to right, #999, #bbb, #999);
-    border-radius: 3px;
-    transform: rotate(-6deg);
-    box-shadow: 0 -2px 4px rgba(0,0,0,0.2);
-}
-
-.screen-bezel {
-    flex: 1;
-    background: linear-gradient(135deg, #1a1a1a, #0d0d0d);
-    border: 2px solid #555;
-    border-radius: 10px;
-    box-shadow:
-        inset 0 0 15px rgba(0,0,0,0.6),
-        0 1px 0 rgba(255,255,255,0.05);
-    padding: 6px;
-    display: flex;
-    flex-direction: column;
-}
-
-.lcd {
-    flex: 1;
-    background: linear-gradient(180deg, #0a1a0a, #061206);
-    border-radius: 6px;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    position: relative;
-}
-
-.lcd::after {
-    content: '';
-    position: absolute;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    background: repeating-linear-gradient(
-        0deg,
-        transparent,
-        transparent 2px,
-        rgba(0,0,0,0.08) 2px,
-        rgba(0,0,0,0.08) 4px
-    );
+/* On hover: hide closed, show open */
+.phone:hover #closedState {
+    opacity: 0;
+    transform: scale(0.9) translateY(-10px);
     pointer-events: none;
-    z-index: 1;
 }
 
-.lcd-hdr {
-    display: flex;
-    justify-content: space-between;
-    padding: 5px 8px 3px;
-    border-bottom: 1px solid rgba(0,255,0,0.1);
-    font-family: 'Courier New', monospace;
-    font-size: 9px;
-    color: #0f0;
-    letter-spacing: 1px;
-    z-index: 2;
-    position: relative;
+.phone:hover #openState {
+    opacity: 1;
+    transform: translateY(0);
 }
 
-.lcd-hdr span:first-child {
-    font-weight: bold;
+/* Key press animations */
+.phone:active .nbtn rect,
+.phone:active .nbtn ellipse {
+    fill: url(#keyPressGrad);
 }
 
-.lcd-body {
-    flex: 1;
-    padding: 4px 6px;
-    overflow-y: auto;
-    z-index: 2;
-    position: relative;
-}
-
-.lcd-body div {
-    font-family: 'Courier New', monospace;
-    font-size: 10px;
-    color: #0f0;
-    padding: 3px 5px;
-    margin-bottom: 2px;
-    border: 1px solid rgba(0,255,0,0.06);
-    border-radius: 2px;
-    background: rgba(0,30,0,0.1);
-    line-height: 1.3;
-    transition: all 0.15s;
-}
-
-.lcd-body div:hover {
-    background: rgba(0,50,0,0.3);
-    border-color: rgba(0,255,0,0.25);
-    text-shadow: 0 0 3px rgba(0,255,0,0.3);
-}
-
-.lcd-body::-webkit-scrollbar { width: 3px; }
-.lcd-body::-webkit-scrollbar-track { background: transparent; }
-.lcd-body::-webkit-scrollbar-thumb { background: #0f0; border-radius: 2px; }
-
-.lcd-ftr {
-    display: flex;
-    justify-content: space-between;
-    padding: 3px 8px 4px;
-    border-top: 1px solid rgba(0,255,0,0.1);
-    z-index: 2;
-    position: relative;
-}
-
-.lcd-ftr span {
-    font-family: 'Courier New', monospace;
-    font-size: 8px;
-    color: #0f0;
-    padding: 2px 5px;
-    border: 1px solid rgba(0,255,0,0.12);
-    border-radius: 2px;
-}
-
-/* Hinge gap */
-.hinge-gap {
-    height: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: transparent;
-    position: relative;
-    z-index: 1;
-}
-
-.hinge-part {
-    width: 180px;
-    height: 8px;
-    background: linear-gradient(to bottom, #666, #888, #666);
-    border-radius: 4px;
-    box-shadow:
-        0 2px 6px rgba(0,0,0,0.3),
-        0 1px 0 rgba(255,255,255,0.1) inset;
-}
-
-/* Keypad section */
-.keypad-section {
-    height: 42%;
-    background: linear-gradient(
-        170deg,
-        #a8a8a8 0%,
-        #b8b8b8 15%,
-        #a0a0a0 40%,
-        #989898 60%,
-        #a8a8a8 85%,
-        #b0b0b0 100%
-    );
-    border: 1px solid #888;
-    border-radius: 4px 4px 18px 18px;
-    box-shadow:
-        0 8px 30px rgba(0,0,0,0.4),
-        0 -1px 0 rgba(255,255,255,0.2) inset;
-    padding: 6px 14px 14px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-}
-
-/* Navigation */
-.nav-area {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 2px;
-    margin-bottom: 2px;
-}
-
-.n-mid {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.n-up, .n-dn {
-    width: 26px;
-    height: 14px;
-    background: linear-gradient(135deg, #666, #555);
-    border: 1px solid #777;
-    border-radius: 3px;
-    color: #bbb;
-    font-size: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.3);
-}
-
-.n-l, .n-r {
-    width: 14px;
-    height: 26px;
-    background: linear-gradient(135deg, #666, #555);
-    border: 1px solid #777;
-    border-radius: 3px;
-    color: #bbb;
-    font-size: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.3);
-}
-
-.n-ok {
-    width: 34px;
-    height: 26px;
-    background: linear-gradient(135deg, #2a5a8a, #1a3a6a);
-    border: 1px solid #3a7aba;
-    border-radius: 5px;
-    color: #8ac0f0;
-    font-size: 11px;
-    font-weight: bold;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow:
-        0 2px 4px rgba(0,0,0,0.3),
-        0 1px 0 rgba(255,255,255,0.08) inset;
-}
-
-/* Numeric keypad */
-.num-area {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 6px;
-}
-
-.nbtn {
-    aspect-ratio: 1.2;
-    background: linear-gradient(145deg, #f0f0f0, #d8d8d8, #c8c8c8);
-    border-radius: 6px;
-    border: 1px solid #999;
-    box-shadow:
-        0 3px 6px rgba(0,0,0,0.25),
-        0 1px 0 rgba(255,255,255,0.7) inset,
-        0 -1px 0 rgba(0,0,0,0.05) inset;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 1px;
-    cursor: pointer;
-    transition: all 0.06s;
-}
-
-.nbtn:active {
-    transform: scale(0.94);
-    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-}
-
-.nbtn span {
-    font-size: 17px;
-    font-weight: bold;
-    color: #222;
-    line-height: 1;
-}
-
-.nbtn small {
-    font-size: 7px;
-    color: #666;
-}
-
-/* Call buttons */
-.call-area {
-    display: flex;
-    gap: 10px;
-    margin-top: 4px;
-}
-
-.snd, .end {
-    flex: 1;
-    padding: 7px;
-    border-radius: 6px;
-    font-size: 12px;
-    font-weight: bold;
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.08s;
-}
-
-.snd:active, .end:active {
+.phone:active .call-btn rect {
     transform: scale(0.95);
 }
 
-.snd {
-    background: linear-gradient(180deg, #44bb55, #228833);
-    border: 1px solid #55cc66;
-    color: #fff;
-    box-shadow:
-        0 2px 4px rgba(0,0,0,0.3),
-        0 1px 0 rgba(255,255,255,0.12) inset;
-}
-
-.end {
-    background: linear-gradient(180deg, #e04444, #b02222);
-    border: 1px solid #ee5555;
-    color: #fff;
-    box-shadow:
-        0 2px 4px rgba(0,0,0,0.3),
-        0 1px 0 rgba(255,255,255,0.12) inset;
-}
-
-/* Hint */
+/* Hint text */
 .hint {
     text-align: center;
     font-size: 12px;
-    color: rgba(255,255,255,0.15);
-    letter-spacing: 3px;
+    color: rgba(255,255,255,0.12);
+    letter-spacing: 4px;
     text-transform: uppercase;
+    transition: color 0.3s;
+}
+
+.phone:hover ~ .hint {
+    color: rgba(255,255,255,0.25);
 }
 
 /* Responsive */
 @media (max-width: 400px) {
     .phone {
         width: 290px;
-        height: 400px;
     }
 
-    .ext-display {
-        width: 70px;
-        height: 28px;
+    .hint {
+        font-size: 10px;
     }
+}
 
-    .ext-t {
-        font-size: 14px;
-    }
-
-    .badge {
-        font-size: 26px;
-    }
-
-    .nbtn span {
-        font-size: 15px;
-    }
-
-    .nbtn small {
-        font-size: 6px;
-    }
-
-    .snd, .end {
-        font-size: 11px;
-        padding: 6px;
-    }
-
-    .lcd-body div {
-        font-size: 9px;
-        padding: 2px 4px;
-    }
-
-    .num-area {
-        gap: 4px;
-    }
-
-    .call-area {
-        gap: 8px;
-    }
-
-    .hinge-part {
-        width: 150px;
+@media (max-width: 320px) {
+    .phone {
+        width: 260px;
     }
 }
