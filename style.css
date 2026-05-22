@@ -9,140 +9,177 @@ body {
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    background: #1a1a2e;
-    perspective: 1200px;
+    background: #2a1a0a;
+    background-image:
+        radial-gradient(ellipse at 50% 80%, #3a2a1a 0%, #1a0a00 100%);
+    font-family: Arial, sans-serif;
+    overflow: hidden;
 }
 
-.container {
-    perspective: 1200px;
+.scene {
+    perspective: 900px;
+    perspective-origin: 50% 40%;
 }
 
-.phone {
-    position: relative;
-    width: 340px;
-    height: 480px;
-    transform-style: preserve-3d;
+.phone-wrapper:hover .top-half {
+    transform: rotateX(-155deg);
 }
 
-.flip {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 48%;
-    transform-origin: bottom center;
-    transform-style: preserve-3d;
-    transition: transform 0.8s cubic-bezier(0.4, 0.2, 0.2, 1);
-    z-index: 2;
-}
-
-.flip:hover {
-    transform: rotateX(-160deg);
-}
-
-.flip-front {
+/* Front of top half (external) */
+.top-front {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(170deg, #2a2a2a 0%, #1a1a1a 40%, #0d0d0d 100%);
-    border-radius: 20px 20px 4px 4px;
     backface-visibility: hidden;
-    border: 2px solid #333;
-    box-shadow: 
-        inset 0 0 30px rgba(0,0,0,0.8),
-        0 10px 40px rgba(0,0,0,0.6);
+    background: linear-gradient(
+        180deg,
+        #2a2a2a 0%,
+        #1e1e1e 20%,
+        #151515 50%,
+        #1a1a1a 80%,
+        #222 100%
+    );
+    border-radius: 18px 18px 6px 6px;
+    border: 1.5px solid #333;
+    box-shadow:
+        inset 0 0 40px rgba(0,0,0,0.6),
+        inset 0 1px 0 rgba(255,255,255,0.04),
+        0 8px 40px rgba(0,0,0,0.7);
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding-top: 30px;
+    padding-top: 24px;
 }
 
-.external-screen {
-    width: 100px;
-    height: 36px;
-    background: linear-gradient(135deg, #0a1a0a, #0d2d0d);
-    border: 3px solid #444;
+/* Top edge bevel */
+.top-front::before {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 8px;
+    right: 8px;
+    height: 2px;
+    background: rgba(255,255,255,0.03);
+    border-radius: 1px;
+}
+
+/* External LCD bezel */
+.ext-bezel {
+    width: 96px;
+    height: 40px;
+    background: linear-gradient(135deg, #1a1a1a, #0d0d0d);
+    border: 2px solid #3a3a3a;
     border-radius: 6px;
-    color: #0f0;
-    font-family: 'Courier New', monospace;
-    font-size: 14px;
+    box-shadow:
+        inset 0 0 8px rgba(0,0,0,0.8),
+        0 1px 3px rgba(0,0,0,0.5);
+    padding: 3px;
+}
+
+.ext-lcd {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #081a08, #0a2a0a);
+    border-radius: 3px;
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    padding: 4px 8px;
-    box-shadow: inset 0 0 10px rgba(0,255,0,0.1);
+    justify-content: center;
+    box-shadow: inset 0 0 6px rgba(0,255,0,0.05);
 }
 
-.ext-time {
-    letter-spacing: 2px;
+.lcd-time {
+    font-family: 'Courier New', monospace;
+    font-size: 16px;
     font-weight: bold;
+    color: #0f0;
+    letter-spacing: 3px;
+    text-shadow: 0 0 4px rgba(0,255,0,0.3);
 }
 
-.camera {
-    width: 8px;
-    height: 8px;
-    background: radial-gradient(circle, #222, #111);
-    border: 1px solid #444;
-    border-radius: 50%;
+/* Earpiece */
+.earpiece {
+    width: 40px;
+    height: 4px;
+    background: linear-gradient(to bottom, #3a3a3a, #1a1a1a);
+    border-radius: 2px;
     margin-top: 18px;
-    box-shadow: inset 0 0 4px rgba(0,0,0,0.8);
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.5);
 }
 
-.brand {
-    margin-top: 20px;
-    font-size: 32px;
+/* Brand logo */
+.top-front-brand {
+    font-size: 28px;
     font-weight: bold;
-    color: #555;
-    font-family: Arial, sans-serif;
+    color: #4a4a4a;
+    margin-top: 22px;
     letter-spacing: -2px;
     text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+    font-family: 'Arial', sans-serif;
 }
 
-.antenna {
+/* Antenna stub */
+.antenna-stub {
     position: absolute;
-    top: -8px;
-    right: 30px;
-    width: 6px;
-    height: 18px;
-    background: linear-gradient(to right, #444, #666, #444);
+    top: -6px;
+    right: 32px;
+    width: 5px;
+    height: 16px;
+    background: linear-gradient(to right, #2a2a2a, #4a4a4a, #2a2a2a);
     border-radius: 3px 3px 0 0;
-    transform: rotate(-5deg);
+    transform: rotate(-4deg);
+    box-shadow: -1px -1px 2px rgba(0,0,0,0.3);
 }
 
-.flip-back {
+/* Inner side of top half (screen) */
+.top-inner {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: #111;
-    border-radius: 20px 20px 4px 4px;
     backface-visibility: hidden;
     transform: rotateX(180deg);
-    border: 2px solid #333;
-    box-shadow: 
-        inset 0 0 30px rgba(0,0,0,0.8),
-        0 10px 40px rgba(0,0,0,0.6);
-    padding: 14px;
+    background: linear-gradient(180deg, #1a1a1a, #111);
+    border-radius: 18px 18px 6px 6px;
+    border: 1.5px solid #333;
+    box-shadow:
+        inset 0 0 40px rgba(0,0,0,0.6),
+        0 8px 40px rgba(0,0,0,0.7);
+    padding: 12px;
     display: flex;
     flex-direction: column;
 }
 
-.screen {
+/* Screen bezel */
+.screen-bezel {
     flex: 1;
-    background: linear-gradient(135deg, #0a1a0a, #0d2d0d);
-    border: 3px solid #333;
-    border-radius: 8px;
+    background: linear-gradient(135deg, #0d0d0d, #1a1a1a);
+    border: 2px solid #2a2a2a;
+    border-radius: 10px;
+    box-shadow:
+        inset 0 0 15px rgba(0,0,0,0.8),
+        0 1px 0 rgba(255,255,255,0.03);
+    padding: 6px;
+    display: flex;
+    flex-direction: column;
+}
+
+.lcd-screen {
+    flex: 1;
+    background: linear-gradient(180deg, #0a1a0a, #061206);
+    border-radius: 6px;
+    border: 1px solid #0a0a0a;
+    box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    box-shadow: inset 0 0 20px rgba(0,255,0,0.05);
     position: relative;
 }
 
-.screen::after {
+/* Scan lines */
+.lcd-screen::after {
     content: '';
     position: absolute;
     top: 0;
@@ -153,292 +190,432 @@ body {
         0deg,
         transparent,
         transparent 2px,
-        rgba(0,0,0,0.15) 2px,
-        rgba(0,0,0,0.15) 4px
+        rgba(0,0,0,0.12) 2px,
+        rgba(0,0,0,0.12) 4px
     );
     pointer-events: none;
+    z-index: 1;
 }
 
-.screen-header {
+/* LCD glare */
+.lcd-screen::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(
+        ellipse at 30% 30%,
+        rgba(0,255,0,0.03) 0%,
+        transparent 60%
+    );
+    pointer-events: none;
+    z-index: 2;
+}
+
+.lcd-header {
     display: flex;
     justify-content: space-between;
-    padding: 8px 10px 4px;
-    border-bottom: 1px solid rgba(0,255,0,0.2);
+    padding: 6px 8px 3px;
+    border-bottom: 1px solid rgba(0,255,0,0.15);
+    font-family: 'Courier New', monospace;
+    font-size: 10px;
+    color: #0f0;
+    letter-spacing: 1px;
+    z-index: 3;
+    position: relative;
+}
+
+.lcd-carrier {
+    font-weight: bold;
+}
+
+.lcd-battery {
+    font-size: 9px;
+}
+
+.lcd-content {
+    flex: 1;
+    padding: 4px 6px;
+    overflow-y: auto;
+    z-index: 3;
+    position: relative;
+}
+
+.lcd-news {
+    font-family: 'Courier New', monospace;
     font-size: 11px;
     color: #0f0;
+    padding: 4px 6px;
+    margin-bottom: 2px;
+    border: 1px solid rgba(0,255,0,0.1);
+    border-radius: 2px;
+    background: rgba(0,30,0,0.15);
+    line-height: 1.3;
+    transition: all 0.2s;
+}
+
+.lcd-news:hover {
+    background: rgba(0,50,0,0.3);
+    border-color: rgba(0,255,0,0.3);
+    text-shadow: 0 0 4px rgba(0,255,0,0.4);
+}
+
+.lcd-content::-webkit-scrollbar { width: 3px; }
+.lcd-content::-webkit-scrollbar-track { background: transparent; }
+.lcd-content::-webkit-scrollbar-thumb { background: #0f0; border-radius: 2px; }
+
+.lcd-footer {
+    display: flex;
+    justify-content: space-between;
+    padding: 3px 8px 5px;
+    border-top: 1px solid rgba(0,255,0,0.15);
+    z-index: 3;
+    position: relative;
+}
+
+.lcd-soft {
     font-family: 'Courier New', monospace;
+    font-size: 9px;
+    color: #0f0;
+    padding: 2px 6px;
+    border: 1px solid rgba(0,255,0,0.2);
+    border-radius: 2px;
 }
 
-.carrier {
-    font-weight: bold;
-    letter-spacing: 1px;
+/* Top edge / thickness */
+.top-edge {
+    position: absolute;
+    bottom: -6px;
+    left: 8px;
+    right: 8px;
+    height: 6px;
+    background: linear-gradient(to bottom, #222, #1a1a1a);
+    border-radius: 0 0 3px 3px;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.5);
 }
 
-.bat {
-    font-size: 10px;
+/* ========== BOTTOM HALF (BASE) ========== */
+.bottom-half {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 56%;
+    background: linear-gradient(
+        180deg,
+        #222 0%,
+        #1a1a1a 15%,
+        #151515 50%,
+        #181818 85%,
+        #1e1e1e 100%
+    );
+    border-radius: 6px 6px 18px 18px;
+    border: 1.5px solid #333;
+    box-shadow:
+        inset 0 0 40px rgba(0,0,0,0.6),
+        inset 0 -1px 0 rgba(255,255,255,0.04),
+        0 8px 40px rgba(0,0,0,0.7);
+    padding: 4px 12px 14px;
+    display: flex;
+    flex-direction: column;
 }
 
-.screen-body {
+/* Bottom edge bevel */
+.bottom-half::before {
+    content: '';
+    position: absolute;
+    bottom: 2px;
+    left: 8px;
+    right: 8px;
+    height: 2px;
+    background: rgba(255,255,255,0.03);
+    border-radius: 1px;
+}
+
+/* Bottom edge thickness */
+.bottom-edge {
+    position: absolute;
+    top: -6px;
+    left: 8px;
+    right: 8px;
+    height: 6px;
+    background: linear-gradient(to top, #222, #1a1a1a);
+    border-radius: 3px 3px 0 0;
+    box-shadow: inset 0 -1px 2px rgba(0,0,0,0.5);
+}
+
+/* Hinge */
+.hinge-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 6px;
+    margin-bottom: 8px;
+    margin-top: 2px;
+    gap: 4px;
+}
+
+.hinge-groove {
+    width: 70%;
+    height: 4px;
+    background: linear-gradient(to bottom, #333, #555, #333);
+    border-radius: 2px;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.5);
+}
+
+.hinge-dot {
+    width: 8px;
+    height: 8px;
+    background: radial-gradient(circle at 35% 35%, #666, #333);
+    border-radius: 50%;
+    border: 1px solid #444;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.3);
+}
+
+/* Keypad area */
+.keypad-area {
     flex: 1;
-    padding: 8px 10px;
-    overflow-y: auto;
     display: flex;
     flex-direction: column;
     gap: 6px;
 }
 
-.news-item {
-    font-family: 'Courier New', monospace;
-    font-size: 12px;
-    color: #0f0;
-    padding: 6px 8px;
-    border: 1px solid rgba(0,255,0,0.2);
-    border-radius: 3px;
-    background: rgba(0,30,0,0.2);
-    transition: all 0.2s;
-    line-height: 1.3;
-}
-
-.news-item:hover {
-    background: rgba(0,40,0,0.4);
-    border-color: #0f0;
-    text-shadow: 0 0 5px rgba(0,255,0,0.5);
-}
-
-.screen-body::-webkit-scrollbar {
-    width: 4px;
-}
-
-.screen-body::-webkit-scrollbar-track {
-    background: #0a1a0a;
-}
-
-.screen-body::-webkit-scrollbar-thumb {
-    background: #0f0;
-    border-radius: 2px;
-}
-
-.base {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 55%;
-    background: linear-gradient(170deg, #2a2a2a 0%, #1a1a1a 40%, #0d0d0d 100%);
-    border-radius: 4px 4px 20px 20px;
-    border: 2px solid #333;
-    box-shadow: 
-        inset 0 0 30px rgba(0,0,0,0.8),
-        0 10px 40px rgba(0,0,0,0.6);
-    padding: 10px 14px 14px;
-}
-
-.hinge {
-    width: 80%;
-    height: 6px;
-    margin: 0 auto 10px;
-    background: linear-gradient(to bottom, #444, #666, #444);
-    border-radius: 3px;
-    position: relative;
-}
-
-.hinge::before,
-.hinge::after {
-    content: '';
-    position: absolute;
-    width: 10px;
-    height: 10px;
-    background: #555;
-    border-radius: 50%;
-    top: -2px;
-}
-
-.hinge::before { left: -5px; }
-.hinge::after { right: -5px; }
-
-.keypad {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.nav {
+/* Navigation pad */
+.nav-pad {
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 2px;
-    margin-bottom: 4px;
+    margin-bottom: 2px;
 }
 
-.nav-mid {
+.nav-row.mid {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
 }
 
-.nav-up, .nav-down {
+.nav-btn {
+    background: linear-gradient(135deg, #3a3a3a, #2a2a2a);
+    border: 1px solid #4a4a4a;
+    border-radius: 3px;
+    color: #888;
+    font-size: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.3);
+}
+
+.nav-btn.up, .nav-btn.down {
+    width: 22px;
+    height: 12px;
+}
+
+.nav-btn.left, .nav-btn.right {
+    width: 12px;
+    height: 22px;
+}
+
+.nav-ok {
     width: 28px;
-    height: 14px;
-    background: linear-gradient(to bottom, #444, #333);
-    border-radius: 3px;
-    border: 1px solid #555;
-    color: #aaa;
-    font-size: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.nav-left, .nav-right {
-    width: 14px;
-    height: 28px;
-    background: linear-gradient(to right, #444, #333);
-    border-radius: 3px;
-    border: 1px solid #555;
-    color: #aaa;
-    font-size: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.ok {
-    width: 32px;
-    height: 28px;
-    background: linear-gradient(to bottom, #1a4a7a, #0d3060);
+    height: 22px;
+    background: linear-gradient(135deg, #1a3a5a, #0d2040);
+    border: 1px solid #2a5a8a;
     border-radius: 4px;
-    border: 1px solid #2a6aaa;
-    color: #8cf;
-    font-size: 11px;
+    color: #4a8aca;
+    font-size: 10px;
     font-weight: bold;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.5);
+    box-shadow:
+        0 1px 3px rgba(0,0,0,0.4),
+        inset 0 1px 0 rgba(255,255,255,0.05);
 }
 
-.keys {
+/* Numeric keypad */
+.num-pad {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 5px;
 }
 
-.key {
-    aspect-ratio: 1.2;
-    background: linear-gradient(135deg, #e8e8e8, #c0c0c0);
+.num-btn {
+    aspect-ratio: 1.1;
+    background: linear-gradient(
+        135deg,
+        #e8e8e8 0%,
+        #d8d8d8 30%,
+        #c8c8c8 60%,
+        #b8b8b8 100%
+    );
     border-radius: 5px;
-    border: 1px solid #aaa;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    border: 1px solid #999;
+    box-shadow:
+        0 2px 4px rgba(0,0,0,0.35),
+        inset 0 1px 0 rgba(255,255,255,0.6),
+        inset 0 -1px 0 rgba(0,0,0,0.05);
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    font-size: 15px;
+    position: relative;
+    transition: all 0.1s;
+}
+
+.num-btn:active {
+    transform: scale(0.96);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.3);
+}
+
+.num {
+    font-size: 16px;
     font-weight: bold;
     color: #222;
+    line-height: 1;
+}
+
+.sub {
+    font-size: 7px;
+    color: #666;
+    margin-top: 1px;
+    font-weight: normal;
+}
+
+/* Call buttons */
+.call-pad {
+    display: flex;
+    gap: 8px;
+    margin-top: 2px;
+}
+
+.call-btn {
+    flex: 1;
+    padding: 7px;
+    border-radius: 5px;
+    font-size: 12px;
+    font-weight: bold;
+    text-align: center;
     font-family: Arial, sans-serif;
     cursor: pointer;
     transition: all 0.1s;
 }
 
-.key:active {
-    transform: scale(0.95);
-    box-shadow: 0 1px 2px rgba(0,0,0,0.2);
-}
-
-.key sub {
-    font-size: 8px;
-    font-weight: normal;
-    color: #555;
-    margin-top: -2px;
-}
-
-.key-star,
-.key-pound {
-    background: linear-gradient(135deg, #d0d0d0, #b0b0b0);
-}
-
-.key-0 {
-    background: linear-gradient(135deg, #e8e8e8, #c0c0c0);
-}
-
-.talk-keys {
-    display: flex;
-    gap: 10px;
-    margin-top: 2px;
+.call-btn:active {
+    transform: scale(0.97);
 }
 
 .send {
-    flex: 1;
-    padding: 8px;
-    background: linear-gradient(to bottom, #33aa44, #228833);
-    border: 1px solid #44cc55;
-    border-radius: 5px;
+    background: linear-gradient(180deg, #44bb55, #228833);
+    border: 1px solid #55cc66;
     color: #fff;
-    font-size: 12px;
-    font-weight: bold;
-    text-align: center;
-    font-family: Arial, sans-serif;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    box-shadow:
+        0 2px 4px rgba(0,0,0,0.4),
+        inset 0 1px 0 rgba(255,255,255,0.15);
 }
 
 .end {
-    flex: 1;
-    padding: 8px;
-    background: linear-gradient(to bottom, #cc3333, #aa2222);
-    border: 1px solid #ee4444;
-    border-radius: 5px;
+    background: linear-gradient(180deg, #e04444, #b02222);
+    border: 1px solid #ee5555;
     color: #fff;
-    font-size: 12px;
-    font-weight: bold;
-    text-align: center;
-    font-family: Arial, sans-serif;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    box-shadow:
+        0 2px 4px rgba(0,0,0,0.4),
+        inset 0 1px 0 rgba(255,255,255,0.15);
 }
 
+/* Microphone hole */
+.mic-hole {
+    position: absolute;
+    bottom: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 16px;
+    height: 3px;
+    background: #0a0a0a;
+    border-radius: 1px;
+    box-shadow: 0 0 2px rgba(0,0,0,0.5);
+}
+
+/* Hint text */
+.hint {
+    text-align: center;
+    margin-top: 30px;
+    font-family: Arial, sans-serif;
+    font-size: 13px;
+    color: rgba(255,255,255,0.15);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+/* Phone drop shadow on surface */
+.phone-wrapper::after {
+    content: '';
+    position: absolute;
+    bottom: -20px;
+    left: 10%;
+    width: 80%;
+    height: 30px;
+    background: radial-gradient(
+        ellipse at 50% 50%,
+        rgba(0,0,0,0.4) 0%,
+        transparent 70%
+    );
+    transform: rotateX(40deg);
+    pointer-events: none;
+}
+
+/* ========== RESPONSIVE ========== */
 @media (max-width: 400px) {
     .phone {
         width: 280px;
         height: 400px;
     }
 
-    .flip {
+    .top-half {
         height: 46%;
     }
 
-    .base {
+    .bottom-half {
         height: 57%;
     }
 
-    .external-screen {
+    .ext-bezel {
         width: 80px;
-        height: 30px;
-        font-size: 12px;
+        height: 34px;
     }
 
-    .brand {
-        font-size: 28px;
+    .lcd-time {
+        font-size: 14px;
     }
 
-    .screen {
-        padding: 8px;
+    .top-front-brand {
+        font-size: 24px;
+        margin-top: 18px;
     }
 
-    .news-item {
-        font-size: 10px;
-        padding: 4px 6px;
+    .num {
+        font-size: 14px;
     }
 
-    .key {
-        font-size: 13px;
+    .sub {
+        font-size: 6px;
     }
 
-    .key sub {
-        font-size: 7px;
-    }
-
-    .send, .end {
+    .call-btn {
         font-size: 11px;
         padding: 6px;
+    }
+
+    .lcd-news {
+        font-size: 10px;
+        padding: 3px 5px;
+    }
+
+    .hint {
+        font-size: 11px;
+        margin-top: 24px;
     }
 }
