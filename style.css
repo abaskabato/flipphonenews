@@ -10,472 +10,435 @@ body {
     align-items: center;
     min-height: 100vh;
     background: #1a1a2e;
-    font-family: 'Courier New', monospace;
-    background-image: 
-        radial-gradient(circle at 20% 30%, rgba(100, 100, 200, 0.1) 0%, transparent 20%),
-        radial-gradient(circle at 80% 70%, rgba(100, 100, 200, 0.1) 0%, transparent 20%);
+    perspective: 1200px;
 }
 
-.flip-phone-container {
-    perspective: 1000px;
+.container {
+    perspective: 1200px;
 }
 
-.flip-phone {
+.phone {
     position: relative;
-    width: 280px;
+    width: 340px;
     height: 480px;
     transform-style: preserve-3d;
-    transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-    cursor: pointer;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
 }
 
-.flip-phone:hover {
-    transform: rotateY(180deg);
-}
-
-/* External display (front of closed phone) */
-.external-display {
+.flip {
     position: absolute;
-    top: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 80px;
-    height: 20px;
-    background: #000;
-    color: #0f0;
-    font-family: 'Courier New', monospace;
-    font-size: 10px;
-    text-align: center;
-    padding: 4px;
-    border-radius: 4px;
-    border: 1px solid #333;
-}
-
-.external-time {
-    font-size: 12px;
-    letter-spacing: 1px;
-}
-
-.external-signal, .external-battery {
-    font-size: 10px;
-    margin-top: 2px;
-}
-
-/* Main phone body */
-.phone-body {
-    position: relative;
+    top: 0;
+    left: 0;
     width: 100%;
-    height: 100%;
-    background: linear-gradient(to bottom, #8b0000, #a52a2a);
-    border-radius: 12px;
-    overflow: hidden;
-    border: 2px solid #555;
-    box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.3);
+    height: 48%;
+    transform-origin: bottom center;
+    transform-style: preserve-3d;
+    transition: transform 0.8s cubic-bezier(0.4, 0.2, 0.2, 1);
+    z-index: 2;
 }
 
-/* Keypad section */
-.keypad-section {
-    position: relative;
-    width: 100%;
-    height: 60%;
-    padding: 15px;
+.flip:hover {
+    transform: rotateX(-160deg);
 }
 
-/* Navigation controls */
-.nav-controls {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 15px;
-    padding: 0 10px;
-}
-
-.nav-controls-middle {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.nav-up, .nav-down, .nav-left, .nav-right {
-    width: 24px;
-    height: 24px;
-    background: #333;
-    color: #fff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 14px;
-    font-weight: bold;
-    border-radius: 4px;
-    border: 1px solid #555;
-}
-
-.nav-ok {
-    width: 28px;
-    height: 24px;
-    background: #0066cc;
-    color: #fff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 12px;
-    font-weight: bold;
-    border-radius: 4px;
-    border: 1px solid #0044aa;
-}
-
-/* Numeric keypad */
-.numeric-keypad {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
-    margin-bottom: 10px;
-}
-
-.key {
-    aspect-ratio: 1;
-    background: #eee;
-    color: #333;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    font-size: 16px;
-    font-weight: bold;
-    border-radius: 6px;
-    border: 1px solid #ccc;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    position: relative;
-    overflow: hidden;
-}
-
-.key small {
-    font-size: 10px;
-    opacity: 0.7;
-    margin-top: 2px;
-}
-
-.key:active {
-    transform: scale(0.95);
-    background: #ddd;
-}
-
-/* Function keys */
-.function-keys {
-    display: flex;
-    justify-content: space-between;
-    padding: 0 10px;
-}
-
-.func-key {
-    flex: 1;
-    margin: 0 5px;
-    padding: 8px;
-    background: linear-gradient(to bottom, #ff6600, #cc5500);
-    color: #fff;
-    text-align: center;
-    font-size: 12px;
-    font-weight: bold;
-    border-radius: 4px;
-    border: 1px solid #ff8800;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-}
-
-/* Main screen (appears when flipped) */
-.main-screen {
+.flip-front {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: #000;
-    color: #0f0;
-    font-family: 'Courier New', monospace;
-    overflow: hidden;
-    display: none;
+    background: linear-gradient(170deg, #2a2a2a 0%, #1a1a1a 40%, #0d0d0d 100%);
+    border-radius: 20px 20px 4px 4px;
+    backface-visibility: hidden;
+    border: 2px solid #333;
+    box-shadow: 
+        inset 0 0 30px rgba(0,0,0,0.8),
+        0 10px 40px rgba(0,0,0,0.6);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 30px;
 }
 
-.flip-phone:hover .main-screen {
-    display: block;
+.external-screen {
+    width: 100px;
+    height: 36px;
+    background: linear-gradient(135deg, #0a1a0a, #0d2d0d);
+    border: 3px solid #444;
+    border-radius: 6px;
+    color: #0f0;
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 4px 8px;
+    box-shadow: inset 0 0 10px rgba(0,255,0,0.1);
+}
+
+.ext-time {
+    letter-spacing: 2px;
+    font-weight: bold;
+}
+
+.camera {
+    width: 8px;
+    height: 8px;
+    background: radial-gradient(circle, #222, #111);
+    border: 1px solid #444;
+    border-radius: 50%;
+    margin-top: 18px;
+    box-shadow: inset 0 0 4px rgba(0,0,0,0.8);
+}
+
+.brand {
+    margin-top: 20px;
+    font-size: 32px;
+    font-weight: bold;
+    color: #555;
+    font-family: Arial, sans-serif;
+    letter-spacing: -2px;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+}
+
+.antenna {
+    position: absolute;
+    top: -8px;
+    right: 30px;
+    width: 6px;
+    height: 18px;
+    background: linear-gradient(to right, #444, #666, #444);
+    border-radius: 3px 3px 0 0;
+    transform: rotate(-5deg);
+}
+
+.flip-back {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #111;
+    border-radius: 20px 20px 4px 4px;
+    backface-visibility: hidden;
+    transform: rotateX(180deg);
+    border: 2px solid #333;
+    box-shadow: 
+        inset 0 0 30px rgba(0,0,0,0.8),
+        0 10px 40px rgba(0,0,0,0.6);
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+}
+
+.screen {
+    flex: 1;
+    background: linear-gradient(135deg, #0a1a0a, #0d2d0d);
+    border: 3px solid #333;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: inset 0 0 20px rgba(0,255,0,0.05);
+    position: relative;
+}
+
+.screen::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0,0,0,0.15) 2px,
+        rgba(0,0,0,0.15) 4px
+    );
+    pointer-events: none;
 }
 
 .screen-header {
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    padding: 12px;
-    border-bottom: 1px solid #333;
+    padding: 8px 10px 4px;
+    border-bottom: 1px solid rgba(0,255,0,0.2);
+    font-size: 11px;
+    color: #0f0;
+    font-family: 'Courier New', monospace;
 }
 
-.carrier-logo {
-    font-size: 14px;
+.carrier {
     font-weight: bold;
     letter-spacing: 1px;
 }
 
-.signal-strength {
-    font-size: 12px;
+.bat {
+    font-size: 10px;
 }
 
-.screen-content {
+.screen-body {
     flex: 1;
-    padding: 15px;
+    padding: 8px 10px;
     overflow-y: auto;
-}
-
-.news-title {
-    background: rgba(0, 30, 0, 0.3);
-    border: 1px solid #0f0;
-    border-radius: 6px;
-    padding: 12px;
-    margin: 10px 0;
-    font-size: 14px;
-    line-height: 1.4;
-    transition: all 0.2s ease;
-    position: relative;
-    overflow: hidden;
-}
-
-.news-title::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(
-        90deg,
-        transparent,
-        rgba(0, 255, 0, 0.1),
-        transparent
-    );
-    transition: left 0.5s;
-}
-
-.news-title:hover::before {
-    left: 100%;
-}
-
-.news-title:hover {
-    background: rgba(0, 40, 0, 0.4);
-    transform: translateX(-2px);
-    box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
-}
-
-/* Scrollbar for WebKit browsers */
-.screen-content::-webkit-scrollbar {
-    width: 6px;
-}
-
-.screen-content::-webkit-scrollbar-track {
-    background: #111;
-}
-
-.screen-content::-webkit-scrollbar-thumb {
-    background: #0f0;
-    border-radius: 3px;
-}
-
-.screen-content::-webkit-scrollbar-thumb:hover {
-    background: #0ff;
-}
-
-.screen-footer {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 12px;
-    border-top: 1px solid #333;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.news-item {
+    font-family: 'Courier New', monospace;
     font-size: 12px;
-}
-
-.soft-left, .soft-right {
-    background: rgba(0, 30, 0, 0.2);
-    border: 1px solid #0f0;
-    border-radius: 4px;
-    padding: 4px 8px;
-    cursor: pointer;
+    color: #0f0;
+    padding: 6px 8px;
+    border: 1px solid rgba(0,255,0,0.2);
+    border-radius: 3px;
+    background: rgba(0,30,0,0.2);
     transition: all 0.2s;
+    line-height: 1.3;
 }
 
-.soft-left:hover, .soft-right:hover {
-    background: rgba(0, 40, 0, 0.3);
+.news-item:hover {
+    background: rgba(0,40,0,0.4);
+    border-color: #0f0;
+    text-shadow: 0 0 5px rgba(0,255,0,0.5);
 }
 
-/* Add some scan line effect to the screen */
-.main-screen::after {
-    content: '';
+.screen-body::-webkit-scrollbar {
+    width: 4px;
+}
+
+.screen-body::-webkit-scrollbar-track {
+    background: #0a1a0a;
+}
+
+.screen-body::-webkit-scrollbar-thumb {
+    background: #0f0;
+    border-radius: 2px;
+}
+
+.base {
     position: absolute;
-    top: 0;
+    bottom: 0;
     left: 0;
     width: 100%;
-    height: 100%;
-    background: 
-        repeating-linear-gradient(
-            0deg,
-            transparent,
-            transparent 2px,
-            rgba(0, 0, 0, 0.1) 2px,
-            rgba(0, 0, 0, 0.1) 4px
-        );
-    pointer-events: none;
-    opacity: 0.3;
-}
-
-/* Add slight curvature to make it look more like a real flip phone */
-.flip-phone {
-    border-radius: 16px;
-}
-
-.phone-body {
-    border-radius: 14px;
-}
-
-/* Add wear and tear effects */
-.flip-phone::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: 
-        radial-gradient(circle at 30% 30%, rgba(255,255,255,0.05) 0%, transparent 50%),
-        radial-gradient(circle at 70% 70%, rgba(255,255,255,0.03) 0%, transparent 50%);
-    pointer-events: none;
-    border-radius: inherit;
-}
-
-/* Make the flip more realistic with a slight 3D effect */
-.flip-phone {
-    transform-style: preserve-3d;
-}
-
-.flip-phone:hover {
-    transform: rotateY(180deg) translateZ(10px);
-}
-
-/* Add hinge effect */
-.flip-phone {
-    transform-origin: left center;
-}
-
-.flip-phone:hover {
-    transform: rotateY(180deg) translateZ(10px);
-}
-
-/* Add some texture to the phone body */
-.phone-body {
-    background-image: 
-        linear-gradient(45deg, rgba(255,255,255,0.05) 25%, transparent 25%),
-        linear-gradient(-45deg, rgba(255,255,255,0.05) 25%, transparent 25%),
-        linear-gradient(45deg, transparent 75%, rgba(255,255,255,0.05) 75%),
-        linear-gradient(-45deg, transparent 75%, rgba(255,255,255,0.05) 75%);
-    background-size: 20px 20px;
-    background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
-}
-
-/* Add a slight shadow for depth */
-.flip-phone {
+    height: 55%;
+    background: linear-gradient(170deg, #2a2a2a 0%, #1a1a1a 40%, #0d0d0d 100%);
+    border-radius: 4px 4px 20px 20px;
+    border: 2px solid #333;
     box-shadow: 
-        0 15px 35px rgba(0, 0, 0, 0.4),
-        inset 0 0 20px rgba(0, 0, 0, 0.2);
+        inset 0 0 30px rgba(0,0,0,0.8),
+        0 10px 40px rgba(0,0,0,0.6);
+    padding: 10px 14px 14px;
 }
 
-/* Make sure the external display is visible when phone is closed */
-.flip-phone:hover .external-display {
-    display: none;
+.hinge {
+    width: 80%;
+    height: 6px;
+    margin: 0 auto 10px;
+    background: linear-gradient(to bottom, #444, #666, #444);
+    border-radius: 3px;
+    position: relative;
 }
 
-/* Show external display when phone is closed (not hovered) */
-.flip-phone:not(:hover) .external-display {
-    display: block;
+.hinge::before,
+.hinge::after {
+    content: '';
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background: #555;
+    border-radius: 50%;
+    top: -2px;
 }
 
-/* Hide keypad when phone is open */
-.flip-phone:hover .keypad-section {
-    display: none;
+.hinge::before { left: -5px; }
+.hinge::after { right: -5px; }
+
+.keypad {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
 }
 
-/* Show keypad when phone is closed */
-.flip-phone:not(:hover) .keypad-section {
-    display: block;
+.nav {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    margin-bottom: 4px;
 }
 
-/* Responsive adjustments */
+.nav-mid {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.nav-up, .nav-down {
+    width: 28px;
+    height: 14px;
+    background: linear-gradient(to bottom, #444, #333);
+    border-radius: 3px;
+    border: 1px solid #555;
+    color: #aaa;
+    font-size: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.nav-left, .nav-right {
+    width: 14px;
+    height: 28px;
+    background: linear-gradient(to right, #444, #333);
+    border-radius: 3px;
+    border: 1px solid #555;
+    color: #aaa;
+    font-size: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ok {
+    width: 32px;
+    height: 28px;
+    background: linear-gradient(to bottom, #1a4a7a, #0d3060);
+    border-radius: 4px;
+    border: 1px solid #2a6aaa;
+    color: #8cf;
+    font-size: 11px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.5);
+}
+
+.keys {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 5px;
+}
+
+.key {
+    aspect-ratio: 1.2;
+    background: linear-gradient(135deg, #e8e8e8, #c0c0c0);
+    border-radius: 5px;
+    border: 1px solid #aaa;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    font-weight: bold;
+    color: #222;
+    font-family: Arial, sans-serif;
+    cursor: pointer;
+    transition: all 0.1s;
+}
+
+.key:active {
+    transform: scale(0.95);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+}
+
+.key sub {
+    font-size: 8px;
+    font-weight: normal;
+    color: #555;
+    margin-top: -2px;
+}
+
+.key-star,
+.key-pound {
+    background: linear-gradient(135deg, #d0d0d0, #b0b0b0);
+}
+
+.key-0 {
+    background: linear-gradient(135deg, #e8e8e8, #c0c0c0);
+}
+
+.talk-keys {
+    display: flex;
+    gap: 10px;
+    margin-top: 2px;
+}
+
+.send {
+    flex: 1;
+    padding: 8px;
+    background: linear-gradient(to bottom, #33aa44, #228833);
+    border: 1px solid #44cc55;
+    border-radius: 5px;
+    color: #fff;
+    font-size: 12px;
+    font-weight: bold;
+    text-align: center;
+    font-family: Arial, sans-serif;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.end {
+    flex: 1;
+    padding: 8px;
+    background: linear-gradient(to bottom, #cc3333, #aa2222);
+    border: 1px solid #ee4444;
+    border-radius: 5px;
+    color: #fff;
+    font-size: 12px;
+    font-weight: bold;
+    text-align: center;
+    font-family: Arial, sans-serif;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
 @media (max-width: 400px) {
-    .flip-phone {
-        width: 250px;
-        height: 430px;
+    .phone {
+        width: 280px;
+        height: 400px;
     }
-    
-    .external-display {
-        width: 70px;
-        height: 18px;
-        top: 15px;
+
+    .flip {
+        height: 46%;
     }
-    
-    .numeric-keypad {
-        gap: 6px;
+
+    .base {
+        height: 57%;
     }
-    
-    .key {
-        font-size: 14px;
-    }
-    
-    .key small {
-        font-size: 9px;
-    }
-    
-    .nav-controls-middle {
-        gap: 6px;
-    }
-    
-    .nav-up, .nav-down, .nav-left, .nav-right {
-        width: 20px;
-        height: 20px;
+
+    .external-screen {
+        width: 80px;
+        height: 30px;
         font-size: 12px;
     }
-    
-    .nav-ok {
-        width: 24px;
-        height: 20px;
-        font-size: 11px;
+
+    .brand {
+        font-size: 28px;
     }
-    
-    .func-key {
-        padding: 6px;
-        font-size: 11px;
+
+    .screen {
+        padding: 8px;
     }
-    
-    .screen-header {
-        padding: 10px;
-    }
-    
-    .carrier-logo {
-        font-size: 12px;
-    }
-    
-    .signal-strength {
+
+    .news-item {
         font-size: 10px;
+        padding: 4px 6px;
     }
-    
-    .screen-content {
-        padding: 12px;
-    }
-    
-    .news-title {
-        padding: 10px;
+
+    .key {
         font-size: 13px;
     }
-    
-    .screen-footer {
-        padding: 10px;
-        font-size: 11px;
+
+    .key sub {
+        font-size: 7px;
     }
-    
-    .soft-left, .soft-right {
-        padding: 3px 6px;
+
+    .send, .end {
+        font-size: 11px;
+        padding: 6px;
     }
 }
