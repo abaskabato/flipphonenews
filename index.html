@@ -9,21 +9,83 @@
 <body>
     <div class="flip-phone-container">
         <div class="flip-phone">
-            <div class="flip-phone-front">
-                <div class="phone-logo">FlipNews</div>
-                <div class="phone-time">10:30</div>
+            <!-- External Display (Small screen on the front) -->
+            <div class="external-display">
+                <div class="external-time">10:30</div>
+                <div class="external-signal">&#9728;&#9728;&#9728;</div>
+                <div class="external-battery">&#9889;&#9889;&#9889;</div>
             </div>
-            <div class="flip-phone-back">
-                <div class="news-title">Breaking: Major Event Happens</div>
-                <div class="news-title">Weather Update: Sunny Skies Ahead</div>
-                <div class="news-title">Sports: Local Team Wins Championship</div>
-                <div class="news-title">Tech: New Gadget Released Today</div>
-                <div class="news-title">World: International Summit Concludes</div>
-                <div class="news-title">Health: Study Shows Benefits of Exercise</div>
-                <div class="news-title">Entertainment: Movie Breaks Box Office Records</div>
-                <div class="news-title">Business: Market Shows Steady Growth</div>
-                <div class="news-title">Science: Discovery Made in Space Exploration</div>
-                <div class="news-title">Food: New Restaurant Opens Downtown</div>
+            
+            <!-- Main Phone Body -->
+            <div class="phone-body">
+                <!-- Keypad Section -->
+                <div class="keypad-section">
+                    <div class="nav-controls">
+                        <div class="nav-up">&#9650;</div>
+                        <div class="nav-controls-middle">
+                            <div class="nav-left">&#9664;</div>
+                            <div class="nav-ok">OK</div>
+                            <div class="nav-right">&#9654;</div>
+                        </div>
+                        <div class="nav-down">&#9660;</div>
+                    </div>
+                    
+                    <!-- Numeric Keypad -->
+                    <div class="numeric-keypad">
+                        <div class="key-row">
+                            <div class="key">1</div>
+                            <div class="key">2<br><small>ABC</small></div>
+                            <div class="key">3<br><small>DEF</small></div>
+                        </div>
+                        <div class="key-row">
+                            <div class="key">4<br><small>GHI</small></div>
+                            <div class="key">5<br><small>JKL</small></div>
+                            <div class="key">6<br><small>MNO</small></div>
+                        </div>
+                        <div class="key-row">
+                            <div class="key">7<br><small>PQRS</small></div>
+                            <div class="key">8<br><small>TUV</small></div>
+                            <div class="key">9<br><small>WXYZ</small></div>
+                        </div>
+                        <div class="key-row">
+                            <div class="key">*</div>
+                            <div class="key">0</div>
+                            <div class="key">#</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Function Keys -->
+                    <div class="function-keys">
+                        <div class="func-key">Talk</div>
+                        <div class="func-key">End</div>
+                    </div>
+                </div>
+                
+                <!-- Main Screen (appears when flipped open) -->
+                <div class="main-screen">
+                    <div class="screen-header">
+                        <div class="carrier-logo">FlipNews</div>
+                        <div class="signal-strength">&#9728;&#9728;&#9728;&#9728;&#9728;</div>
+                    </div>
+                    
+                    <div class="screen-content">
+                        <div class="news-title">Breaking: Major Event Happens</div>
+                        <div class="news-title">Weather Update: Sunny Skies Ahead</div>
+                        <div class="news-title">Sports: Local Team Wins Championship</div>
+                        <div class="news-title">Tech: New Gadget Released Today</div>
+                        <div class="news-title">World: International Summit Concludes</div>
+                        <div class="news-title">Health: Study Shows Benefits of Exercise</div>
+                        <div class="news-title">Entertainment: Movie Breaks Box Office Records</div>
+                        <div class="news-title">Business: Market Shows Steady Growth</div>
+                        <div class="news-title">Science: Discovery Made in Space Exploration</div>
+                        <div class="news-title">Food: New Restaurant Opens Downtown</div>
+                    </div>
+                    
+                    <div class="screen-footer">
+                        <div class="soft-left">Menu</div>
+                        <div class="soft-right">Back</div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

@@ -9,8 +9,11 @@ body {
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #1a1a2e;
+    font-family: 'Courier New', monospace;
+    background-image: 
+        radial-gradient(circle at 20% 30%, rgba(100, 100, 200, 0.1) 0%, transparent 20%),
+        radial-gradient(circle at 80% 70%, rgba(100, 100, 200, 0.1) 0%, transparent 20%);
 }
 
 .flip-phone-container {
@@ -19,114 +22,460 @@ body {
 
 .flip-phone {
     position: relative;
-    width: 320px;
-    height: 580px;
+    width: 280px;
+    height: 480px;
     transform-style: preserve-3d;
-    transition: transform 0.6s;
+    transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
     cursor: pointer;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
 }
 
 .flip-phone:hover {
     transform: rotateY(180deg);
 }
 
-.flip-phone-front,
-.flip-phone-back {
+/* External display (front of closed phone) */
+.external-display {
     position: absolute;
-    width: 100%;
-    height: 100%;
-    -webkit-backface-visibility: hidden;
-    backface-visibility: hidden;
-    border-radius: 20px;
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 20px;
+    background: #000;
+    color: #0f0;
+    font-family: 'Courier New', monospace;
+    font-size: 10px;
+    text-align: center;
+    padding: 4px;
+    border-radius: 4px;
+    border: 1px solid #333;
 }
 
-.flip-phone-front {
-    background: linear-gradient(to bottom, #2c3e50, #4a6572);
+.external-time {
+    font-size: 12px;
+    letter-spacing: 1px;
+}
+
+.external-signal, .external-battery {
+    font-size: 10px;
+    margin-top: 2px;
+}
+
+/* Main phone body */
+.phone-body {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to bottom, #8b0000, #a52a2a);
+    border-radius: 12px;
+    overflow: hidden;
+    border: 2px solid #555;
+    box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.3);
+}
+
+/* Keypad section */
+.keypad-section {
+    position: relative;
+    width: 100%;
+    height: 60%;
+    padding: 15px;
+}
+
+/* Navigation controls */
+.nav-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding: 0 10px;
+}
+
+.nav-controls-middle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.nav-up, .nav-down, .nav-left, .nav-right {
+    width: 24px;
+    height: 24px;
+    background: #333;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: bold;
+    border-radius: 4px;
+    border: 1px solid #555;
+}
+
+.nav-ok {
+    width: 28px;
+    height: 24px;
+    background: #0066cc;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: bold;
+    border-radius: 4px;
+    border: 1px solid #0044aa;
+}
+
+/* Numeric keypad */
+.numeric-keypad {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.key {
+    aspect-ratio: 1;
+    background: #eee;
+    color: #333;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: hidden;
 }
 
-.flip-phone-back {
-    background: linear-gradient(to bottom, #1a2a6c, #b21f1f);
-    transform: rotateY(180deg);
+.key small {
+    font-size: 10px;
+    opacity: 0.7;
+    margin-top: 2px;
+}
+
+.key:active {
+    transform: scale(0.95);
+    background: #ddd;
+}
+
+/* Function keys */
+.function-keys {
     display: flex;
-    flex-direction: column;
-    padding: 20px;
+    justify-content: space-between;
+    padding: 0 10px;
+}
+
+.func-key {
+    flex: 1;
+    margin: 0 5px;
+    padding: 8px;
+    background: linear-gradient(to bottom, #ff6600, #cc5500);
+    color: #fff;
+    text-align: center;
+    font-size: 12px;
+    font-weight: bold;
+    border-radius: 4px;
+    border: 1px solid #ff8800;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Main screen (appears when flipped) */
+.main-screen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #000;
+    color: #0f0;
+    font-family: 'Courier New', monospace;
+    overflow: hidden;
+    display: none;
+}
+
+.flip-phone:hover .main-screen {
+    display: block;
+}
+
+.screen-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    border-bottom: 1px solid #333;
+}
+
+.carrier-logo {
+    font-size: 14px;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+.signal-strength {
+    font-size: 12px;
+}
+
+.screen-content {
+    flex: 1;
+    padding: 15px;
     overflow-y: auto;
 }
 
-.phone-logo {
-    font-size: 28px;
-    font-weight: bold;
-    color: #ecf0f1;
-    margin-bottom: 20px;
-    letter-spacing: 2px;
-}
-
-.phone-time {
-    font-size: 18px;
-    color: #bdc3c7;
-    font-weight: 300;
-}
-
 .news-title {
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 12px;
-    padding: 15px;
+    background: rgba(0, 30, 0, 0.3);
+    border: 1px solid #0f0;
+    border-radius: 6px;
+    padding: 12px;
     margin: 10px 0;
-    color: #ecf0f1;
-    font-size: 16px;
-    line-height: 1.5;
-    transition: all 0.3s ease;
+    font-size: 14px;
+    line-height: 1.4;
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.news-title::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(0, 255, 0, 0.1),
+        transparent
+    );
+    transition: left 0.5s;
+}
+
+.news-title:hover::before {
+    left: 100%;
 }
 
 .news-title:hover {
-    background: rgba(255, 255, 255, 0.15);
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    background: rgba(0, 40, 0, 0.4);
+    transform: translateX(-2px);
+    box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
 }
 
-/* Scrollbar styling */
-.flip-phone-back::-webkit-scrollbar {
-    width: 8px;
+/* Scrollbar for WebKit browsers */
+.screen-content::-webkit-scrollbar {
+    width: 6px;
 }
 
-.flip-phone-back::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.1);
+.screen-content::-webkit-scrollbar-track {
+    background: #111;
+}
+
+.screen-content::-webkit-scrollbar-thumb {
+    background: #0f0;
+    border-radius: 3px;
+}
+
+.screen-content::-webkit-scrollbar-thumb:hover {
+    background: #0ff;
+}
+
+.screen-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    border-top: 1px solid #333;
+    font-size: 12px;
+}
+
+.soft-left, .soft-right {
+    background: rgba(0, 30, 0, 0.2);
+    border: 1px solid #0f0;
     border-radius: 4px;
+    padding: 4px 8px;
+    cursor: pointer;
+    transition: all 0.2s;
 }
 
-.flip-phone-back::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.3);
-    border-radius: 4px;
+.soft-left:hover, .soft-right:hover {
+    background: rgba(0, 40, 0, 0.3);
 }
 
-.flip-phone-back::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.5);
+/* Add some scan line effect to the screen */
+.main-screen::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+        repeating-linear-gradient(
+            0deg,
+            transparent,
+            transparent 2px,
+            rgba(0, 0, 0, 0.1) 2px,
+            rgba(0, 0, 0, 0.1) 4px
+        );
+    pointer-events: none;
+    opacity: 0.3;
 }
 
-/* Responsive design */
+/* Add slight curvature to make it look more like a real flip phone */
+.flip-phone {
+    border-radius: 16px;
+}
+
+.phone-body {
+    border-radius: 14px;
+}
+
+/* Add wear and tear effects */
+.flip-phone::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+        radial-gradient(circle at 30% 30%, rgba(255,255,255,0.05) 0%, transparent 50%),
+        radial-gradient(circle at 70% 70%, rgba(255,255,255,0.03) 0%, transparent 50%);
+    pointer-events: none;
+    border-radius: inherit;
+}
+
+/* Make the flip more realistic with a slight 3D effect */
+.flip-phone {
+    transform-style: preserve-3d;
+}
+
+.flip-phone:hover {
+    transform: rotateY(180deg) translateZ(10px);
+}
+
+/* Add hinge effect */
+.flip-phone {
+    transform-origin: left center;
+}
+
+.flip-phone:hover {
+    transform: rotateY(180deg) translateZ(10px);
+}
+
+/* Add some texture to the phone body */
+.phone-body {
+    background-image: 
+        linear-gradient(45deg, rgba(255,255,255,0.05) 25%, transparent 25%),
+        linear-gradient(-45deg, rgba(255,255,255,0.05) 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, rgba(255,255,255,0.05) 75%),
+        linear-gradient(-45deg, transparent 75%, rgba(255,255,255,0.05) 75%);
+    background-size: 20px 20px;
+    background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+}
+
+/* Add a slight shadow for depth */
+.flip-phone {
+    box-shadow: 
+        0 15px 35px rgba(0, 0, 0, 0.4),
+        inset 0 0 20px rgba(0, 0, 0, 0.2);
+}
+
+/* Make sure the external display is visible when phone is closed */
+.flip-phone:hover .external-display {
+    display: none;
+}
+
+/* Show external display when phone is closed (not hovered) */
+.flip-phone:not(:hover) .external-display {
+    display: block;
+}
+
+/* Hide keypad when phone is open */
+.flip-phone:hover .keypad-section {
+    display: none;
+}
+
+/* Show keypad when phone is closed */
+.flip-phone:not(:hover) .keypad-section {
+    display: block;
+}
+
+/* Responsive adjustments */
 @media (max-width: 400px) {
     .flip-phone {
-        width: 280px;
-        height: 500px;
+        width: 250px;
+        height: 430px;
     }
     
-    .phone-logo {
-        font-size: 24px;
+    .external-display {
+        width: 70px;
+        height: 18px;
+        top: 15px;
     }
     
-    .phone-time {
-        font-size: 16px;
+    .numeric-keypad {
+        gap: 6px;
+    }
+    
+    .key {
+        font-size: 14px;
+    }
+    
+    .key small {
+        font-size: 9px;
+    }
+    
+    .nav-controls-middle {
+        gap: 6px;
+    }
+    
+    .nav-up, .nav-down, .nav-left, .nav-right {
+        width: 20px;
+        height: 20px;
+        font-size: 12px;
+    }
+    
+    .nav-ok {
+        width: 24px;
+        height: 20px;
+        font-size: 11px;
+    }
+    
+    .func-key {
+        padding: 6px;
+        font-size: 11px;
+    }
+    
+    .screen-header {
+        padding: 10px;
+    }
+    
+    .carrier-logo {
+        font-size: 12px;
+    }
+    
+    .signal-strength {
+        font-size: 10px;
+    }
+    
+    .screen-content {
+        padding: 12px;
     }
     
     .news-title {
-        font-size: 14px;
-        padding: 12px;
+        padding: 10px;
+        font-size: 13px;
+    }
+    
+    .screen-footer {
+        padding: 10px;
+        font-size: 11px;
+    }
+    
+    .soft-left, .soft-right {
+        padding: 3px 6px;
     }
 }
