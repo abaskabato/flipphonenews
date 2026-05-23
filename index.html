@@ -4,114 +4,38 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Flip Phone News</title>
+    <meta name="description" content="A live, interactive 3D flip phone that streams the day's top tech headlines on its tiny screen.">
     <link rel="stylesheet" href="style.css">
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "./vendor/three.module.js",
+            "three/addons/": "./vendor/addons/"
+        }
+    }
+    </script>
 </head>
 <body>
-    <div class="scene">
-        <div class="stage">
-            <div class="floor-shadow"></div>
-            <div class="phone">
+    <div id="app">
+        <canvas id="scene"></canvas>
 
-                <!-- ===== BASE / KEYPAD HALF ===== -->
-                <div class="half base">
-                    <div class="face f-front shell keypad-face">
-                        <div class="nav">
-                            <div class="soft l"></div>
-                            <div class="dpad">
-                                <div class="ring"></div>
-                                <span class="arr up">&#9650;</span>
-                                <span class="arr dn">&#9660;</span>
-                                <span class="arr lf">&#9664;</span>
-                                <span class="arr rt">&#9654;</span>
-                                <div class="ok">OK</div>
-                            </div>
-                            <div class="soft r"></div>
-                        </div>
+        <header class="topbar">
+            <div class="brand">FLIP&shy;PHONE<span>NEWS</span></div>
+            <a class="sponsor-link" href="/sponsor.html">Advertise here &rarr;</a>
+        </header>
 
-                        <div class="callrow">
-                            <div class="call send">SEND</div>
-                            <div class="call end">END</div>
-                        </div>
-
-                        <div class="keys">
-                            <div class="key"><span class="num">1</span><span class="abc">&nbsp;</span></div>
-                            <div class="key"><span class="num">2</span><span class="abc">ABC</span></div>
-                            <div class="key"><span class="num">3</span><span class="abc">DEF</span></div>
-                            <div class="key"><span class="num">4</span><span class="abc">GHI</span></div>
-                            <div class="key"><span class="num">5</span><span class="abc">JKL</span></div>
-                            <div class="key"><span class="num">6</span><span class="abc">MNO</span></div>
-                            <div class="key"><span class="num">7</span><span class="abc">PQRS</span></div>
-                            <div class="key"><span class="num">8</span><span class="abc">TUV</span></div>
-                            <div class="key"><span class="num">9</span><span class="abc">WXYZ</span></div>
-                            <div class="key"><span class="num">*</span><span class="abc">&nbsp;</span></div>
-                            <div class="key"><span class="num">0</span><span class="abc">+</span></div>
-                            <div class="key"><span class="num">#</span><span class="abc">&nbsp;</span></div>
-                        </div>
-                    </div>
-                    <div class="face f-back shell"></div>
-                    <div class="face f-left"></div>
-                    <div class="face f-right"></div>
-                    <div class="face f-top"></div>
-                    <div class="face f-bottom"></div>
-                </div>
-
-                <!-- ===== HINGE + LID / SCREEN HALF ===== -->
-                <div class="hinge">
-                    <div class="barrel"></div>
-                    <div class="half lid">
-
-                        <!-- inner: green LCD news -->
-                        <div class="face f-front shell screen-face">
-                            <div class="ear-slit"></div>
-                            <div class="bezel">
-                                <div class="lcd">
-                                    <div class="lcd-bar"><span>FLIPNEWS</span><span>&#9776; 10:30</span></div>
-                                    <div class="lcd-feed">
-                                        <ul>
-                                            <li>&#9656; BREAKING: Major event unfolds</li>
-                                            <li>&#9656; Weather: Sunny nationwide</li>
-                                            <li>&#9656; Sports: Championship decided</li>
-                                            <li>&#9656; Tech: New AI breakthrough</li>
-                                            <li>&#9656; World: Summit concludes</li>
-                                            <li>&#9656; Markets: Stocks rally today</li>
-                                            <li>&#9656; Science: Mars rover finds ice</li>
-                                            <li>&#9656; Health: Study on exercise</li>
-                                            <!-- duplicated for seamless ticker -->
-                                            <li>&#9656; BREAKING: Major event unfolds</li>
-                                            <li>&#9656; Weather: Sunny nationwide</li>
-                                            <li>&#9656; Sports: Championship decided</li>
-                                            <li>&#9656; Tech: New AI breakthrough</li>
-                                            <li>&#9656; World: Summit concludes</li>
-                                            <li>&#9656; Markets: Stocks rally today</li>
-                                            <li>&#9656; Science: Mars rover finds ice</li>
-                                            <li>&#9656; Health: Study on exercise</li>
-                                        </ul>
-                                    </div>
-                                    <div class="lcd-foot"><span>MENU</span><span>&#9201;</span><span>BACK</span></div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- outer: external display -->
-                        <div class="face f-back shell outer-face">
-                            <div class="ext-screen">10:30</div>
-                            <div class="ext-ear"></div>
-                            <div class="ext-logo">M</div>
-                        </div>
-
-                        <div class="face f-left"></div>
-                        <div class="face f-right"></div>
-                        <div class="face f-top"></div>
-                        <div class="face f-bottom"></div>
-                    </div>
-                </div>
-
-                <!-- antenna mounted to the body, pokes out the top when closed -->
-                <div class="antenna"></div>
-
-            </div>
+        <div class="hud">
+            <button id="flipBtn" class="flip-btn" aria-label="Open or close the phone">
+                <span class="dot"></span> Open / Close
+            </button>
+            <p class="tip">drag to rotate &middot; scroll to zoom</p>
         </div>
-        <div class="hint">hover to flip open</div>
+
+        <div id="sponsorTag" class="sponsor-tag" hidden></div>
+
+        <div id="loader" class="loader">Booting handset&hellip;</div>
     </div>
+
+    <script type="module" src="js/main.js"></script>
 </body>
 </html>

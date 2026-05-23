@@ -1,0 +1,15 @@
+{
+  "name": "flipphonenews",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Interactive 3D WebGL flip phone that streams live tech headlines, with a self-serve Stripe sponsorship billboard.",
+  "scripts": {
+    "dev": "vercel dev",
+    "start": "vercel dev"
+  },
+  "dependencies": {
+    "@vercel/kv": "^2.0.0",
+    "stripe": "^17.5.0"
+  }
+}
