@@ -107,10 +107,13 @@ phone.setOpenAmount(0);
 function setOpenTarget(v) {
     const closing = v < 0.5 && openTarget > 0.5;
     openTarget = v; lastDir = v;
-    if (closing && activeName === 'chat' && chat.draft) {
+    if (closing) {
         // flip closed = send draft, like hanging up
-        chat.send(chat.draft);
-        chat.draft = '';
+        if (chat.draft) {
+            chat.send(chat.draft);
+            chat.draft = '';
+        }
+        hiddenInput.blur();
     }
     playFlip(v === 1);
 }
@@ -134,66 +137,47 @@ renderer.domElement.addEventListener('pointerup', (e) => {
     if (raycaster.intersectObject(phone.group, true).length) toggle();
 });
 
-// ---------- mode switching ----------
-function setApp(name) {
-    activeName = name;
-    activeApp = apps[name];
-    activeApp.enter && activeApp.enter();
-    document.querySelectorAll('.tab').forEach((b) => b.classList.toggle('active', b.dataset.app === name));
-    extOverride = { title: 'CHAT', sub: chat.gh ? `#${chat.gh}` : '' };
-    refreshExternal();
-}
-document.querySelector('.tab').addEventListener('click', () => setApp('chat'));
+// ---------- mobile keyboard: hidden input that captures keystrokes ----------
+const hiddenInput = document.createElement('input');
+hiddenInput.type = 'text';
+hiddenInput.id = 'hidden-input';
+hiddenInput.autocomplete = 'off';
+hiddenInput.autocorrect = 'off';
+hiddenInput.autocapitalize = 'off';
+hiddenInput.spellcheck = false;
+Object.assign(hiddenInput.style, {
+    position: 'fixed', left: '-9999px', top: '-9999px',
+    opacity: '0', width: '1px', height: '1px', pointerEvents: 'none',
+});
+document.body.appendChild(hiddenInput);
 
-// ---------- keyboard: send messages via Enter ----------
+// Focus hidden input on canvas tap for mobile keyboard (only when open)
+renderer.domElement.addEventListener('pointerdown', () => {
+    if (open > 0.5) hiddenInput.focus();
+});
+
+hiddenInput.addEventListener('input', () => {
+    if (hiddenInput.value) {
+        chat.appendToDraft(hiddenInput.value);
+        hiddenInput.value = '';
+    }
+});
+hiddenInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === 'Backspace') {
+        chat.handleKeyDown(e);
+    }
+});
+
+// ---------- keyboard: route to phone screen ----------
 addEventListener('keydown', (e) => {
-    if (e.target.tagName === 'INPUT') return;
-    if (activeName === 'chat' && e.key === 'Enter') {
-        const input = document.getElementById('chat-input');
-        if (input && input.value.trim()) {
-            chat.send(input.value);
-            input.value = '';
-        }
-    }
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+    chat.handleKeyDown(e);
 });
 
-// ---------- CHAT panel wiring ----------
-const $ = (id) => document.getElementById(id);
-const chatInput = $('chat-input');
-const chatSend = $('chat-send');
-const chatStatus = $('chat-status');
-const chatName = $('chat-name');
-const chatKey = $('chat-key');
-
-chatSend.addEventListener('click', () => {
-    if (chatInput.value.trim()) {
-        chat.send(chatInput.value);
-        chatInput.value = '';
-    }
-});
-chatInput.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') {
-        if (chatInput.value.trim()) {
-            chat.send(chatInput.value);
-            chatInput.value = '';
-        }
-        e.preventDefault();
-    }
-});
-chatName.addEventListener('input', () => {
-    chat.name = chatName.value.trim();
-});
-
-// update status from the chat app
-const origDraw = chat.draw.bind(chat);
-chat.draw = function () {
-    chatStatus.textContent = this.status;
-    chatKey.textContent = `key: ${this.pk ? this.pk.slice(0, 12) + '…' : '—'}`;
-    origDraw();
-};
-
-// ---------- boot: always start in chat ----------
-setApp('chat');
+// ---------- mode switching (single app now) ----------
+chat.enter();
+extOverride = { title: 'CHAT', sub: chat.gh ? `#${chat.gh}` : '' };
+refreshExternal();
 
 // ---------- data loads ----------
 loadSponsor().then((data) => applySponsor(data, {

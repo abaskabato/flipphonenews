@@ -166,6 +166,31 @@ export class NostrChat {
         this.messages = [];
     }
 
+    handleKeyDown(e) {
+        if (e.key === 'Enter') {
+            if (this.draft.trim()) {
+                this.send(this.draft);
+                this.draft = '';
+            }
+            this.draw();
+            e.preventDefault();
+        } else if (e.key === 'Backspace') {
+            this.draft = this.draft.slice(0, -1);
+            this.draw();
+            e.preventDefault();
+        } else if (e.key.length === 1 && !e.metaKey && !e.ctrlKey && !e.altKey) {
+            this.draft += e.key;
+            if (this.draft.length > 280) this.draft = this.draft.slice(0, 280);
+            this.draw();
+            e.preventDefault();
+        }
+    }
+
+    appendToDraft(s) {
+        this.draft += s.slice(0, 280 - this.draft.length);
+        this.draw();
+    }
+
     update() {}
 
     draw() {
@@ -175,7 +200,7 @@ export class NostrChat {
         headerBar(ctx, W, 'CHAT', status);
 
         const topY = 62;
-        const bottomY = H - 50;
+        const bottomY = H - 54;
         const lineH = 20;
         const maxLines = Math.floor((bottomY - topY) / lineH);
 
@@ -202,9 +227,10 @@ export class NostrChat {
         ctx.textBaseline = 'middle';
         ctx.textAlign = 'left';
         ctx.fillStyle = NEON;
-        const prefix = '> ';
-        const input = draft || 'Type to chat…';
-        ctx.fillText(prefix + input, 20, H - 24);
+        const prefix = '\xbb ';  // » compose prompt
+        const cursor = '\u258c'; // ▌ block cursor
+        const input = draft ? prefix + draft + cursor : prefix + cursor;
+        ctx.fillText(input, 20, H - 24);
 
         crt(ctx, W, H);
     }
