@@ -53,7 +53,7 @@ body {
 
 .hero-copy {
     position: absolute; z-index: 6;
-    left: 5vw; top: 50%; transform: translateY(-50%);
+    left: 5vw; top: 84px;
     max-width: 380px;
     text-shadow: 0 2px 20px rgba(0,0,0,0.6);
 }
@@ -124,7 +124,7 @@ body {
 
 /* ===== responsive ===== */
 @media (max-width: 880px) {
-    .hero-copy { left: 0; right: 0; top: 84px; transform: none; max-width: none; padding: 0 22px; text-align: center; }
+    .hero-copy { left: 0; right: 0; max-width: none; padding: 0 22px; text-align: center; }
     .hero-copy .sub { display: none; }
     .cta-row { justify-content: center; }
     .site-nav a:not(.ghost) { display: none; }
