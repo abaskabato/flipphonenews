@@ -9,6 +9,7 @@ import { loadSponsor, applySponsor, drawPlaceholder } from './sponsor.js';
 import { playFlip } from './audio.js';
 import { TextsApp } from './texts.js';
 import { SnakeApp, randomSeed } from './snake.js';
+import { ShopApp } from './shop.js';
 
 // ---------- renderer / scene ----------
 const canvasEl = document.getElementById('scene');
@@ -92,7 +93,8 @@ const newsTicker = new NewsTicker(screenC.canvas);
 const newsApp = { update: (dt) => newsTicker.update(dt) };
 const texts = new TextsApp(screenC.canvas);
 const snake = new SnakeApp(screenC.canvas, { onGameOver: onSnakeOver });
-const apps = { news: newsApp, texts, snake };
+const shop = new ShopApp(screenC.canvas);
+const apps = { news: newsApp, shop, texts, snake };
 let activeName = 'news';
 let activeApp = apps.news;
 
@@ -147,13 +149,17 @@ function setApp(name) {
     document.querySelectorAll('.tab').forEach((b) => b.classList.toggle('active', b.dataset.app === name));
     document.getElementById('panel-texts').hidden = name !== 'texts';
     document.getElementById('panel-snake').hidden = name !== 'snake';
+    document.getElementById('panel-shop').hidden = name !== 'shop';
     if (name !== 'news') {
-        grabbed = true;                     // stop idle spin
-        phone.group.rotation.set(0, 0, 0);  // face the screen forward
+        grabbed = true;
+        phone.group.rotation.set(0, 0, 0);
         setOpenTarget(1);
     }
     if (name === 'snake' && snake.target) {
         extOverride = { title: `BEAT ${snake.by || 'RIVAL'}`, sub: `${snake.target} ★` };
+    } else if (name === 'shop') {
+        const c = shop.current;
+        extOverride = c ? { title: c.name, sub: c.price || '' } : { title: 'SHOP', sub: '' };
     } else if (name !== 'texts') {
         extOverride = null;
     }
@@ -165,6 +171,11 @@ document.querySelectorAll('.tab').forEach((b) => b.addEventListener('click', () 
 addEventListener('keydown', (e) => {
     if (e.target.tagName === 'INPUT') return;
     if (activeName === 'snake') snake.onKey(e);
+    if (activeName === 'shop') {
+        if (e.key === 'ArrowLeft') { shop.prev(); updateShopPanel(); e.preventDefault(); }
+        if (e.key === 'ArrowRight') { shop.next(); updateShopPanel(); e.preventDefault(); }
+        if (e.key === ' ' || e.key === 'Enter') { shop.buy(); e.preventDefault(); }
+    }
 });
 
 // ---------- TEXTS panel wiring ----------
@@ -200,6 +211,19 @@ $('sn-challenge').addEventListener('click', () => {
     copy(url, $('sn-share'));
     $('sn-share').textContent = `Sharing a challenge to beat ${score}★ — link copied!`;
 });
+
+// ---------- SHOP panel wiring ----------
+function updateShopPanel() {
+    const c = shop.current;
+    $('shop-counter').textContent = c ? `${shop.idx + 1} of ${shop.total} — ${c.price}` : '0 of 0';
+    if (shop.current) {
+        extOverride = { title: shop.current.name, sub: shop.current.price || '' };
+        refreshExternal();
+    }
+}
+$('shop-prev').addEventListener('click', () => { shop.prev(); updateShopPanel(); });
+$('shop-next').addEventListener('click', () => { shop.next(); updateShopPanel(); });
+$('shop-buy').addEventListener('click', () => shop.buy());
 
 function onSnakeOver(score) {
     $('sn-status').textContent = snake.target
@@ -243,6 +267,8 @@ function fallbackCopy(text, done) {
             by: q.get('by') || '',
         });
         setApp('snake');
+    } else if (app === 'shop') {
+        setApp('shop');
     } else {
         setApp('news');
     }
