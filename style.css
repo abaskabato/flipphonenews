@@ -4,100 +4,491 @@
     box-sizing: border-box;
 }
 
+:root {
+    /* Half dimensions: W = width, H = height of each half, D = thickness */
+    --w: 200px;
+    --h: 272px;
+    --d: 22px;
+
+    /* lid rotation about the hinge: -180deg = closed, ~ -8deg = open */
+    --lid-closed: -180deg;
+    --lid-open: -9deg;
+
+    /* metallic silver body */
+    --metal: linear-gradient(135deg, #fafafa 0%, #d6d6d6 28%, #a4a4a4 60%, #c4c4c4 80%, #e8e8e8 100%);
+    --metal-edge: linear-gradient(90deg, #8c8c8c, #cfcfcf 45%, #f2f2f2 50%, #cfcfcf 55%, #8c8c8c);
+    --metal-dark: linear-gradient(135deg, #c8c8c8, #9a9a9a 55%, #828282);
+}
+
 body {
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    background: linear-gradient(135deg, #0f0c29, #24243e, #302b63);
-    font-family: Arial, sans-serif;
+    background: radial-gradient(circle at 50% 35%, #2a2a4a 0%, #16162b 45%, #0a0a14 100%);
+    font-family: Arial, Helvetica, sans-serif;
+    overflow: hidden;
 }
 
 .scene {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 24px;
+    gap: 40px;
+}
+
+/* 3D viewport */
+.stage {
+    position: relative;
+    width: var(--w);
+    height: calc(var(--h) * 2);
+    perspective: 1700px;
+    perspective-origin: 50% 42%;
+}
+
+/* contact shadow on the floor — lives outside the 3D space */
+.floor-shadow {
+    position: absolute;
+    left: 50%;
+    bottom: -36px;
+    width: 230px;
+    height: 46px;
+    background: radial-gradient(ellipse at center, rgba(0,0,0,0.55), rgba(0,0,0,0) 70%);
+    transform: translateX(-50%);
+    filter: blur(6px);
+    transition: width 0.8s ease, opacity 0.8s ease;
+    z-index: 0;
 }
 
 .phone {
-    width: 340px;
-    cursor: pointer;
-    transition: transform 0.3s;
-}
-
-.phone:hover {
-    transform: scale(1.02);
-}
-
-.phone-svg {
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
-    height: auto;
-    display: block;
+    height: 100%;
+    transform-style: preserve-3d;
+    transform: translateY(28px) rotateX(-16deg) rotateY(-24deg) rotateZ(0deg);
+    animation: float 6s ease-in-out infinite;
+    cursor: pointer;
 }
 
-/* Closed state shown by default */
-#closedState {
-    opacity: 1;
-    transition: opacity 0.35s, transform 0.35s;
+@keyframes float {
+    0%, 100% { transform: translateY(28px) rotateX(-16deg) rotateY(-24deg); }
+    50%      { transform: translateY(18px) rotateX(-16deg) rotateY(-28deg); }
 }
 
-/* Open state hidden by default */
-#openState {
-    opacity: 0;
-    transform: translateY(10px);
-    transition: opacity 0.35s, transform 0.35s;
+/* ============ HALF (a 3D cuboid anchored at a zero-size point) ============ */
+.half {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 0;
+    height: 0;
+    transform-style: preserve-3d;
 }
 
-/* On hover: hide closed, show open */
-.phone:hover #closedState {
-    opacity: 0;
-    transform: scale(0.9) translateY(-10px);
+/* the keypad half sits in the lower portion of the stage */
+.base {
+    transform: translateY(calc(var(--h) / 2));
+}
+
+/* hinge pivot lives at the FRONT-top edge of the base */
+.hinge {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 0;
+    height: 0;
+    transform-style: preserve-3d;
+    transform: translateY(0px) translateZ(calc(var(--d) / 2)) rotateX(var(--lid-closed));
+    transition: transform 0.95s cubic-bezier(0.62, 0.01, 0.2, 1);
+}
+
+/* lid (screen half) hangs upward from the hinge */
+.lid {
+    transform: translateY(calc(var(--h) / -2)) translateZ(calc(var(--d) / -2));
+}
+
+/* open on hover */
+.phone:hover .hinge {
+    transform: translateY(0px) translateZ(calc(var(--d) / 2)) rotateX(var(--lid-open));
+}
+.phone:hover { animation-play-state: paused; }
+.stage:hover .floor-shadow { width: 250px; opacity: 0.85; }
+
+/* ============ CUBOID FACES ============ */
+.face {
+    position: absolute;
+    left: 0;
+    top: 0;
+    backface-visibility: hidden;
+    overflow: hidden;
+}
+
+.f-front {
+    width: var(--w); height: var(--h);
+    transform: translate(-50%, -50%) translateZ(calc(var(--d) / 2));
+}
+.f-back {
+    width: var(--w); height: var(--h);
+    transform: translate(-50%, -50%) translateZ(calc(var(--d) / -2)) rotateY(180deg);
+}
+/* the lid's outer face is only ever seen CLOSED, where the lid is flipped 180°
+   about the hinge — flip it vertically so its content reads upright then */
+.lid .f-back {
+    transform: translate(-50%, -50%) translateZ(calc(var(--d) / -2)) rotateX(180deg);
+}
+.f-left {
+    width: var(--d); height: var(--h);
+    transform: translate(-50%, -50%) rotateY(-90deg) translateZ(calc(var(--w) / 2));
+}
+.f-right {
+    width: var(--d); height: var(--h);
+    transform: translate(-50%, -50%) rotateY(90deg) translateZ(calc(var(--w) / 2));
+}
+.f-top {
+    width: var(--w); height: var(--d);
+    transform: translate(-50%, -50%) rotateX(-90deg) translateZ(calc(var(--h) / 2));
+}
+.f-bottom {
+    width: var(--w); height: var(--d);
+    transform: translate(-50%, -50%) rotateX(90deg) translateZ(calc(var(--h) / 2));
+}
+
+/* edge faces are brushed metal */
+.f-left, .f-right { background: var(--metal-edge); }
+.f-top, .f-bottom { background: var(--metal-edge); }
+
+/* ============ BODY SHELLS ============ */
+.shell {
+    background: var(--metal);
+    border-radius: 26px;
+    box-shadow: inset 0 2px 2px rgba(255,255,255,0.6),
+                inset 0 -3px 6px rgba(0,0,0,0.25),
+                inset 3px 0 5px rgba(255,255,255,0.25),
+                inset -3px 0 5px rgba(0,0,0,0.18);
+}
+.base .f-front.shell { border-radius: 18px 18px 26px 26px; }
+.base .f-back        { background: var(--metal-dark); border-radius: 18px 18px 26px 26px; }
+.lid  .f-front.shell { border-radius: 26px 26px 18px 18px; }
+.lid  .f-back        { background: var(--metal); border-radius: 26px 26px 18px 18px;
+                       box-shadow: inset 0 2px 2px rgba(255,255,255,0.6),
+                                   inset 0 -3px 6px rgba(0,0,0,0.25); }
+
+/* ============ INNER SCREEN (lid front) ============ */
+.screen-face {
+    padding: 18px 16px;
+    display: flex;
+    flex-direction: column;
+}
+.bezel {
+    flex: 1;
+    background: #0c0c0c;
+    border-radius: 12px;
+    padding: 9px;
+    box-shadow: inset 0 0 0 2px #2c2c2c, inset 0 4px 10px rgba(0,0,0,0.9);
+    display: flex;
+}
+.lcd {
+    flex: 1;
+    position: relative;
+    border-radius: 5px;
+    background: linear-gradient(160deg, #0b2a10, #061806);
+    overflow: hidden;
+    box-shadow: inset 0 0 18px rgba(0,255,90,0.18), inset 0 0 4px rgba(0,0,0,0.8);
+    font-family: "Courier New", monospace;
+    color: #51ff7a;
+    text-shadow: 0 0 4px rgba(60,255,120,0.7);
+}
+/* scanlines */
+.lcd::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(0deg, rgba(0,0,0,0.18) 0 1px, transparent 1px 3px);
     pointer-events: none;
 }
-
-.phone:hover #openState {
-    opacity: 1;
-    transform: translateY(0);
+/* glass glare */
+.lcd::before {
+    content: "";
+    position: absolute;
+    top: -10%; left: -20%;
+    width: 70%; height: 130%;
+    background: linear-gradient(105deg, rgba(255,255,255,0.10), rgba(255,255,255,0));
+    transform: rotate(8deg);
+    pointer-events: none;
+}
+.lcd-bar {
+    display: flex;
+    justify-content: space-between;
+    font-size: 9px;
+    font-weight: bold;
+    padding: 5px 6px 3px;
+    border-bottom: 1px solid rgba(80,255,120,0.25);
+    letter-spacing: 1px;
+}
+.lcd-feed {
+    position: absolute;
+    top: 22px; bottom: 16px; left: 0; right: 0;
+    overflow: hidden;
+}
+.lcd-feed ul {
+    list-style: none;
+    padding: 4px 6px;
+    animation: ticker 11s linear infinite;
+}
+.phone:hover .lcd-feed ul { animation-play-state: running; }
+.lcd-feed li {
+    font-size: 9px;
+    line-height: 1.75;
+    white-space: nowrap;
+}
+@keyframes ticker {
+    0%   { transform: translateY(0); }
+    100% { transform: translateY(-50%); }
+}
+.lcd-foot {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    display: flex;
+    justify-content: space-between;
+    font-size: 8px;
+    padding: 3px 6px;
+    border-top: 1px solid rgba(80,255,120,0.25);
 }
 
-/* Key press animations */
-.phone:active .nbtn rect,
-.phone:active .nbtn ellipse {
-    fill: url(#keyPressGrad);
+/* speaker slit above the screen */
+.ear-slit {
+    height: 5px;
+    width: 54px;
+    margin: 0 auto 7px;
+    border-radius: 3px;
+    background: repeating-linear-gradient(90deg, #6e6e6e 0 3px, #bcbcbc 3px 6px);
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.6);
 }
 
-.phone:active .call-btn rect {
-    transform: scale(0.95);
+/* ============ EXTERNAL FACE (lid back) ============ */
+.outer-face {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 26px 0 0;
+    overflow: visible; /* let the antenna poke past the top edge when closed */
+}
+.ext-screen {
+    width: 108px;
+    height: 42px;
+    border-radius: 7px;
+    background: linear-gradient(160deg, #0b2a10, #061806);
+    box-shadow: inset 0 0 0 3px #1a1a1a, inset 0 0 10px rgba(0,255,90,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: "Courier New", monospace;
+    color: #51ff7a;
+    font-size: 15px;
+    font-weight: bold;
+    letter-spacing: 2px;
+    text-shadow: 0 0 4px rgba(60,255,120,0.7);
+}
+.ext-ear {
+    width: 46px;
+    height: 4px;
+    margin-top: 12px;
+    border-radius: 3px;
+    background: repeating-linear-gradient(90deg, #6e6e6e 0 3px, #bcbcbc 3px 6px);
+}
+.ext-logo {
+    margin-top: 40px;
+    font-size: 30px;
+    font-weight: 800;
+    color: #7a7a7a;
+    text-shadow: 0 1px 0 #fff, 0 -1px 1px rgba(0,0,0,0.3);
 }
 
-/* Hint text */
+/* antenna mounted on the body's top-right; pokes up out of the closed phone */
+.antenna {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 9px;
+    height: 80px;
+    border-radius: 5px 5px 0 0;
+    background: linear-gradient(90deg, #5f5f5f, #c2c2c2 45%, #efefef 50%, #9a9a9a 70%, #5f5f5f);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+    transform: translate(-50%, 0) translateX(56px) translateY(-80px) translateZ(calc(var(--d) / 2 + 1px));
+    transition: opacity 0.4s ease;
+}
+.antenna::after {
+    content: "";
+    position: absolute;
+    top: -9px; left: 50%;
+    width: 15px; height: 15px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #6a6a6a, #161616);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.5);
+    transform: translateX(-50%);
+}
+/* tuck the antenna away as the phone opens */
+.phone:hover .antenna { opacity: 0; }
+
+/* ============ HINGE BARREL ============ */
+.barrel {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 150px;
+    height: 16px;
+    transform: translate(-50%, -50%) rotateX(-90deg) translateZ(calc(var(--d) / 2 + 1px));
+    background: linear-gradient(180deg, #6a6a6a, #2c2c2c);
+    border-radius: 8px;
+    box-shadow: inset 0 1px 2px rgba(255,255,255,0.3);
+}
+.barrel::before, .barrel::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #8a8a8a, #2a2a2a);
+    transform: translateY(-50%);
+}
+.barrel::before { left: -7px; }
+.barrel::after  { right: -7px; }
+
+/* ============ KEYPAD (base front) ============ */
+.keypad-face {
+    padding: 16px 14px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+/* navigation cluster */
+.nav {
+    position: relative;
+    height: 72px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.dpad {
+    position: relative;
+    width: 72px;
+    height: 72px;
+}
+.dpad .ring {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: radial-gradient(circle at 38% 32%, #5a5a5a, #2e2e2e 70%);
+    box-shadow: inset 0 2px 3px rgba(255,255,255,0.25), inset 0 -3px 5px rgba(0,0,0,0.5), 0 2px 3px rgba(0,0,0,0.4);
+}
+.dpad .ok {
+    position: absolute;
+    left: 50%; top: 50%;
+    width: 30px; height: 30px;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    background: radial-gradient(circle at 38% 32%, #3a78b4, #1c3f72);
+    box-shadow: inset 0 1px 2px rgba(255,255,255,0.4), 0 1px 2px rgba(0,0,0,0.5);
+    color: #cfe6ff;
+    font-size: 9px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-shadow: 0 1px 1px rgba(0,0,0,0.4);
+}
+.dpad .arr {
+    position: absolute;
+    left: 50%;
+    color: #cfcfcf;
+    font-size: 9px;
+    transform: translateX(-50%);
+}
+.dpad .arr.up { top: 3px; }
+.dpad .arr.dn { bottom: 3px; }
+.dpad .arr.lf { left: 6px; top: 50%; transform: translateY(-50%); }
+.dpad .arr.rt { right: 6px; left: auto; top: 50%; transform: translateY(-50%); }
+
+.soft {
+    position: absolute;
+    top: 16px;
+    width: 40px;
+    height: 22px;
+    border-radius: 6px / 10px;
+    background: var(--metal-dark);
+    box-shadow: inset 0 1px 1px rgba(255,255,255,0.5), 0 1px 2px rgba(0,0,0,0.4);
+}
+.soft.l { left: 6px; transform: rotate(-12deg); }
+.soft.r { right: 6px; transform: rotate(12deg); }
+
+.callrow {
+    display: flex;
+    gap: 10px;
+}
+.call {
+    flex: 1;
+    height: 26px;
+    border-radius: 7px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: bold;
+    color: #fff;
+    text-shadow: 0 1px 1px rgba(0,0,0,0.4);
+    box-shadow: inset 0 1px 1px rgba(255,255,255,0.45), 0 2px 3px rgba(0,0,0,0.35);
+}
+.call.send { background: linear-gradient(180deg, #4cc265, #1f8e38); }
+.call.end  { background: linear-gradient(180deg, #ef5a5a, #a82020); }
+
+/* number grid */
+.keys {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 7px 9px;
+    margin-top: 2px;
+}
+.key {
+    height: 30px;
+    border-radius: 8px;
+    background: linear-gradient(180deg, #fbfbfb, #d0d0d0 55%, #b4b4b4);
+    box-shadow: inset 0 1px 1px rgba(255,255,255,0.9), inset 0 -2px 3px rgba(0,0,0,0.18), 0 2px 3px rgba(0,0,0,0.3);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    transition: transform 0.08s, box-shadow 0.08s;
+}
+.key:hover {
+    transform: translateY(1px);
+    box-shadow: inset 0 1px 1px rgba(255,255,255,0.9), 0 1px 1px rgba(0,0,0,0.3);
+}
+.key .num {
+    font-size: 14px;
+    font-weight: bold;
+    color: #222;
+}
+.key .abc {
+    font-size: 6px;
+    color: #777;
+    letter-spacing: 0.5px;
+    margin-top: 1px;
+}
+
+/* ============ HINT ============ */
 .hint {
-    text-align: center;
-    font-size: 12px;
-    color: rgba(255,255,255,0.12);
-    letter-spacing: 4px;
+    font-size: 11px;
+    color: rgba(255,255,255,0.18);
+    letter-spacing: 5px;
     text-transform: uppercase;
-    transition: color 0.3s;
+    transition: color 0.4s;
 }
+.stage:hover ~ .hint { color: rgba(255,255,255,0.4); }
 
-.phone:hover ~ .hint {
-    color: rgba(255,255,255,0.25);
-}
-
-/* Responsive */
-@media (max-width: 400px) {
-    .phone {
-        width: 290px;
-    }
-
-    .hint {
-        font-size: 10px;
-    }
-}
-
-@media (max-width: 320px) {
-    .phone {
-        width: 260px;
-    }
+@media (max-width: 460px) {
+    :root { --w: 168px; --h: 230px; --d: 18px; }
 }
