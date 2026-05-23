@@ -2,102 +2,69 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FlipPhoneNews — find your flip phone</title>
-    <meta name="description" content="Browse, compare, and buy the best dumbphones and flip phones — all inside a 3D flip phone.">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="icon" href="/icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/icon.svg">
+    <title>FlipPhone — open chat</title>
+    <meta name="description" content="A 3D flip phone that runs Nostr chat. No accounts, no phone numbers, no central servers.">
     <link rel="stylesheet" href="style.css">
     <script type="importmap">
     {
         "imports": {
             "three": "./vendor/three.module.js",
-            "three/addons/": "./vendor/addons/"
+            "three/addons/": "./vendor/addons/",
+            "nostr-tools": "https://esm.sh/nostr-tools@2.10.4",
+            "nostr-tools/pool": "https://esm.sh/nostr-tools@2.10.4/pool"
         }
     }
     </script>
 </head>
-<body>
+    <body>
     <!-- sticky site header -->
     <header class="site-header">
-        <a class="brand" href="/">FLIP&shy;PHONE<span>NEWS</span></a>
+        <a class="brand" href="/">FLIP&shy;PHONE</a>
         <nav class="site-nav">
-            <a href="#shop">Shop phones</a>
-            <a class="ghost" href="/sponsor.html">Advertise</a>
+            <a href="https://github.com/permissionlesstech/bitchat" target="_blank" rel="noopener">Bitchat</a>
+            <a class="ghost" href="/sponsor.html">Sponsor</a>
         </nav>
     </header>
 
-    <!-- ===== HERO: full-screen interactive 3D phone ===== -->
+    <!-- ===== HERO: full-screen 3D flip phone ===== -->
     <section class="hero">
         <canvas id="scene"></canvas>
 
         <div class="hero-copy">
-            <p class="eyebrow">The dumbphone shop</p>
-            <h1>Find your flip phone.</h1>
+            <p class="eyebrow">Open · Nostr · Chat</p>
+            <h1>A flip phone for the open web.</h1>
             <p class="sub">
-                It's all happening inside the phone. Tap the screen to browse,
-                flip it open to explore, buy what you want.
+                Location-based chat, no accounts, no tracking.
+                All inside a 3D flip phone. Powered by Nostr.
             </p>
-            <p class="microcopy">Drag to spin · tap to flip · ← → to browse</p>
+            <p class="microcopy">Drag to spin · tap to flip · type to chat</p>
         </div>
 
-        <!-- phone screen-app controls -->
-        <section id="panel-texts" class="panel" hidden>
-            <h3>Text from 2003</h3>
-            <label>Contact</label>
-            <input id="tx-contact" type="text" value="CRUSH ♥" maxlength="16">
-            <div class="row presets">
-                <button class="tx-preset" data-preset="Crush">Crush</button>
-                <button class="tx-preset" data-preset="Mom">Mom</button>
-                <button class="tx-preset" data-preset="Nokia">Nokia</button>
-                <button class="tx-preset" data-preset="Y2K">Y2K</button>
-            </div>
-            <label>Add a message</label>
-            <input id="tx-msg" type="text" placeholder="type… (Enter = from you)">
+        <!-- chat panel -->
+        <section id="panel-chat" class="panel">
+            <h3>💬 Chat</h3>
+            <p id="chat-status" class="note">📍 locating…</p>
+            <label>Display name</label>
+            <input id="chat-name" type="text" placeholder="anonymous" maxlength="24">
+            <label>Message</label>
             <div class="row">
-                <button id="tx-add-them">+ Them</button>
-                <button id="tx-add-me">+ You</button>
-                <button id="tx-undo" class="ghost">Undo</button>
-                <button id="tx-clear" class="ghost">Clear</button>
+                <input id="chat-input" type="text" placeholder="type…" maxlength="280">
+                <button id="chat-send" class="primary">Send</button>
             </div>
-            <div class="row">
-                <button id="tx-save" class="primary">📸 Save image</button>
-                <button id="tx-share" class="primary">🔗 Share thread</button>
-            </div>
-            <p id="tx-sharemsg" class="note">Flip the phone shut to “send” it.</p>
-        </section>
-
-        <section id="panel-snake" class="panel" hidden>
-            <h3>Snake</h3>
-            <button id="sn-start" class="primary wide">▶ Start / Restart</button>
-            <div class="dpad">
-                <button id="sn-up">▲</button>
-                <button id="sn-left">◀</button>
-                <button id="sn-right">▶</button>
-                <button id="sn-down">▼</button>
-            </div>
-            <p class="note">Arrow keys or WASD also work.</p>
-            <label>Your name (for the challenge)</label>
-            <input id="sn-name" type="text" placeholder="optional" maxlength="16">
-            <button id="sn-challenge" class="primary wide">⚔️ Challenge a friend</button>
-            <p id="sn-share" class="note">Beat a score, then share the exact same board.</p>
-            <p id="sn-status" class="status"></p>
-        </section>
-
-        <section id="panel-shop" class="panel" hidden>
-            <h3>🛒 Shop</h3>
-            <p id="shop-counter" class="note">0 of 0</p>
-            <div class="row">
-                <button id="shop-prev">← Prev</button>
-                <button id="shop-next">Next →</button>
-            </div>
-            <button id="shop-buy" class="primary wide">Buy this phone</button>
+            <p class="note">Messages are public on Nostr. No accounts, no tracking.</p>
+            <p id="chat-key" class="note" style="font-size:10px;word-break:break-all"></p>
         </section>
 
         <div class="hero-controls">
             <nav class="tabs">
-                <button class="tab active" data-app="news">📰 News</button>
-                <button class="tab" data-app="shop">🛒 Shop</button>
-                <button class="tab" data-app="texts">📟 Texts</button>
-                <button class="tab" data-app="snake">🐍 Snake</button>
+                <button class="tab active" data-app="chat">💬 Chat</button>
             </nav>
             <button id="flipBtn" class="flip-btn"><span class="dot"></span> Open / Close</button>
         </div>

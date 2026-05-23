@@ -3,13 +3,10 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 
 import { buildPhone } from './phone.js';
-import { NewsTicker, fetchHeadlines } from './news.js';
 import { drawKeypad, drawExtScreen, drawExtMessage } from './faces.js';
 import { loadSponsor, applySponsor, drawPlaceholder } from './sponsor.js';
 import { playFlip } from './audio.js';
-import { TextsApp } from './texts.js';
-import { SnakeApp, randomSeed } from './snake.js';
-import { ShopApp } from './shop.js';
+import { NostrChat } from './nostr-chat.js';
 
 // ---------- renderer / scene ----------
 const canvasEl = document.getElementById('scene');
@@ -89,14 +86,10 @@ controls.addEventListener('start', () => { grabbed = true; });
 let grabbed = false;
 
 // ---------- screen apps ----------
-const newsTicker = new NewsTicker(screenC.canvas);
-const newsApp = { update: (dt) => newsTicker.update(dt) };
-const texts = new TextsApp(screenC.canvas);
-const snake = new SnakeApp(screenC.canvas, { onGameOver: onSnakeOver });
-const shop = new ShopApp(screenC.canvas);
-const apps = { news: newsApp, shop, texts, snake };
-let activeName = 'news';
-let activeApp = apps.news;
+const chat = new NostrChat(screenC.canvas);
+const apps = { chat };
+let activeName = 'chat';
+let activeApp = apps.chat;
 
 // ---------- external display state ----------
 let extOverride = null; // { title, sub } or null = clock
@@ -114,17 +107,17 @@ phone.setOpenAmount(0);
 function setOpenTarget(v) {
     const closing = v < 0.5 && openTarget > 0.5;
     openTarget = v; lastDir = v;
-    if (closing && activeName === 'texts' && texts.messages.length) {
-        texts.markSent();
-        extOverride = { title: 'MESSAGE', sub: 'SENT' };
-        refreshExternal();
+    if (closing && activeName === 'chat' && chat.draft) {
+        // flip closed = send draft, like hanging up
+        chat.send(chat.draft);
+        chat.draft = '';
     }
     playFlip(v === 1);
 }
 function toggle() { setOpenTarget(openTarget > 0.5 ? 0 : 1); }
 document.getElementById('flipBtn').addEventListener('click', toggle);
 
-// tap the phone to flip (not while playing snake)
+// tap the phone to flip
 const raycaster = new THREE.Raycaster();
 const pointer = new THREE.Vector2();
 let downXY = null;
@@ -133,7 +126,7 @@ renderer.domElement.addEventListener('pointerup', (e) => {
     if (!downXY) return;
     const moved = Math.hypot(e.clientX - downXY[0], e.clientY - downXY[1]);
     downXY = null;
-    if (moved > 6 || (activeName === 'snake' && snake.playing)) return;
+    if (moved > 6) return;
     const rect = renderer.domElement.getBoundingClientRect();
     pointer.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
     pointer.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
@@ -147,136 +140,62 @@ function setApp(name) {
     activeApp = apps[name];
     activeApp.enter && activeApp.enter();
     document.querySelectorAll('.tab').forEach((b) => b.classList.toggle('active', b.dataset.app === name));
-    document.getElementById('panel-texts').hidden = name !== 'texts';
-    document.getElementById('panel-snake').hidden = name !== 'snake';
-    document.getElementById('panel-shop').hidden = name !== 'shop';
-    if (name !== 'news') {
-        grabbed = true;
-        phone.group.rotation.set(0, 0, 0);
-        setOpenTarget(1);
-    }
-    if (name === 'snake' && snake.target) {
-        extOverride = { title: `BEAT ${snake.by || 'RIVAL'}`, sub: `${snake.target} ★` };
-    } else if (name === 'shop') {
-        const c = shop.current;
-        extOverride = c ? { title: c.name, sub: c.price || '' } : { title: 'SHOP', sub: '' };
-    } else if (name !== 'texts') {
-        extOverride = null;
-    }
+    extOverride = { title: 'CHAT', sub: chat.gh ? `#${chat.gh}` : '' };
     refreshExternal();
 }
-document.querySelectorAll('.tab').forEach((b) => b.addEventListener('click', () => setApp(b.dataset.app)));
+document.querySelector('.tab').addEventListener('click', () => setApp('chat'));
 
-// ---------- keyboard ----------
+// ---------- keyboard: send messages via Enter ----------
 addEventListener('keydown', (e) => {
     if (e.target.tagName === 'INPUT') return;
-    if (activeName === 'snake') snake.onKey(e);
-    if (activeName === 'shop') {
-        if (e.key === 'ArrowLeft') { shop.prev(); updateShopPanel(); e.preventDefault(); }
-        if (e.key === 'ArrowRight') { shop.next(); updateShopPanel(); e.preventDefault(); }
-        if (e.key === ' ' || e.key === 'Enter') { shop.buy(); e.preventDefault(); }
+    if (activeName === 'chat' && e.key === 'Enter') {
+        const input = document.getElementById('chat-input');
+        if (input && input.value.trim()) {
+            chat.send(input.value);
+            input.value = '';
+        }
     }
 });
 
-// ---------- TEXTS panel wiring ----------
+// ---------- CHAT panel wiring ----------
 const $ = (id) => document.getElementById(id);
-$('tx-contact').addEventListener('input', (e) => texts.setContact(e.target.value));
-document.querySelectorAll('.tx-preset').forEach((b) => b.addEventListener('click', () => {
-    texts.setPreset(b.dataset.preset);
-    $('tx-contact').value = texts.contact;
-}));
-$('tx-add-them').addEventListener('click', () => { texts.add(false, $('tx-msg').value); $('tx-msg').value = ''; });
-$('tx-add-me').addEventListener('click', () => { texts.add(true, $('tx-msg').value); $('tx-msg').value = ''; });
-$('tx-msg').addEventListener('keydown', (e) => { if (e.key === 'Enter') { texts.add(true, e.target.value); e.target.value = ''; } });
-$('tx-undo').addEventListener('click', () => texts.pop());
-$('tx-clear').addEventListener('click', () => texts.clear());
-$('tx-save').addEventListener('click', savePNG);
-$('tx-share').addEventListener('click', () => {
-    const url = `${location.origin}${location.pathname}?app=texts&t=${texts.encode()}`;
-    copy(url, $('tx-sharemsg'));
+const chatInput = $('chat-input');
+const chatSend = $('chat-send');
+const chatStatus = $('chat-status');
+const chatName = $('chat-name');
+const chatKey = $('chat-key');
+
+chatSend.addEventListener('click', () => {
+    if (chatInput.value.trim()) {
+        chat.send(chatInput.value);
+        chatInput.value = '';
+    }
+});
+chatInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+        if (chatInput.value.trim()) {
+            chat.send(chatInput.value);
+            chatInput.value = '';
+        }
+        e.preventDefault();
+    }
+});
+chatName.addEventListener('input', () => {
+    chat.name = chatName.value.trim();
 });
 
-// ---------- SNAKE panel wiring ----------
-$('sn-start').addEventListener('click', () => snake.start());
-$('sn-up').addEventListener('click', () => dpad(0, -1));
-$('sn-down').addEventListener('click', () => dpad(0, 1));
-$('sn-left').addEventListener('click', () => dpad(-1, 0));
-$('sn-right').addEventListener('click', () => dpad(1, 0));
-function dpad(x, y) { if (!snake.playing) snake.start(); snake.setDir(x, y); }
-$('sn-challenge').addEventListener('click', () => {
-    const name = ($('sn-name').value || '').trim().slice(0, 16);
-    const score = snake.score;
-    const url = `${location.origin}${location.pathname}?app=snake&seed=${snake.seed}&target=${score}` +
-        (name ? `&by=${encodeURIComponent(name)}` : '');
-    copy(url, $('sn-share'));
-    $('sn-share').textContent = `Sharing a challenge to beat ${score}★ — link copied!`;
-});
+// update status from the chat app
+const origDraw = chat.draw.bind(chat);
+chat.draw = function () {
+    chatStatus.textContent = this.status;
+    chatKey.textContent = `key: ${this.pk ? this.pk.slice(0, 12) + '…' : '—'}`;
+    origDraw();
+};
 
-// ---------- SHOP panel wiring ----------
-function updateShopPanel() {
-    const c = shop.current;
-    $('shop-counter').textContent = c ? `${shop.idx + 1} of ${shop.total} — ${c.price}` : '0 of 0';
-    if (shop.current) {
-        extOverride = { title: shop.current.name, sub: shop.current.price || '' };
-        refreshExternal();
-    }
-}
-$('shop-prev').addEventListener('click', () => { shop.prev(); updateShopPanel(); });
-$('shop-next').addEventListener('click', () => { shop.next(); updateShopPanel(); });
-$('shop-buy').addEventListener('click', () => shop.buy());
-
-function onSnakeOver(score) {
-    $('sn-status').textContent = snake.target
-        ? (score > snake.target ? `🏆 You beat ${snake.by || 'them'} (${score} > ${snake.target})!`
-                                 : `Scored ${score}. Need > ${snake.target}. Try again!`)
-        : `Game over — ${score}★. Challenge a friend!`;
-}
-
-// ---------- exports / clipboard ----------
-function savePNG() {
-    renderer.render(scene, camera);
-    const a = document.createElement('a');
-    a.href = renderer.domElement.toDataURL('image/png');
-    a.download = 'flipphonenews.png';
-    a.click();
-}
-function copy(text, el) {
-    const done = () => { if (el) { el.textContent = 'Link copied to clipboard ✓'; } };
-    if (navigator.clipboard) navigator.clipboard.writeText(text).then(done).catch(() => fallbackCopy(text, done));
-    else fallbackCopy(text, done);
-}
-function fallbackCopy(text, done) {
-    const ta = document.createElement('textarea');
-    ta.value = text; document.body.appendChild(ta); ta.select();
-    try { document.execCommand('copy'); } catch (_) {}
-    ta.remove(); done();
-}
-
-// ---------- boot: URL params (shared thread / challenge) ----------
-(function bootFromURL() {
-    const q = new URLSearchParams(location.search);
-    const app = q.get('app');
-    if (app === 'texts' && q.get('t')) {
-        const d = TextsApp.decode(q.get('t'));
-        if (d) { texts.applyDecoded(d); $('tx-contact').value = texts.contact; }
-        setApp('texts');
-    } else if (app === 'snake') {
-        snake.configure({
-            seed: Number(q.get('seed')) || randomSeed(),
-            target: Number(q.get('target')) || 0,
-            by: q.get('by') || '',
-        });
-        setApp('snake');
-    } else if (app === 'shop') {
-        setApp('shop');
-    } else {
-        setApp('news');
-    }
-})();
+// ---------- boot: always start in chat ----------
+setApp('chat');
 
 // ---------- data loads ----------
-fetchHeadlines(12).then((t) => newsTicker.setHeadlines(t)).catch(() => {})
-    .finally(() => setInterval(() => fetchHeadlines(12).then((t) => newsTicker.setHeadlines(t)).catch(() => {}), 6e5));
 loadSponsor().then((data) => applySponsor(data, {
     ctx: sponsorC.ctx, tex: sponsorC.tex, mat: phone.sponsorMat,
     loader: new THREE.TextureLoader(), domTag: document.getElementById('sponsorTag'),
@@ -293,8 +212,7 @@ function animate() {
     if (Math.abs(openTarget - open) < 0.001) open = openTarget;
     phone.setOpenAmount(open);
 
-    if (activeName === 'news' && !grabbed) phone.group.rotation.y += dt * 0.18;
-    controls.enableRotate = !(activeName === 'snake' && snake.playing);
+    if (activeName === 'chat' && !grabbed) phone.group.rotation.y += dt * 0.18;
 
     activeApp.update(dt);
     screenC.tex.needsUpdate = true;
@@ -317,7 +235,7 @@ new ResizeObserver(sizeToStage).observe(stage);
 
 // debug/test hook
 window.FPN = {
-    phone, controls, setApp, snake, texts,
+    chat,
     setOpen: (v) => setOpenTarget(v),
     stopIdle: () => { grabbed = true; },
 };

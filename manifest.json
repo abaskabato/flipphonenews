@@ -1,0 +1,18 @@
+{
+  "name": "FlipPhone",
+  "short_name": "FlipPhone",
+  "description": "A 3D flip phone for Nostr chat. No accounts, no tracking.",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#08080f",
+  "theme_color": "#08080f",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
