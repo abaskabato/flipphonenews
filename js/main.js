@@ -4,12 +4,15 @@ import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 
 import { buildPhone } from './phone.js';
 import { NewsTicker, fetchHeadlines } from './news.js';
-import { drawKeypad, drawExtScreen } from './faces.js';
+import { drawKeypad, drawExtScreen, drawExtMessage } from './faces.js';
 import { loadSponsor, applySponsor, drawPlaceholder } from './sponsor.js';
 import { playFlip } from './audio.js';
+import { TextsApp } from './texts.js';
+import { SnakeApp, randomSeed } from './snake.js';
 
+// ---------- renderer / scene ----------
 const canvasEl = document.getElementById('scene');
-const renderer = new THREE.WebGLRenderer({ canvas: canvasEl, antialias: true, alpha: true });
+const renderer = new THREE.WebGLRenderer({ canvas: canvasEl, antialias: true, alpha: true, preserveDrawingBuffer: true });
 renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
 renderer.setSize(innerWidth, innerHeight);
 renderer.shadowMap.enabled = true;
@@ -19,72 +22,57 @@ renderer.toneMappingExposure = 1.05;
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 
 const scene = new THREE.Scene();
-
 const camera = new THREE.PerspectiveCamera(34, innerWidth / innerHeight, 0.1, 100);
 camera.position.set(0.1, 0.25, 4.6);
 
-// metallic reflections from a procedural room
 const pmrem = new THREE.PMREMGenerator(renderer);
 scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
 
-// ---- lighting ----
 scene.add(new THREE.HemisphereLight(0xbcd0ff, 0x202028, 0.45));
-const key = new THREE.DirectionalLight(0xffffff, 2.4);
-key.position.set(2.6, 4.2, 3.4);
-key.castShadow = true;
-key.shadow.mapSize.set(2048, 2048);
-key.shadow.camera.near = 1; key.shadow.camera.far = 14;
-key.shadow.camera.left = -3; key.shadow.camera.right = 3;
-key.shadow.camera.top = 3; key.shadow.camera.bottom = -3;
-key.shadow.bias = -0.0004;
-scene.add(key);
+const keyLight = new THREE.DirectionalLight(0xffffff, 2.4);
+keyLight.position.set(2.6, 4.2, 3.4);
+keyLight.castShadow = true;
+keyLight.shadow.mapSize.set(2048, 2048);
+keyLight.shadow.camera.near = 1; keyLight.shadow.camera.far = 14;
+keyLight.shadow.camera.left = -3; keyLight.shadow.camera.right = 3;
+keyLight.shadow.camera.top = 3; keyLight.shadow.camera.bottom = -3;
+keyLight.shadow.bias = -0.0004;
+scene.add(keyLight);
 const rim = new THREE.DirectionalLight(0x88aaff, 0.9);
 rim.position.set(-3, 1.5, -2.5);
 scene.add(rim);
 
-// ---- ground shadow catcher ----
-const ground = new THREE.Mesh(
-    new THREE.PlaneGeometry(40, 40),
-    new THREE.ShadowMaterial({ opacity: 0.32 })
-);
+const ground = new THREE.Mesh(new THREE.PlaneGeometry(40, 40), new THREE.ShadowMaterial({ opacity: 0.32 }));
 ground.rotation.x = -Math.PI / 2;
 ground.position.y = -1.55;
 ground.receiveShadow = true;
 scene.add(ground);
 
-// ---- canvases / textures ----
+// ---------- canvases / textures ----------
 function makeCanvasTexture(w, h) {
     const c = document.createElement('canvas');
     c.width = w; c.height = h;
     const tex = new THREE.CanvasTexture(c);
     tex.colorSpace = THREE.SRGBColorSpace;
     tex.anisotropy = 8;
-    return { canvas: c, ctx: c.getContext('2d'), tex };
+    return { canvas: c, ctx: c.getContext('2d'), tex, W: w, H: h };
 }
+const screenC = makeCanvasTexture(512, 576);
+const keypadC = makeCanvasTexture(540, 760);
+const extC = makeCanvasTexture(360, 150);
+const sponsorC = makeCanvasTexture(512, 280);
 
-const screenC = makeCanvasTexture(512, 576);   // inner news LCD
-const keypadC = makeCanvasTexture(540, 760);   // base keypad
-const extC = makeCanvasTexture(360, 150);      // external clock
-const sponsorC = makeCanvasTexture(512, 280);  // sponsor billboard
-
-drawKeypad(keypadC.ctx, keypadC.canvas.width, keypadC.canvas.height);
+drawKeypad(keypadC.ctx, keypadC.W, keypadC.H);
 keypadC.tex.needsUpdate = true;
-drawExtScreen(extC.ctx, extC.canvas.width, extC.canvas.height, new Date().toTimeString().slice(0, 5));
-extC.tex.needsUpdate = true;
 drawPlaceholder(sponsorC.ctx, sponsorC.tex);
 
-const ticker = new NewsTicker(screenC.canvas);
-
-// ---- build the handset ----
 const phone = buildPhone({
-    screenTex: screenC.tex,
-    keypadTex: keypadC.tex,
-    extScreenTex: extC.tex,
-    sponsorTex: sponsorC.tex,
+    screenTex: screenC.tex, keypadTex: keypadC.tex,
+    extScreenTex: extC.tex, sponsorTex: sponsorC.tex,
 });
 scene.add(phone.group);
 
-// ---- controls ----
+// ---------- controls ----------
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
 controls.dampingFactor = 0.08;
@@ -94,21 +82,45 @@ controls.maxDistance = 7;
 controls.minPolarAngle = 0.55;
 controls.maxPolarAngle = Math.PI - 0.7;
 controls.target.set(0, -0.05, 0);
+controls.addEventListener('start', () => { grabbed = true; });
+let grabbed = false;
 
-// ---- open/close state machine ----
-let open = 0;          // current 0..1
-let openTarget = 1;    // start by springing open
-let lastDir = 1;
-phone.setOpenAmount(open);
+// ---------- screen apps ----------
+const newsTicker = new NewsTicker(screenC.canvas);
+const newsApp = { update: (dt) => newsTicker.update(dt) };
+const texts = new TextsApp(screenC.canvas);
+const snake = new SnakeApp(screenC.canvas, { onGameOver: onSnakeOver });
+const apps = { news: newsApp, texts, snake };
+let activeName = 'news';
+let activeApp = apps.news;
 
-function toggle() {
-    openTarget = openTarget > 0.5 ? 0 : 1;
-    lastDir = openTarget;
-    playFlip(openTarget === 1);
+// ---------- external display state ----------
+let extOverride = null; // { title, sub } or null = clock
+function refreshExternal() {
+    if (extOverride) drawExtMessage(extC.ctx, extC.W, extC.H, extOverride.title, extOverride.sub);
+    else drawExtScreen(extC.ctx, extC.W, extC.H, new Date().toTimeString().slice(0, 5));
+    extC.tex.needsUpdate = true;
 }
+refreshExternal();
+setInterval(refreshExternal, 30 * 1000);
+
+// ---------- open / close ----------
+let open = 0, openTarget = 0, lastDir = 0;
+phone.setOpenAmount(0);
+function setOpenTarget(v) {
+    const closing = v < 0.5 && openTarget > 0.5;
+    openTarget = v; lastDir = v;
+    if (closing && activeName === 'texts' && texts.messages.length) {
+        texts.markSent();
+        extOverride = { title: 'MESSAGE', sub: 'SENT' };
+        refreshExternal();
+    }
+    playFlip(v === 1);
+}
+function toggle() { setOpenTarget(openTarget > 0.5 ? 0 : 1); }
 document.getElementById('flipBtn').addEventListener('click', toggle);
 
-// click the phone itself to toggle, too
+// tap the phone to flip (not while playing snake)
 const raycaster = new THREE.Raycaster();
 const pointer = new THREE.Vector2();
 let downXY = null;
@@ -117,80 +129,163 @@ renderer.domElement.addEventListener('pointerup', (e) => {
     if (!downXY) return;
     const moved = Math.hypot(e.clientX - downXY[0], e.clientY - downXY[1]);
     downXY = null;
-    if (moved > 6) return; // it was a drag, not a tap
+    if (moved > 6 || (activeName === 'snake' && snake.playing)) return;
     pointer.x = (e.clientX / innerWidth) * 2 - 1;
     pointer.y = -(e.clientY / innerHeight) * 2 + 1;
     raycaster.setFromCamera(pointer, camera);
     if (raycaster.intersectObject(phone.group, true).length) toggle();
 });
 
-// ---- news loading ----
-fetchHeadlines(12)
-    .then((titles) => ticker.setHeadlines(titles))
-    .catch(() => { /* keep fallback headlines */ })
-    .finally(() => setInterval(refreshNews, 10 * 60 * 1000)); // refresh every 10 min
-function refreshNews() {
-    fetchHeadlines(12).then((t) => ticker.setHeadlines(t)).catch(() => {});
+// ---------- mode switching ----------
+function setApp(name) {
+    activeName = name;
+    activeApp = apps[name];
+    activeApp.enter && activeApp.enter();
+    document.querySelectorAll('.tab').forEach((b) => b.classList.toggle('active', b.dataset.app === name));
+    document.getElementById('panel-texts').hidden = name !== 'texts';
+    document.getElementById('panel-snake').hidden = name !== 'snake';
+    if (name !== 'news') {
+        grabbed = true;                     // stop idle spin
+        phone.group.rotation.set(0, 0, 0);  // face the screen forward
+        setOpenTarget(1);
+    }
+    if (name === 'snake' && snake.target) {
+        extOverride = { title: `BEAT ${snake.by || 'RIVAL'}`, sub: `${snake.target} ★` };
+    } else if (name !== 'texts') {
+        extOverride = null;
+    }
+    refreshExternal();
+}
+document.querySelectorAll('.tab').forEach((b) => b.addEventListener('click', () => setApp(b.dataset.app)));
+
+// ---------- keyboard ----------
+addEventListener('keydown', (e) => {
+    if (e.target.tagName === 'INPUT') return;
+    if (activeName === 'snake') snake.onKey(e);
+});
+
+// ---------- TEXTS panel wiring ----------
+const $ = (id) => document.getElementById(id);
+$('tx-contact').addEventListener('input', (e) => texts.setContact(e.target.value));
+document.querySelectorAll('.tx-preset').forEach((b) => b.addEventListener('click', () => {
+    texts.setPreset(b.dataset.preset);
+    $('tx-contact').value = texts.contact;
+}));
+$('tx-add-them').addEventListener('click', () => { texts.add(false, $('tx-msg').value); $('tx-msg').value = ''; });
+$('tx-add-me').addEventListener('click', () => { texts.add(true, $('tx-msg').value); $('tx-msg').value = ''; });
+$('tx-msg').addEventListener('keydown', (e) => { if (e.key === 'Enter') { texts.add(true, e.target.value); e.target.value = ''; } });
+$('tx-undo').addEventListener('click', () => texts.pop());
+$('tx-clear').addEventListener('click', () => texts.clear());
+$('tx-save').addEventListener('click', savePNG);
+$('tx-share').addEventListener('click', () => {
+    const url = `${location.origin}${location.pathname}?app=texts&t=${texts.encode()}`;
+    copy(url, $('tx-sharemsg'));
+});
+
+// ---------- SNAKE panel wiring ----------
+$('sn-start').addEventListener('click', () => snake.start());
+$('sn-up').addEventListener('click', () => dpad(0, -1));
+$('sn-down').addEventListener('click', () => dpad(0, 1));
+$('sn-left').addEventListener('click', () => dpad(-1, 0));
+$('sn-right').addEventListener('click', () => dpad(1, 0));
+function dpad(x, y) { if (!snake.playing) snake.start(); snake.setDir(x, y); }
+$('sn-challenge').addEventListener('click', () => {
+    const name = ($('sn-name').value || '').trim().slice(0, 16);
+    const score = snake.score;
+    const url = `${location.origin}${location.pathname}?app=snake&seed=${snake.seed}&target=${score}` +
+        (name ? `&by=${encodeURIComponent(name)}` : '');
+    copy(url, $('sn-share'));
+    $('sn-share').textContent = `Sharing a challenge to beat ${score}★ — link copied!`;
+});
+
+function onSnakeOver(score) {
+    $('sn-status').textContent = snake.target
+        ? (score > snake.target ? `🏆 You beat ${snake.by || 'them'} (${score} > ${snake.target})!`
+                                 : `Scored ${score}. Need > ${snake.target}. Try again!`)
+        : `Game over — ${score}★. Challenge a friend!`;
 }
 
-// ---- sponsor loading ----
+// ---------- exports / clipboard ----------
+function savePNG() {
+    renderer.render(scene, camera);
+    const a = document.createElement('a');
+    a.href = renderer.domElement.toDataURL('image/png');
+    a.download = 'flipphonenews.png';
+    a.click();
+}
+function copy(text, el) {
+    const done = () => { if (el) { el.textContent = 'Link copied to clipboard ✓'; } };
+    if (navigator.clipboard) navigator.clipboard.writeText(text).then(done).catch(() => fallbackCopy(text, done));
+    else fallbackCopy(text, done);
+}
+function fallbackCopy(text, done) {
+    const ta = document.createElement('textarea');
+    ta.value = text; document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); } catch (_) {}
+    ta.remove(); done();
+}
+
+// ---------- boot: URL params (shared thread / challenge) ----------
+(function bootFromURL() {
+    const q = new URLSearchParams(location.search);
+    const app = q.get('app');
+    if (app === 'texts' && q.get('t')) {
+        const d = TextsApp.decode(q.get('t'));
+        if (d) { texts.applyDecoded(d); $('tx-contact').value = texts.contact; }
+        setApp('texts');
+    } else if (app === 'snake') {
+        snake.configure({
+            seed: Number(q.get('seed')) || randomSeed(),
+            target: Number(q.get('target')) || 0,
+            by: q.get('by') || '',
+        });
+        setApp('snake');
+    } else {
+        setApp('news');
+    }
+})();
+
+// ---------- data loads ----------
+fetchHeadlines(12).then((t) => newsTicker.setHeadlines(t)).catch(() => {})
+    .finally(() => setInterval(() => fetchHeadlines(12).then((t) => newsTicker.setHeadlines(t)).catch(() => {}), 6e5));
 loadSponsor().then((data) => applySponsor(data, {
     ctx: sponsorC.ctx, tex: sponsorC.tex, mat: phone.sponsorMat,
     loader: new THREE.TextureLoader(), domTag: document.getElementById('sponsorTag'),
 }));
 
-// ---- spring-open easing ----
-function approach(cur, target, dt) {
-    // critically-damped-ish spring with a touch of overshoot near the latch
-    const k = 9;
-    let next = cur + (target - cur) * Math.min(1, k * dt);
-    if (Math.abs(target - next) < 0.001) next = target;
-    return next;
-}
-
-// ---- render loop ----
+// ---------- render loop ----------
 const clock = new THREE.Clock();
 let booted = false;
 function animate() {
     requestAnimationFrame(animate);
     const dt = Math.min(clock.getDelta(), 0.05);
 
-    open = approach(open, openTarget, dt);
+    open += (openTarget - open) * Math.min(1, 9 * dt);
+    if (Math.abs(openTarget - open) < 0.001) open = openTarget;
     phone.setOpenAmount(open);
 
-    // gentle idle turn until the user grabs it
-    if (!controls._grabbed) phone.group.rotation.y += dt * 0.18;
+    if (activeName === 'news' && !grabbed) phone.group.rotation.y += dt * 0.18;
+    controls.enableRotate = !(activeName === 'snake' && snake.playing);
 
-    ticker.update(dt);
+    activeApp.update(dt);
     screenC.tex.needsUpdate = true;
 
     controls.update();
     renderer.render(scene, camera);
 
-    if (!booted) {
-        booted = true;
-        document.getElementById('loader').classList.add('hidden');
-    }
+    if (!booted) { booted = true; document.getElementById('loader').classList.add('hidden'); }
 }
-controls.addEventListener('start', () => { controls._grabbed = true; });
 animate();
 
-// debug/test hook
-window.FPN = {
-    phone, controls, toggle,
-    setOpen: (v) => { openTarget = v; lastDir = v; },
-    stopIdle: () => { controls._grabbed = true; },
-};
-
-// keep external clock current
-setInterval(() => {
-    drawExtScreen(extC.ctx, extC.canvas.width, extC.canvas.height, new Date().toTimeString().slice(0, 5));
-    extC.tex.needsUpdate = true;
-}, 30 * 1000);
-
-// ---- resize ----
 addEventListener('resize', () => {
     camera.aspect = innerWidth / innerHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(innerWidth, innerHeight);
 });
+
+// debug/test hook
+window.FPN = {
+    phone, controls, setApp, snake, texts,
+    setOpen: (v) => setOpenTarget(v),
+    stopIdle: () => { grabbed = true; },
+};

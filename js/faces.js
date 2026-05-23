@@ -79,6 +79,32 @@ export function drawExtScreen(ctx, W, H, timeStr) {
     ctx.globalAlpha = 1;
 }
 
+// external display showing a short message (e.g. "MESSAGE SENT", a challenge)
+export function drawExtMessage(ctx, W, H, title, sub) {
+    const g = ctx.createLinearGradient(0, 0, 0, H);
+    g.addColorStop(0, '#0b2a12');
+    g.addColorStop(1, '#05140a');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, W, H);
+
+    ctx.fillStyle = NEON;
+    ctx.shadowColor = 'rgba(57,255,20,0.8)';
+    ctx.shadowBlur = 10;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.font = "bold 30px 'Courier New', monospace";
+    ctx.fillText(title, W / 2, sub ? H * 0.38 : H * 0.5);
+    if (sub) {
+        ctx.font = "bold 36px 'Courier New', monospace";
+        ctx.fillText(sub, W / 2, H * 0.66);
+    }
+    ctx.shadowBlur = 0;
+
+    ctx.globalAlpha = 0.1; ctx.fillStyle = '#000';
+    for (let y = 0; y < H; y += 4) ctx.fillRect(0, y, W, 2);
+    ctx.globalAlpha = 1;
+}
+
 // ---------- primitives ----------
 function roundRect(ctx, x, y, w, h, r) {
     ctx.beginPath();
