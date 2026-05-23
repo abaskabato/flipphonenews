@@ -14,7 +14,8 @@ import { SnakeApp, randomSeed } from './snake.js';
 const canvasEl = document.getElementById('scene');
 const renderer = new THREE.WebGLRenderer({ canvas: canvasEl, antialias: true, alpha: true, preserveDrawingBuffer: true });
 renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
-renderer.setSize(innerWidth, innerHeight);
+const stage = canvasEl.parentElement; // the .hero section
+renderer.setSize(stage.clientWidth, stage.clientHeight);
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -22,7 +23,7 @@ renderer.toneMappingExposure = 1.05;
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 
 const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(34, innerWidth / innerHeight, 0.1, 100);
+const camera = new THREE.PerspectiveCamera(34, stage.clientWidth / stage.clientHeight, 0.1, 100);
 camera.position.set(0.1, 0.25, 4.6);
 
 const pmrem = new THREE.PMREMGenerator(renderer);
@@ -77,6 +78,7 @@ const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
 controls.dampingFactor = 0.08;
 controls.enablePan = false;
+controls.enableZoom = false; // let the page scroll over the canvas
 controls.minDistance = 2.6;
 controls.maxDistance = 7;
 controls.minPolarAngle = 0.55;
@@ -130,8 +132,9 @@ renderer.domElement.addEventListener('pointerup', (e) => {
     const moved = Math.hypot(e.clientX - downXY[0], e.clientY - downXY[1]);
     downXY = null;
     if (moved > 6 || (activeName === 'snake' && snake.playing)) return;
-    pointer.x = (e.clientX / innerWidth) * 2 - 1;
-    pointer.y = -(e.clientY / innerHeight) * 2 + 1;
+    const rect = renderer.domElement.getBoundingClientRect();
+    pointer.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+    pointer.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
     raycaster.setFromCamera(pointer, camera);
     if (raycaster.intersectObject(phone.group, true).length) toggle();
 });
@@ -277,11 +280,14 @@ function animate() {
 }
 animate();
 
-addEventListener('resize', () => {
-    camera.aspect = innerWidth / innerHeight;
+function sizeToStage() {
+    const w = stage.clientWidth, h = stage.clientHeight;
+    camera.aspect = w / h;
     camera.updateProjectionMatrix();
-    renderer.setSize(innerWidth, innerHeight);
-});
+    renderer.setSize(w, h);
+}
+addEventListener('resize', sizeToStage);
+new ResizeObserver(sizeToStage).observe(stage);
 
 // debug/test hook
 window.FPN = {

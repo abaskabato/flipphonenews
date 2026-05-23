@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flip Phone News</title>
-    <meta name="description" content="A live, interactive 3D flip phone: stream the day's headlines, text like it's 2003, and challenge friends to Snake.">
+    <title>FlipPhoneNews — reclaim your attention</title>
+    <meta name="description" content="A digital-minimalism playground. Play with the phone that does almost nothing, then start a 30-day reset to win back your hours.">
     <link rel="stylesheet" href="style.css">
     <script type="importmap">
     {
@@ -16,22 +16,36 @@
     </script>
 </head>
 <body>
-    <div id="app">
+    <!-- sticky site header -->
+    <header class="site-header">
+        <a class="brand" href="/">FLIP&shy;PHONE<span>NEWS</span></a>
+        <nav class="site-nav">
+            <a href="#problem">The problem</a>
+            <a href="#program">30-Day Reset</a>
+            <a href="#join">Free guide</a>
+            <a class="ghost" href="/sponsor.html">Advertise</a>
+        </nav>
+    </header>
+
+    <!-- ===== HERO: interactive phone + pitch ===== -->
+    <section class="hero">
         <canvas id="scene"></canvas>
 
-        <header class="topbar">
-            <div class="brand">FLIP&shy;PHONE<span>NEWS</span></div>
-            <a class="sponsor-link" href="/sponsor.html">Advertise here &rarr;</a>
-        </header>
+        <div class="hero-copy">
+            <p class="eyebrow">Digital minimalism</p>
+            <h1>Your attention is worth more than their feed.</h1>
+            <p class="sub">
+                Meet the phone that does almost nothing — on purpose. Flip it open,
+                feel how quiet it is, then take the 30-day reset and win your hours back.
+            </p>
+            <div class="cta-row">
+                <button class="btn primary js-buy">Start the 30-Day Reset · $19</button>
+                <a class="btn ghost" href="#join">Free 7-day starter →</a>
+            </div>
+            <p class="microcopy">Drag the phone to spin it · tap to flip it open</p>
+        </div>
 
-        <!-- mode tabs -->
-        <nav class="tabs">
-            <button class="tab active" data-app="news">📰 News</button>
-            <button class="tab" data-app="texts">📟 Texts</button>
-            <button class="tab" data-app="snake">🐍 Snake</button>
-        </nav>
-
-        <!-- TEXTS composer -->
+        <!-- phone screen-app controls -->
         <section id="panel-texts" class="panel" hidden>
             <h3>Text from 2003</h3>
             <label>Contact</label>
@@ -57,7 +71,6 @@
             <p id="tx-sharemsg" class="note">Flip the phone shut to “send” it.</p>
         </section>
 
-        <!-- SNAKE -->
         <section id="panel-snake" class="panel" hidden>
             <h3>Snake</h3>
             <button id="sn-start" class="primary wide">▶ Start / Restart</button>
@@ -75,18 +88,84 @@
             <p id="sn-status" class="status"></p>
         </section>
 
-        <div class="hud">
-            <button id="flipBtn" class="flip-btn" aria-label="Open or close the phone">
-                <span class="dot"></span> Open / Close
-            </button>
-            <p class="tip">drag to rotate &middot; scroll to zoom</p>
+        <div class="hero-controls">
+            <nav class="tabs">
+                <button class="tab active" data-app="news">📰 News</button>
+                <button class="tab" data-app="texts">📟 Texts</button>
+                <button class="tab" data-app="snake">🐍 Snake</button>
+            </nav>
+            <button id="flipBtn" class="flip-btn"><span class="dot"></span> Open / Close</button>
         </div>
 
         <div id="sponsorTag" class="sponsor-tag" hidden></div>
+        <div id="loader" class="loader">Booting handset…</div>
+        <a class="scroll-cue" href="#problem" aria-label="Scroll down">▾</a>
+    </section>
 
-        <div id="loader" class="loader">Booting handset&hellip;</div>
-    </div>
+    <!-- ===== PROBLEM ===== -->
+    <section id="problem" class="band">
+        <h2>You already feel it.</h2>
+        <p class="lead">The average person now spends about <strong>7 hours a day</strong> looking at a screen. Your phone wasn't built to inform you — it was built to keep you.</p>
+        <div class="stats">
+            <div class="stat"><b>+148%</b><span>rise in dumbphone interest among 18–24s (2021→2024)</span></div>
+            <div class="stat"><b>80%</b><span>of people actively try to cut their screen time</span></div>
+            <div class="stat"><b>45%</b><span>say they'd consider switching to a simpler phone</span></div>
+            <div class="stat"><b>~7 hrs</b><span>average daily screen time, and climbing</span></div>
+        </div>
+        <p class="src">You don't need another app to fix your phone problem. You need fewer.</p>
+    </section>
+
+    <!-- ===== HOW ===== -->
+    <section id="how" class="how">
+        <h2>The reset, not the relapse.</h2>
+        <div class="steps">
+            <div class="step"><span class="n">1</span><h3>Audit</h3><p>See where your hours actually go — no guilt, just the number.</p></div>
+            <div class="step"><span class="n">2</span><h3>Strip</h3><p>A daily 30-day plan to remove the hooks: feeds, badges, the dopamine slot machines.</p></div>
+            <div class="step"><span class="n">3</span><h3>Replace</h3><p>Swap the scroll for analog defaults — including, if you want, a phone like this one.</p></div>
+        </div>
+    </section>
+
+    <!-- ===== PROGRAM (product) ===== -->
+    <section id="program" class="program">
+        <div class="prod-card">
+            <p class="eyebrow">Flagship</p>
+            <h2>The 30-Day Reset</h2>
+            <p class="sub">A no-fluff, day-by-day program to break the scroll and rebuild a calmer relationship with your phone. Built from what actually works — not willpower.</p>
+            <ul class="includes">
+                <li>30 daily missions (5 min each)</li>
+                <li>Screen-time audit + weekly check-ins</li>
+                <li>The “analog swap” playbook</li>
+                <li>Lifetime access, yours forever</li>
+            </ul>
+            <div class="price-row">
+                <div class="price"><b>$19</b><small>one-time</small></div>
+                <button class="btn primary js-buy">Get instant access →</button>
+            </div>
+            <p id="buyMsg" class="note">Secure checkout via Stripe. 7-day money-back, no questions.</p>
+        </div>
+    </section>
+
+    <!-- ===== EMAIL CAPTURE ===== -->
+    <section id="join" class="join">
+        <h2>Not ready? Start free.</h2>
+        <p class="sub">Get the <strong>7-Day Starter</strong> — one small change a day, in your inbox. No spam, unsubscribe anytime.</p>
+        <form id="subscribeForm" class="subscribe">
+            <input id="emailInput" type="email" required placeholder="you@email.com">
+            <button class="btn primary" type="submit">Send me the starter</button>
+        </form>
+        <p id="subscribeMsg" class="note"></p>
+    </section>
+
+    <footer class="site-footer">
+        <div>© <span id="yr"></span> FlipPhoneNews — less screen, more life.</div>
+        <nav>
+            <a href="#program">30-Day Reset</a>
+            <a href="#join">Free guide</a>
+            <a href="/sponsor.html">Advertise</a>
+        </nav>
+    </footer>
 
     <script type="module" src="js/main.js"></script>
+    <script type="module" src="js/site.js"></script>
 </body>
 </html>
