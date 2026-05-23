@@ -1,8 +1,6 @@
 // Nostr chat — location-based channels inside the 3D flip phone.
-// No accounts, no phone numbers. Ephemeral keys, open relays.
+// Dynamically imports nostr-tools so the 3D phone always boots even if the CDN fails.
 import { NEON, NEON_DIM, lcdBackground, headerBar, footerBar, crt, wrapText } from './lcd.js';
-import { generatePrivateKey, getPublicKey, finalizeEvent } from 'nostr-tools';
-import { SimplePool } from 'nostr-tools/pool';
 
 const RELAYS = [
     'wss://relay.damus.io',
@@ -27,6 +25,18 @@ function geohash(lat, lon, precision = 5) {
     return hash;
 }
 
+let _nostr = null;
+async function nostr() {
+    if (!_nostr) {
+        try {
+            _nostr = await import('nostr-tools');
+        } catch {
+            return null;
+        }
+    }
+    return _nostr;
+}
+
 export class NostrChat {
     constructor(canvas) {
         this.canvas = canvas;
@@ -38,17 +48,22 @@ export class NostrChat {
         this.sub = null;
         this.draft = '';
         this.name = '';
-        this._initKey();
+        this.sk = null;
+        this.pk = null;
+        this._nostrReady = false;
     }
 
-    _initKey() {
+    async _initKey() {
+        const n = await nostr();
+        if (!n) return false;
         let key = localStorage.getItem(STORAGE_KEY);
         if (!key) {
-            key = generatePrivateKey();
+            key = n.generatePrivateKey();
             localStorage.setItem(STORAGE_KEY, key);
         }
         this.sk = key;
-        this.pk = getPublicKey(key);
+        this.pk = n.getPublicKey(key);
+        return true;
     }
 
     shortId(pk) {
@@ -56,6 +71,9 @@ export class NostrChat {
     }
 
     async enter() {
+        if (!this._nostrReady) {
+            this._nostrReady = await this._initKey();
+        }
         if (this.messages.length === 0) {
             this.status = 'locating…';
             this.draw();
@@ -80,21 +98,27 @@ export class NostrChat {
 
     async _connect() {
         if (this.pool) return;
-        this.status = `connecting…`;
+        const n = await nostr();
+        if (!n) { this.status = 'nostr unavailable'; this.draw(); return; }
+
+        this.status = 'connecting…';
         this.draw();
+        const { SimplePool } = n;
         this.pool = new SimplePool();
         try {
             await this.pool.ensureRelay(RELAYS[0]);
             this.status = `📍 #${this.gh}`;
         } catch {
-            this.status = `offline`;
+            this.status = 'offline';
         }
         this._subscribe();
         this.draw();
     }
 
     _subscribe() {
-        if (this.sub) return;
+        if (this.sub || !this.pool) return;
+        const n = _nostr;
+        if (!n) return;
         this.sub = this.pool.subscribeMany(
             RELAYS,
             [{ kinds: [1], '#t': [this.gh], limit: 50 }],
@@ -115,9 +139,11 @@ export class NostrChat {
         );
     }
 
-    send(text) {
+    async send(text) {
         if (!text.trim() || !this.pool) return;
-        const ev = finalizeEvent({
+        const n = _nostr;
+        if (!n) return;
+        const ev = n.finalizeEvent({
             kind: 1,
             created_at: Math.floor(Date.now() / 1000),
             tags: [['t', this.gh]],
@@ -146,9 +172,8 @@ export class NostrChat {
         const { ctx, canvas, messages, status, draft, gh } = this;
         const W = canvas.width, H = canvas.height;
         lcdBackground(ctx, W, H);
-        headerBar(ctx, W, `CHAT`, status);
+        headerBar(ctx, W, 'CHAT', status);
 
-        // messages area (scroll offset: show newest at bottom)
         const topY = 62;
         const bottomY = H - 50;
         const lineH = 20;
@@ -172,13 +197,12 @@ export class NostrChat {
             ctx.fillText(line, 20 + nameW, y);
         });
 
-        // input line
-        footerBar(ctx, W, H, ``, `/msg #${gh}`);
+        footerBar(ctx, W, H, '', `/msg #${gh}`);
         ctx.font = "15px 'Courier New', monospace";
         ctx.textBaseline = 'middle';
         ctx.textAlign = 'left';
         ctx.fillStyle = NEON;
-        const prefix = `> `;
+        const prefix = '> ';
         const input = draft || 'Type to chat…';
         ctx.fillText(prefix + input, 20, H - 24);
 
