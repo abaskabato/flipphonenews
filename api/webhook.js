@@ -1,11 +1,11 @@
 // POST /api/webhook — Stripe webhook receiver.
-// Verifies the signature, and on `checkout.session.completed` writes the new
-// active sponsor to KV with a TTL equal to the purchased slot length.
+// Verifies the signature and, on `checkout.session.completed` for a DEAD DROP
+// purchase, persists the now-paid drop to KV so it surfaces at its location.
 //
 // Signature verification needs the *raw* request body, so body parsing is
 // disabled and we buffer the stream ourselves.
 import Stripe from 'stripe';
-import { setSponsor } from '../lib/store.js';
+import { addDrop } from '../lib/store.js';
 
 export const config = { api: { bodyParser: false } };
 
@@ -13,9 +13,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 const WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET;
 
 export default async function handler(req, res) {
-    if (req.method !== 'POST') {
-        return res.status(405).end('Method not allowed');
-    }
+    if (req.method !== 'POST') return res.status(405).end('Method not allowed');
 
     let event;
     try {
@@ -28,27 +26,25 @@ export default async function handler(req, res) {
     }
 
     if (event.type === 'checkout.session.completed') {
-        const s = event.data.object;
-        const m = s.metadata || {};
-        const days = Number(m.sponsor_days || 7);
-        const ttl = days * 24 * 60 * 60;
-
-        const record = {
-            name: m.sponsor_name || null,
-            link: m.sponsor_link || null,
-            imageUrl: m.sponsor_image || null,
-            purchasedAt: Date.now(),
-            expiresAt: Date.now() + ttl * 1000,
-            sessionId: s.id,
-        };
-
-        try {
-            const ok = await setSponsor(record, ttl);
-            console.log(`[webhook] sponsor ${ok ? 'activated' : 'NOT persisted'}: ${record.name}`);
-        } catch (err) {
-            console.error('[webhook] failed to persist sponsor', err);
-            // 500 makes Stripe retry the delivery
-            return res.status(500).json({ error: 'persist failed' });
+        const m = (event.data.object || {}).metadata || {};
+        if (m.dd === '1') {
+            const record = {
+                id: event.data.object.id,
+                message: m.dd_message || '',
+                gh: m.dd_gh || '',
+                place: m.dd_place || '',
+                author: m.dd_author || 'ANON',
+                unlockAt: Number(m.dd_unlockAt) || Date.now(),
+                createdAt: Date.now(),
+            };
+            try {
+                const ok = await addDrop(record);
+                console.log(`[webhook] drop ${ok ? 'buried' : 'NOT persisted'} at ${record.gh}`);
+                if (!ok) return res.status(500).json({ error: 'persist failed' }); // makes Stripe retry
+            } catch (err) {
+                console.error('[webhook] failed to persist drop', err);
+                return res.status(500).json({ error: 'persist failed' });
+            }
         }
     }
 
@@ -59,8 +55,6 @@ async function rawBody(req) {
     if (Buffer.isBuffer(req.body)) return req.body;
     if (typeof req.body === 'string') return Buffer.from(req.body);
     const chunks = [];
-    for await (const chunk of req) {
-        chunks.push(typeof chunk === 'string' ? Buffer.from(chunk) : chunk);
-    }
+    for await (const chunk of req) chunks.push(typeof chunk === 'string' ? Buffer.from(chunk) : chunk);
     return Buffer.concat(chunks);
 }

@@ -1,6 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
   <rect width="512" height="512" rx="72" fill="#08080f"/>
-  <rect x="96" y="64" width="320" height="384" rx="24" fill="none" stroke="#39ff14" stroke-width="12"/>
-  <rect x="136" y="104" width="240" height="200" rx="8" fill="#0b2a12" stroke="#39ff14" stroke-width="4"/>
-  <text x="256" y="340" font-family="monospace" font-size="64" font-weight="bold" fill="#39ff14" text-anchor="middle" letter-spacing="8">FLIP</text>
+  <!-- location pin -->
+  <path d="M256 96c-66 0-120 52-120 117 0 86 120 203 120 203s120-117 120-203c0-65-54-117-120-117z"
+        fill="none" stroke="#39ff14" stroke-width="20" stroke-linejoin="round"/>
+  <!-- LCD slot inside the pin -->
+  <rect x="196" y="168" width="120" height="92" rx="10" fill="#0b2a12" stroke="#39ff14" stroke-width="8"/>
+  <text x="256" y="232" font-family="monospace" font-size="58" font-weight="bold" fill="#39ff14" text-anchor="middle">DD</text>
 </svg>

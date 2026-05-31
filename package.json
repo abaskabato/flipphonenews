@@ -1,9 +1,9 @@
 {
-  "name": "flipphonenews",
+  "name": "deaddrop",
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "Interactive 3D WebGL flip phone that streams live tech headlines, with a self-serve Stripe sponsorship billboard.",
+  "description": "DEAD DROP — a 3D WebGL flip phone that buries anonymous messages at real places. Reading is free; leaving a pin is a paid Stripe micro-transaction.",
   "scripts": {
     "dev": "vercel dev",
     "start": "vercel dev"

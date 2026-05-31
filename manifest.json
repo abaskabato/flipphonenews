@@ -1,7 +1,7 @@
 {
-  "name": "FlipPhone",
-  "short_name": "FlipPhone",
-  "description": "A 3D flip phone for Nostr chat. No accounts, no tracking.",
+  "name": "DEAD DROP",
+  "short_name": "DEAD DROP",
+  "description": "Leave an anonymous message buried where you stand. Read what strangers left here. Seal a note for the future.",
   "start_url": "/",
   "display": "standalone",
   "orientation": "portrait",
