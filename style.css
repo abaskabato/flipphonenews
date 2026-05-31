@@ -53,18 +53,23 @@ body {
 
 .hero-copy {
     position: absolute; z-index: 6;
-    left: 5vw; top: 84px;
-    max-width: 380px;
-    text-shadow: 0 2px 20px rgba(0,0,0,0.6);
+    top: 62px; left: 50%; transform: translateX(-50%);
+    width: min(760px, 94vw);
+    text-align: center;
+    text-shadow: 0 2px 20px rgba(0,0,0,0.7);
+    pointer-events: none; /* let drags pass through to the phone */
 }
 .eyebrow {
     text-transform: uppercase; letter-spacing: 3px; font-size: 12px;
-    color: var(--neon); margin-bottom: 12px;
+    color: var(--neon); margin-bottom: 8px;
 }
-.hero-copy h1 { font-size: clamp(18px, 2.2vw, 28px); line-height: 1.15; font-weight: 700; }
-.hero-copy .sub { margin-top: 8px; color: rgba(255,255,255,0.65); font-size: 13px; }
-.cta-row { display: flex; gap: 12px; margin-top: 26px; flex-wrap: wrap; }
-.microcopy { margin-top: 8px; font-size: 11px; letter-spacing: 1px; color: rgba(255,255,255,0.35); }
+.hero-copy h1 { font-size: clamp(19px, 2.8vw, 32px); line-height: 1.12; font-weight: 700; }
+.hero-copy .sub {
+    margin: 8px auto 0; max-width: 520px;
+    color: rgba(255,255,255,0.7); font-size: 13px;
+}
+.cta-row { display: flex; gap: 12px; margin-top: 26px; flex-wrap: wrap; justify-content: center; }
+.microcopy { margin-top: 10px; font-size: 11px; letter-spacing: 1px; color: rgba(255,255,255,0.4); }
 
 .btn {
     display: inline-flex; align-items: center; justify-content: center;
@@ -117,11 +122,17 @@ body {
 
 /* ===== responsive ===== */
 @media (max-width: 880px) {
-    .hero-copy { left: 0; right: 0; max-width: none; padding: 0 22px; text-align: center; }
-    .hero-copy .sub { display: none; }
-    .cta-row { justify-content: center; }
     .site-nav a:not(.ghost) { display: none; }
 }
+/* narrow screens: no room for the paragraph above the phone — keep just the
+   headline up top and drop the rest so the LCD stays fully visible */
 @media (max-width: 640px) {
-    .hero-copy .sub { display: none; }
+    .hero-copy { top: 66px; }
+    .hero-copy .sub,
+    .hero-copy .microcopy { display: none; }
+}
+/* short / landscape screens: same idea, by height */
+@media (max-height: 560px) {
+    .hero-copy .sub,
+    .hero-copy .microcopy { display: none; }
 }
