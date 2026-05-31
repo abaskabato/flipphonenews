@@ -7,6 +7,10 @@ import { drawKeypad, drawExtScreen, drawExtMessage } from './faces.js';
 import { loadSponsor, applySponsor, drawPlaceholder } from './sponsor.js';
 import { playFlip } from './audio.js';
 import { NostrChat } from './nostr-chat.js';
+import { NewsTicker, fetchHeadlines } from './news.js';
+import { SnakeApp } from './snake.js';
+import { TextsApp } from './texts.js';
+import { ShopApp } from './shop.js';
 
 // ---------- renderer / scene ----------
 const canvasEl = document.getElementById('scene');
@@ -87,12 +91,44 @@ let grabbed = false;
 
 // ---------- screen apps ----------
 const chat = new NostrChat(screenC.canvas);
-const apps = { chat };
-let activeName = 'chat';
-let activeApp = apps.chat;
+const news = new NewsTicker(screenC.canvas);
+const snake = new SnakeApp(screenC.canvas);
+const texts = new TextsApp(screenC.canvas);
+const shop = new ShopApp(screenC.canvas);
+
+const apps = { news, chat, snake, texts, shop };
+let activeName = 'news';
+let activeApp = apps.news;
+
+const extLabels = {
+    news: { title: 'NEWS', sub: 'HN Top' },
+    chat: { title: 'CHAT', sub: '' },
+    snake: { title: 'SNAKE', sub: '' },
+    texts: { title: 'TEXTS', sub: '' },
+    shop: { title: 'SHOP', sub: 'Flip Phones' },
+};
+
+function switchApp(name) {
+    if (name === activeName) return;
+    if (activeApp && activeApp.exit) activeApp.exit();
+    activeName = name;
+    activeApp = apps[name];
+    if (activeApp && activeApp.enter) activeApp.enter();
+    extOverride = extLabels[name] || null;
+    if (name === 'chat') extOverride.sub = chat.gh ? `#${chat.gh}` : '';
+    refreshExternal();
+    document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.app === name));
+}
+
+document.querySelectorAll('.tab').forEach(t => {
+    t.addEventListener('click', () => switchApp(t.dataset.app));
+});
+
+// fetch HN headlines in background
+fetchHeadlines().then(h => { news.setHeadlines(h); }).catch(() => {});
 
 // ---------- external display state ----------
-let extOverride = null; // { title, sub } or null = clock
+let extOverride = null;
 function refreshExternal() {
     if (extOverride) drawExtMessage(extC.ctx, extC.W, extC.H, extOverride.title, extOverride.sub);
     else drawExtScreen(extC.ctx, extC.W, extC.H, new Date().toTimeString().slice(0, 5));
@@ -101,6 +137,11 @@ function refreshExternal() {
 refreshExternal();
 setInterval(refreshExternal, 30 * 1000);
 
+// refresh news headlines every 10 minutes
+setInterval(() => {
+    fetchHeadlines().then(h => { news.setHeadlines(h); }).catch(() => {});
+}, 600000);
+
 // ---------- open / close ----------
 let open = 0, openTarget = 0, lastDir = 0;
 phone.setOpenAmount(0);
@@ -108,8 +149,7 @@ function setOpenTarget(v) {
     const closing = v < 0.5 && openTarget > 0.5;
     openTarget = v; lastDir = v;
     if (closing) {
-        // flip closed = send draft, like hanging up
-        if (chat.draft) {
+        if (activeApp === chat && chat.draft) {
             chat.send(chat.draft);
             chat.draft = '';
         }
@@ -157,27 +197,40 @@ renderer.domElement.addEventListener('pointerdown', () => {
 });
 
 hiddenInput.addEventListener('input', () => {
-    if (hiddenInput.value) {
+    if (!hiddenInput.value) return;
+    if (activeApp === chat) {
         chat.appendToDraft(hiddenInput.value);
-        hiddenInput.value = '';
+    } else if (activeApp === texts) {
+        texts.add(true, hiddenInput.value);
     }
+    hiddenInput.value = '';
 });
 hiddenInput.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' || e.key === 'Backspace') {
+    if (activeApp === chat && (e.key === 'Enter' || e.key === 'Backspace')) {
         chat.handleKeyDown(e);
     }
 });
 
-// ---------- keyboard: route to phone screen ----------
+function routeKey(e) {
+    if (activeApp === chat) {
+        chat.handleKeyDown(e);
+    } else if (activeApp === snake) {
+        snake.onKey(e);
+    } else if (activeApp === shop) {
+        if (e.key === 'ArrowLeft') { shop.prev(); e.preventDefault(); }
+        else if (e.key === 'ArrowRight') { shop.next(); e.preventDefault(); }
+        else if (e.key === ' ' || e.key === 'Enter') { shop.buy(); e.preventDefault(); }
+    }
+}
+
 addEventListener('keydown', (e) => {
     if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
-    chat.handleKeyDown(e);
+    routeKey(e);
 });
 
-// ---------- mode switching (single app now) ----------
-chat.enter();
-extOverride = { title: 'CHAT', sub: chat.gh ? `#${chat.gh}` : '' };
-refreshExternal();
+// ---------- boot apps ----------
+chat.enter(); // connect in background
+switchApp('news');
 
 // ---------- data loads ----------
 loadSponsor().then((data) => applySponsor(data, {
@@ -196,7 +249,7 @@ function animate() {
     if (Math.abs(openTarget - open) < 0.001) open = openTarget;
     phone.setOpenAmount(open);
 
-    if (activeName === 'chat' && !grabbed) phone.group.rotation.y += dt * 0.18;
+    if (activeName !== 'snake' && !grabbed) phone.group.rotation.y += dt * 0.18;
 
     activeApp.update(dt);
     screenC.tex.needsUpdate = true;

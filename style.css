@@ -83,14 +83,15 @@ body {
     display: flex; flex-direction: column; align-items: center; gap: 12px;
 }
 .tabs {
-    display: flex; gap: 6px;
+    display: flex; gap: 6px; flex-wrap: wrap; justify-content: center;
     background: rgba(0,0,0,0.34); border: 1px solid var(--line);
     padding: 5px; border-radius: 999px; backdrop-filter: blur(6px);
 }
 .tab {
     border: none; background: transparent; color: var(--muted);
-    font-size: 13px; font-weight: 600; padding: 8px 14px; border-radius: 999px; cursor: pointer;
+    font-size: 13px; font-weight: 600; padding: 8px 12px; border-radius: 999px; cursor: pointer;
     transition: background .15s, color .15s;
+    white-space: nowrap;
 }
 .tab:hover { color: #fff; }
 .tab.active { background: var(--neon); color: #06140a; }

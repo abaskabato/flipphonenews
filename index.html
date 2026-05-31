@@ -9,8 +9,8 @@
     <link rel="manifest" href="/manifest.json">
     <link rel="icon" href="/icon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="/icon.svg">
-    <title>FlipPhone — open chat</title>
-    <meta name="description" content="A 3D flip phone that runs Nostr chat. No accounts, no phone numbers, no central servers.">
+    <title>FlipPhone — News, Chat & Games</title>
+    <meta name="description" content="A 3D flip phone with live Hacker News headlines, Nostr chat, snake, retro SMS, and more. No accounts, no tracking.">
     <link rel="stylesheet" href="style.css">
     <script type="importmap">
     {
@@ -37,18 +37,22 @@
         <canvas id="scene"></canvas>
 
         <div class="hero-copy">
-            <p class="eyebrow">Open · Nostr · Chat</p>
+            <p class="eyebrow">Live News · Chat · Games</p>
             <h1>A flip phone for the open web.</h1>
             <p class="sub">
-                Location-based chat, no accounts, no tracking.
-                All inside a 3D flip phone. Powered by Nostr.
+                Live HN headlines, location-based chat, snake, retro SMS & more.
+                All inside a 3D flip phone. No accounts, no tracking.
             </p>
             <p class="microcopy">Drag to spin · tap to flip · type on the phone</p>
         </div>
 
         <div class="hero-controls">
             <nav class="tabs">
-                <button class="tab active" data-app="chat">💬 Chat</button>
+                <button class="tab active" data-app="news">📰 News</button>
+                <button class="tab" data-app="chat">💬 Chat</button>
+                <button class="tab" data-app="snake">🐍 Snake</button>
+                <button class="tab" data-app="texts">💌 Texts</button>
+                <button class="tab" data-app="shop">🛒 Shop</button>
             </nav>
             <button id="flipBtn" class="flip-btn"><span class="dot"></span> Open / Close</button>
         </div>
