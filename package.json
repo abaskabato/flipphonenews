@@ -1,15 +1,11 @@
 {
-  "name": "deaddrop",
+  "name": "world-radio",
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "DEAD DROP — a 3D WebGL flip phone that buries anonymous messages at real places. Reading is free; leaving a pin is a paid Stripe micro-transaction.",
+  "description": "WORLD RADIO — a 3D WebGL flip phone that tunes thousands of live internet radio stations from around the world. No accounts, no backend.",
   "scripts": {
-    "dev": "vercel dev",
-    "start": "vercel dev"
-  },
-  "dependencies": {
-    "@vercel/kv": "^2.0.0",
-    "stripe": "^17.5.0"
+    "dev": "python3 -m http.server 8080",
+    "start": "python3 -m http.server 8080"
   }
 }

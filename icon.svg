@@ -1,9 +1,13 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
   <rect width="512" height="512" rx="72" fill="#08080f"/>
-  <!-- location pin -->
-  <path d="M256 96c-66 0-120 52-120 117 0 86 120 203 120 203s120-117 120-203c0-65-54-117-120-117z"
-        fill="none" stroke="#39ff14" stroke-width="20" stroke-linejoin="round"/>
-  <!-- LCD slot inside the pin -->
-  <rect x="196" y="168" width="120" height="92" rx="10" fill="#0b2a12" stroke="#39ff14" stroke-width="8"/>
-  <text x="256" y="232" font-family="monospace" font-size="58" font-weight="bold" fill="#39ff14" text-anchor="middle">DD</text>
+  <!-- broadcast tower dot -->
+  <circle cx="256" cy="300" r="28" fill="#39ff14"/>
+  <!-- mast -->
+  <rect x="248" y="300" width="16" height="120" rx="6" fill="#39ff14"/>
+  <!-- signal waves -->
+  <g fill="none" stroke="#39ff14" stroke-width="16" stroke-linecap="round">
+    <path d="M196 260a85 85 0 0 1 120 0"/>
+    <path d="M160 224a136 136 0 0 1 192 0"/>
+    <path d="M124 188a187 187 0 0 1 264 0"/>
+  </g>
 </svg>

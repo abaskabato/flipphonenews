@@ -5,7 +5,7 @@ import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { buildPhone } from './phone.js';
 import { drawKeypad, drawExtMessage } from './faces.js';
 import { playFlip } from './audio.js';
-import { DeadDrop } from './deaddrop.js';
+import { Radio } from './radio.js';
 
 // ---------- renderer / scene ----------
 const canvasEl = document.getElementById('scene');
@@ -85,24 +85,30 @@ controls.target.set(0, -0.05, 0);
 controls.addEventListener('start', () => { grabbed = true; });
 let grabbed = false;
 
-// ---------- the one app ----------
-const app = new DeadDrop(screenC.canvas);
+// ---------- audio + the one app ----------
+const audioEl = document.createElement('audio');
+audioEl.id = 'radio-audio';
+audioEl.crossOrigin = 'anonymous';
+audioEl.preload = 'none';
+document.body.appendChild(audioEl);
+
+const app = new Radio(screenC.canvas);
+app.setAudio(audioEl);
 
 // ---------- external display ----------
 function refreshExternal() {
-    drawExtMessage(extC.ctx, extC.W, extC.H, 'DEAD DROP', app.place || '');
+    const playing = app.status === 'live';
+    drawExtMessage(extC.ctx, extC.W, extC.H, 'RADIO', playing ? '● ON AIR' : app.genre.toUpperCase());
     extC.tex.needsUpdate = true;
 }
 refreshExternal();
-setInterval(refreshExternal, 5 * 1000);
+setInterval(refreshExternal, 2000);
 
 // ---------- open / close ----------
 let open = 0, openTarget = 0;
 phone.setOpenAmount(0);
 function setOpenTarget(v) {
     openTarget = v;
-    if (v < 0.5) hiddenInput.blur();
-    else hiddenInput.focus();
     playFlip(v === 1);
 }
 function toggle() { setOpenTarget(openTarget > 0.5 ? 0 : 1); }
@@ -125,52 +131,27 @@ renderer.domElement.addEventListener('pointerup', (e) => {
     if (raycaster.intersectObject(phone.group, true).length) toggle();
 });
 
-// ---------- mobile keyboard: hidden input that captures keystrokes ----------
-const hiddenInput = document.createElement('input');
-hiddenInput.type = 'text';
-hiddenInput.id = 'hidden-input';
-hiddenInput.autocomplete = 'off';
-hiddenInput.autocorrect = 'off';
-hiddenInput.autocapitalize = 'off';
-hiddenInput.spellcheck = false;
-Object.assign(hiddenInput.style, {
-    position: 'fixed', left: '-9999px', top: '-9999px',
-    opacity: '0', width: '1px', height: '1px', pointerEvents: 'none',
-});
-document.body.appendChild(hiddenInput);
-
-renderer.domElement.addEventListener('pointerdown', () => {
-    if (open > 0.5 && app.state === 'compose') hiddenInput.focus();
-});
-hiddenInput.addEventListener('input', () => {
-    if (!hiddenInput.value) return;
-    app.appendText(hiddenInput.value);
-    hiddenInput.value = '';
-});
-hiddenInput.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' || e.key === 'Backspace') app.handleKey(e);
-});
-
+// ---------- keyboard ----------
 addEventListener('keydown', (e) => {
     if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
-    if (open < 0.5) return; // keys only matter when the phone is open
+    if (open < 0.5) return; // controls only matter when the phone is open
     app.handleKey(e);
 });
 
-// ---------- on-screen controls (mobile-friendly) ----------
+// ---------- on-screen controls ----------
 const hud = {
-    leave: document.getElementById('leaveBtn'),
     up: document.getElementById('upBtn'),
     down: document.getElementById('downBtn'),
-    back: document.getElementById('backBtn'),
+    left: document.getElementById('leftBtn'),
+    right: document.getElementById('rightBtn'),
     ok: document.getElementById('okBtn'),
 };
 function ensureOpen() { if (openTarget < 0.5) setOpenTarget(1); }
-hud.leave?.addEventListener('click', () => { ensureOpen(); app.startCompose(); if (matchMedia('(pointer: coarse)').matches) hiddenInput.focus(); });
 hud.up?.addEventListener('click', () => { ensureOpen(); app.nav('up'); });
 hud.down?.addEventListener('click', () => { ensureOpen(); app.nav('down'); });
-hud.back?.addEventListener('click', () => { ensureOpen(); app.back(); });
-hud.ok?.addEventListener('click', () => { ensureOpen(); app.primary(); if (app.state === 'compose' && matchMedia('(pointer: coarse)').matches) hiddenInput.focus(); });
+hud.left?.addEventListener('click', () => { ensureOpen(); app.nav('left'); });
+hud.right?.addEventListener('click', () => { ensureOpen(); app.nav('right'); });
+hud.ok?.addEventListener('click', () => { ensureOpen(); app.primary(); });
 
 // ---------- boot ----------
 app.enter();
@@ -207,7 +188,7 @@ function sizeToStage() {
 addEventListener('resize', sizeToStage);
 new ResizeObserver(sizeToStage).observe(stage);
 
-// ---------- back-of-lid printed panel (replaces sponsor billboard) ----------
+// ---------- back-of-lid printed panel ----------
 function drawBackPanel(ctx, W, H) {
     const g = ctx.createLinearGradient(0, 0, 0, H);
     g.addColorStop(0, '#16161f'); g.addColorStop(1, '#0a0a10');
@@ -215,14 +196,14 @@ function drawBackPanel(ctx, W, H) {
     ctx.fillStyle = '#39ff14';
     ctx.shadowColor = 'rgba(57,255,20,0.6)'; ctx.shadowBlur = 12;
     ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    ctx.font = "bold 52px 'Courier New', monospace";
-    ctx.fillText('DEAD', W / 2, H * 0.34);
-    ctx.fillText('DROP', W / 2, H * 0.56);
+    ctx.font = "bold 50px 'Courier New', monospace";
+    ctx.fillText('WORLD', W / 2, H * 0.34);
+    ctx.fillText('RADIO', W / 2, H * 0.56);
     ctx.shadowBlur = 0;
     ctx.fillStyle = 'rgba(255,255,255,0.45)';
     ctx.font = "20px 'Courier New', monospace";
-    ctx.fillText('leave a message where you stand', W / 2, H * 0.82);
+    ctx.fillText('the whole planet, one dial', W / 2, H * 0.82);
 }
 
 // debug/test hook
-window.DD = { app, setOpen: (v) => setOpenTarget(v), stopIdle: () => { grabbed = true; } };
+window.DD = { app, audio: audioEl, setOpen: (v) => setOpenTarget(v), stopIdle: () => { grabbed = true; } };
