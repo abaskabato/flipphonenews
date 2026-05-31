@@ -114,7 +114,7 @@ function setOpenTarget(v) {
 function toggle() { setOpenTarget(openTarget > 0.5 ? 0 : 1); }
 document.getElementById('flipBtn').addEventListener('click', toggle);
 
-// tap the phone to flip
+// tap the phone: when open, a tap on the keypad presses that key; otherwise flip
 const raycaster = new THREE.Raycaster();
 const pointer = new THREE.Vector2();
 let downXY = null;
@@ -123,19 +123,73 @@ renderer.domElement.addEventListener('pointerup', (e) => {
     if (!downXY) return;
     const moved = Math.hypot(e.clientX - downXY[0], e.clientY - downXY[1]);
     downXY = null;
-    if (moved > 6) return;
+    if (moved > 6) return; // a drag, not a tap
     const rect = renderer.domElement.getBoundingClientRect();
     pointer.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
     pointer.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
     raycaster.setFromCamera(pointer, camera);
-    if (raycaster.intersectObject(phone.group, true).length) toggle();
+    const hits = raycaster.intersectObject(phone.group, true);
+    if (!hits.length) return;
+    if (open > 0.5) {
+        const kp = hits.find((h) => h.object === phone.keypad && h.uv);
+        if (kp) { const key = keyAtUV(kp.uv.x, kp.uv.y); if (key) { app.keypadPress(key); return; } }
+    }
+    toggle();
 });
 
-// ---------- keyboard ----------
+// map a UV hit on the keypad texture to a physical key (mirrors faces.js layout)
+function keyAtUV(u, v) {
+    const W = 540, H = 760, cx = W / 2;
+    const x = u * W, y = (1 - v) * H;
+    const dY = 110, dR = 78;
+    const dx = x - cx, dy = y - dY, dist = Math.hypot(dx, dy);
+    if (dist <= 34) return 'OK';
+    if (dist <= dR + 8) return Math.abs(dy) >= Math.abs(dx) ? (dy < 0 ? 'UP' : 'DOWN') : (dx < 0 ? 'LEFT' : 'RIGHT');
+    const callY = dY + dR + 28;
+    if (y >= callY && y <= callY + 46) {
+        if (x >= cx - 150 && x <= cx - 10) return 'SEND';
+        if (x >= cx + 10 && x <= cx + 150) return 'END';
+    }
+    const gridTop = callY + 70, cols = 3, gap = 18, bw = (W - 80 - gap * 2) / cols, bh = 76;
+    const labels = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '*', '0', '#'];
+    for (let i = 0; i < 12; i++) {
+        const c = i % cols, r = (i / cols) | 0;
+        const kx = 40 + c * (bw + gap), ky = gridTop + r * (bh + gap);
+        if (x >= kx && x <= kx + bw && y >= ky && y <= ky + bh) return labels[i];
+    }
+    return null;
+}
+
+// ---------- physical keyboard ----------
 addEventListener('keydown', (e) => {
-    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+    if (e.target.tagName === 'TEXTAREA' || (e.target.tagName === 'INPUT' && e.target !== hiddenInput)) return;
     if (open < 0.5) return; // controls only matter when the phone is open
     app.handleKey(e);
+});
+
+// ---------- mobile keyboard: hidden input feeding the search box ----------
+const hiddenInput = document.createElement('input');
+hiddenInput.type = 'text';
+hiddenInput.id = 'hidden-input';
+hiddenInput.autocomplete = 'off'; hiddenInput.autocorrect = 'off';
+hiddenInput.autocapitalize = 'off'; hiddenInput.spellcheck = false;
+Object.assign(hiddenInput.style, {
+    position: 'fixed', left: '-9999px', top: '-9999px',
+    opacity: '0', width: '1px', height: '1px', pointerEvents: 'none',
+});
+document.body.appendChild(hiddenInput);
+hiddenInput.addEventListener('input', () => {
+    if (!hiddenInput.value) return;
+    app.typeString(hiddenInput.value);
+    hiddenInput.value = '';
+});
+hiddenInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === 'Backspace' || e.key === 'Escape') app.handleKey(e);
+});
+// when search opens on a touch device, pop the soft keyboard
+app.onSearchOpen = () => { if (matchMedia('(pointer: coarse)').matches) hiddenInput.focus(); };
+renderer.domElement.addEventListener('pointerdown', () => {
+    if (open > 0.5 && app.mode === 'search') hiddenInput.focus();
 });
 
 // ---------- on-screen controls ----------
@@ -145,6 +199,7 @@ const hud = {
     left: document.getElementById('leftBtn'),
     right: document.getElementById('rightBtn'),
     ok: document.getElementById('okBtn'),
+    search: document.getElementById('searchBtn'),
 };
 function ensureOpen() { if (openTarget < 0.5) setOpenTarget(1); }
 hud.up?.addEventListener('click', () => { ensureOpen(); app.nav('up'); });
@@ -152,6 +207,11 @@ hud.down?.addEventListener('click', () => { ensureOpen(); app.nav('down'); });
 hud.left?.addEventListener('click', () => { ensureOpen(); app.nav('left'); });
 hud.right?.addEventListener('click', () => { ensureOpen(); app.nav('right'); });
 hud.ok?.addEventListener('click', () => { ensureOpen(); app.primary(); });
+hud.search?.addEventListener('click', () => {
+    ensureOpen();
+    if (app.mode === 'search') app.submitSearch(); else app.openSearch();
+    hiddenInput.focus();
+});
 
 // ---------- boot ----------
 app.enter();
@@ -167,7 +227,13 @@ function animate() {
     if (Math.abs(openTarget - open) < 0.001) open = openTarget;
     phone.setOpenAmount(open);
 
-    if (!grabbed && open < 0.5) phone.group.rotation.y += dt * 0.18;
+    // idle spin only while closed; once open (in use / playing) settle facing
+    // front so the screen stays readable and the keypad stays tappable
+    if (open < 0.5) {
+        if (!grabbed) phone.group.rotation.y += dt * 0.18;
+    } else {
+        phone.group.rotation.y += (0 - phone.group.rotation.y) * Math.min(1, 5 * dt);
+    }
 
     app.update(dt);
     screenC.tex.needsUpdate = true;
@@ -206,4 +272,4 @@ function drawBackPanel(ctx, W, H) {
 }
 
 // debug/test hook
-window.DD = { app, audio: audioEl, setOpen: (v) => setOpenTarget(v), stopIdle: () => { grabbed = true; } };
+window.DD = { app, audio: audioEl, phone, setOpen: (v) => setOpenTarget(v), stopIdle: () => { grabbed = true; } };
