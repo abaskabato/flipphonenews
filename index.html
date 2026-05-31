@@ -9,56 +9,58 @@
     <link rel="manifest" href="/manifest.json">
     <link rel="icon" href="/icon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="/icon.svg">
-    <title>FlipPhone — News, Chat & Games</title>
-    <meta name="description" content="A 3D flip phone with live Hacker News headlines, Nostr chat, snake, retro SMS, and more. No accounts, no tracking.">
+    <title>DEAD DROP — leave a message where you stand</title>
+    <meta name="description" content="A 3D flip phone that buries anonymous messages at real places. Reading what strangers left is free. Leave your own — for the next person, or sealed until a future date.">
+    <meta property="og:title" content="DEAD DROP">
+    <meta property="og:description" content="Leave a message buried where you stand. Read what strangers left here. Seal a note for the future.">
     <link rel="stylesheet" href="style.css">
     <script type="importmap">
     {
         "imports": {
             "three": "./vendor/three.module.js",
-            "three/addons/": "./vendor/addons/",
-            "nostr-tools": "https://esm.sh/nostr-tools@2.10.4"
+            "three/addons/": "./vendor/addons/"
         }
     }
     </script>
 </head>
     <body>
-    <!-- sticky site header -->
     <header class="site-header">
-        <a class="brand" href="/">FLIP&shy;PHONE</a>
+        <a class="brand" href="/">DEAD<span>DROP</span></a>
         <nav class="site-nav">
-            <a href="https://github.com/permissionlesstech/bitchat" target="_blank" rel="noopener">Bitchat</a>
-            <a class="ghost" href="/sponsor.html">Sponsor</a>
+            <a class="ghost" href="#how">How it works</a>
         </nav>
     </header>
 
-    <!-- ===== HERO: full-screen 3D flip phone ===== -->
+    <!-- ===== full-screen 3D flip phone ===== -->
     <section class="hero">
         <canvas id="scene"></canvas>
 
         <div class="hero-copy">
-            <p class="eyebrow">Live News · Chat · Games</p>
-            <h1>A flip phone for the open web.</h1>
+            <p class="eyebrow">Anonymous · location-pinned</p>
+            <h1>Leave a message where you stand.</h1>
             <p class="sub">
-                Live HN headlines, location-based chat, snake, retro SMS & more.
-                All inside a 3D flip phone. No accounts, no tracking.
+                Bury a note at this exact place for whoever comes next —
+                or seal it until a future date. Reading is free. Leaving one costs a buck.
             </p>
             <p class="microcopy">Drag to spin · tap to flip · type on the phone</p>
         </div>
 
         <div class="hero-controls">
-            <nav class="tabs">
-                <button class="tab active" data-app="news">📰 News</button>
-                <button class="tab" data-app="chat">💬 Chat</button>
-                <button class="tab" data-app="snake">🐍 Snake</button>
-                <button class="tab" data-app="texts">💌 Texts</button>
-                <button class="tab" data-app="shop">🛒 Shop</button>
-            </nav>
-            <button id="flipBtn" class="flip-btn"><span class="dot"></span> Open / Close</button>
+            <div class="dpad">
+                <button id="upBtn" class="key" aria-label="up">▲</button>
+                <div class="dpad-mid">
+                    <button id="backBtn" class="key" aria-label="back">‹</button>
+                    <button id="okBtn" class="key ok" aria-label="ok">OK</button>
+                    <button id="downBtn" class="key" aria-label="down">▼</button>
+                </div>
+            </div>
+            <div class="actions">
+                <button id="leaveBtn" class="btn primary">✚ Leave a drop</button>
+                <button id="flipBtn" class="flip-btn"><span class="dot"></span> Open / Close</button>
+            </div>
         </div>
 
-        <div id="sponsorTag" class="sponsor-tag" hidden></div>
-        <div id="loader" class="loader">Booting handset…</div>
+        <div id="loader" class="loader">Tuning in…</div>
     </section>
 
     <script type="module" src="js/main.js"></script>

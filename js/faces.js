@@ -55,31 +55,7 @@ export function drawKeypad(ctx, W, H) {
     });
 }
 
-export function drawExtScreen(ctx, W, H, timeStr) {
-    const g = ctx.createLinearGradient(0, 0, 0, H);
-    g.addColorStop(0, '#0b2a12');
-    g.addColorStop(1, '#05140a');
-    ctx.fillStyle = g;
-    ctx.fillRect(0, 0, W, H);
-
-    ctx.fillStyle = NEON;
-    ctx.shadowColor = 'rgba(57,255,20,0.8)';
-    ctx.shadowBlur = 10;
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.font = "bold 64px 'Courier New', monospace";
-    ctx.fillText(timeStr, W / 2, H * 0.46);
-    ctx.font = "bold 20px 'Courier New', monospace";
-    ctx.fillText('FLIPNEWS · LIVE', W / 2, H * 0.82);
-    ctx.shadowBlur = 0;
-
-    // scanlines
-    ctx.globalAlpha = 0.1; ctx.fillStyle = '#000';
-    for (let y = 0; y < H; y += 4) ctx.fillRect(0, y, W, 2);
-    ctx.globalAlpha = 1;
-}
-
-// external display showing a short message (e.g. "MESSAGE SENT", a challenge)
+// external display showing a short message (the brand + current place codename)
 export function drawExtMessage(ctx, W, H, title, sub) {
     const g = ctx.createLinearGradient(0, 0, 0, H);
     g.addColorStop(0, '#0b2a12');

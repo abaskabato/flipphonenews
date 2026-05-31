@@ -3,14 +3,9 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 
 import { buildPhone } from './phone.js';
-import { drawKeypad, drawExtScreen, drawExtMessage } from './faces.js';
-import { loadSponsor, applySponsor, drawPlaceholder } from './sponsor.js';
+import { drawKeypad, drawExtMessage } from './faces.js';
 import { playFlip } from './audio.js';
-import { NostrChat } from './nostr-chat.js';
-import { NewsTicker, fetchHeadlines } from './news.js';
-import { SnakeApp } from './snake.js';
-import { TextsApp } from './texts.js';
-import { ShopApp } from './shop.js';
+import { DeadDrop } from './deaddrop.js';
 
 // ---------- renderer / scene ----------
 const canvasEl = document.getElementById('scene');
@@ -67,7 +62,8 @@ const sponsorC = makeCanvasTexture(512, 280);
 
 drawKeypad(keypadC.ctx, keypadC.W, keypadC.H);
 keypadC.tex.needsUpdate = true;
-drawPlaceholder(sponsorC.ctx, sponsorC.tex);
+drawBackPanel(sponsorC.ctx, sponsorC.W, sponsorC.H);
+sponsorC.tex.needsUpdate = true;
 
 const phone = buildPhone({
     screenTex: screenC.tex, keypadTex: keypadC.tex,
@@ -89,72 +85,24 @@ controls.target.set(0, -0.05, 0);
 controls.addEventListener('start', () => { grabbed = true; });
 let grabbed = false;
 
-// ---------- screen apps ----------
-const chat = new NostrChat(screenC.canvas);
-const news = new NewsTicker(screenC.canvas);
-const snake = new SnakeApp(screenC.canvas);
-const texts = new TextsApp(screenC.canvas);
-const shop = new ShopApp(screenC.canvas);
+// ---------- the one app ----------
+const app = new DeadDrop(screenC.canvas);
 
-const apps = { news, chat, snake, texts, shop };
-let activeName = 'news';
-let activeApp = apps.news;
-
-const extLabels = {
-    news: { title: 'NEWS', sub: 'HN Top' },
-    chat: { title: 'CHAT', sub: '' },
-    snake: { title: 'SNAKE', sub: '' },
-    texts: { title: 'TEXTS', sub: '' },
-    shop: { title: 'SHOP', sub: 'Flip Phones' },
-};
-
-function switchApp(name) {
-    if (name === activeName) return;
-    if (activeApp && activeApp.exit) activeApp.exit();
-    activeName = name;
-    activeApp = apps[name];
-    if (activeApp && activeApp.enter) activeApp.enter();
-    extOverride = extLabels[name] || null;
-    if (name === 'chat') extOverride.sub = chat.gh ? `#${chat.gh}` : '';
-    refreshExternal();
-    document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.app === name));
-}
-
-document.querySelectorAll('.tab').forEach(t => {
-    t.addEventListener('click', () => switchApp(t.dataset.app));
-});
-
-// fetch HN headlines in background
-fetchHeadlines().then(h => { news.setHeadlines(h); }).catch(() => {});
-
-// ---------- external display state ----------
-let extOverride = null;
+// ---------- external display ----------
 function refreshExternal() {
-    if (extOverride) drawExtMessage(extC.ctx, extC.W, extC.H, extOverride.title, extOverride.sub);
-    else drawExtScreen(extC.ctx, extC.W, extC.H, new Date().toTimeString().slice(0, 5));
+    drawExtMessage(extC.ctx, extC.W, extC.H, 'DEAD DROP', app.place || '');
     extC.tex.needsUpdate = true;
 }
 refreshExternal();
-setInterval(refreshExternal, 30 * 1000);
-
-// refresh news headlines every 10 minutes
-setInterval(() => {
-    fetchHeadlines().then(h => { news.setHeadlines(h); }).catch(() => {});
-}, 600000);
+setInterval(refreshExternal, 5 * 1000);
 
 // ---------- open / close ----------
-let open = 0, openTarget = 0, lastDir = 0;
+let open = 0, openTarget = 0;
 phone.setOpenAmount(0);
 function setOpenTarget(v) {
-    const closing = v < 0.5 && openTarget > 0.5;
-    openTarget = v; lastDir = v;
-    if (closing) {
-        if (activeApp === chat && chat.draft) {
-            chat.send(chat.draft);
-            chat.draft = '';
-        }
-        hiddenInput.blur();
-    }
+    openTarget = v;
+    if (v < 0.5) hiddenInput.blur();
+    else hiddenInput.focus();
     playFlip(v === 1);
 }
 function toggle() { setOpenTarget(openTarget > 0.5 ? 0 : 1); }
@@ -191,52 +139,41 @@ Object.assign(hiddenInput.style, {
 });
 document.body.appendChild(hiddenInput);
 
-// Focus hidden input on canvas tap for mobile keyboard (only when open)
 renderer.domElement.addEventListener('pointerdown', () => {
-    if (open > 0.5) hiddenInput.focus();
+    if (open > 0.5 && app.state === 'compose') hiddenInput.focus();
 });
-
 hiddenInput.addEventListener('input', () => {
     if (!hiddenInput.value) return;
-    if (activeApp === chat) {
-        chat.appendToDraft(hiddenInput.value);
-    } else if (activeApp === texts) {
-        texts.add(true, hiddenInput.value);
-    }
+    app.appendText(hiddenInput.value);
     hiddenInput.value = '';
 });
 hiddenInput.addEventListener('keydown', (e) => {
-    if (activeApp === chat && (e.key === 'Enter' || e.key === 'Backspace')) {
-        chat.handleKeyDown(e);
-    }
+    if (e.key === 'Enter' || e.key === 'Backspace') app.handleKey(e);
 });
-
-function routeKey(e) {
-    if (activeApp === chat) {
-        chat.handleKeyDown(e);
-    } else if (activeApp === snake) {
-        snake.onKey(e);
-    } else if (activeApp === shop) {
-        if (e.key === 'ArrowLeft') { shop.prev(); e.preventDefault(); }
-        else if (e.key === 'ArrowRight') { shop.next(); e.preventDefault(); }
-        else if (e.key === ' ' || e.key === 'Enter') { shop.buy(); e.preventDefault(); }
-    }
-}
 
 addEventListener('keydown', (e) => {
     if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
-    routeKey(e);
+    if (open < 0.5) return; // keys only matter when the phone is open
+    app.handleKey(e);
 });
 
-// ---------- boot apps ----------
-chat.enter(); // connect in background
-switchApp('news');
+// ---------- on-screen controls (mobile-friendly) ----------
+const hud = {
+    leave: document.getElementById('leaveBtn'),
+    up: document.getElementById('upBtn'),
+    down: document.getElementById('downBtn'),
+    back: document.getElementById('backBtn'),
+    ok: document.getElementById('okBtn'),
+};
+function ensureOpen() { if (openTarget < 0.5) setOpenTarget(1); }
+hud.leave?.addEventListener('click', () => { ensureOpen(); app.startCompose(); if (matchMedia('(pointer: coarse)').matches) hiddenInput.focus(); });
+hud.up?.addEventListener('click', () => { ensureOpen(); app.nav('up'); });
+hud.down?.addEventListener('click', () => { ensureOpen(); app.nav('down'); });
+hud.back?.addEventListener('click', () => { ensureOpen(); app.back(); });
+hud.ok?.addEventListener('click', () => { ensureOpen(); app.primary(); if (app.state === 'compose' && matchMedia('(pointer: coarse)').matches) hiddenInput.focus(); });
 
-// ---------- data loads ----------
-loadSponsor().then((data) => applySponsor(data, {
-    ctx: sponsorC.ctx, tex: sponsorC.tex, mat: phone.sponsorMat,
-    loader: new THREE.TextureLoader(), domTag: document.getElementById('sponsorTag'),
-}));
+// ---------- boot ----------
+app.enter();
 
 // ---------- render loop ----------
 const clock = new THREE.Clock();
@@ -249,9 +186,9 @@ function animate() {
     if (Math.abs(openTarget - open) < 0.001) open = openTarget;
     phone.setOpenAmount(open);
 
-    if (activeName !== 'snake' && !grabbed) phone.group.rotation.y += dt * 0.18;
+    if (!grabbed && open < 0.5) phone.group.rotation.y += dt * 0.18;
 
-    activeApp.update(dt);
+    app.update(dt);
     screenC.tex.needsUpdate = true;
 
     controls.update();
@@ -270,9 +207,22 @@ function sizeToStage() {
 addEventListener('resize', sizeToStage);
 new ResizeObserver(sizeToStage).observe(stage);
 
+// ---------- back-of-lid printed panel (replaces sponsor billboard) ----------
+function drawBackPanel(ctx, W, H) {
+    const g = ctx.createLinearGradient(0, 0, 0, H);
+    g.addColorStop(0, '#16161f'); g.addColorStop(1, '#0a0a10');
+    ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = '#39ff14';
+    ctx.shadowColor = 'rgba(57,255,20,0.6)'; ctx.shadowBlur = 12;
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.font = "bold 52px 'Courier New', monospace";
+    ctx.fillText('DEAD', W / 2, H * 0.34);
+    ctx.fillText('DROP', W / 2, H * 0.56);
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = 'rgba(255,255,255,0.45)';
+    ctx.font = "20px 'Courier New', monospace";
+    ctx.fillText('leave a message where you stand', W / 2, H * 0.82);
+}
+
 // debug/test hook
-window.FPN = {
-    chat,
-    setOpen: (v) => setOpenTarget(v),
-    stopIdle: () => { grabbed = true; },
-};
+window.DD = { app, setOpen: (v) => setOpenTarget(v), stopIdle: () => { grabbed = true; } };

@@ -1,6 +1,0 @@
-{
-  "name": null,
-  "imageUrl": null,
-  "link": null,
-  "note": "Default sponsor record. The live value is served by /api/sponsor (KV-backed) and updated by the Stripe webhook after a successful purchase."
-}
