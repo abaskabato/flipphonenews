@@ -9,10 +9,10 @@
     <link rel="manifest" href="/manifest.json">
     <link rel="icon" href="/icon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="/icon.svg">
-    <title>DEAD DROP — leave a message where you stand</title>
-    <meta name="description" content="A 3D flip phone that buries anonymous messages at real places. Reading what strangers left is free. Leave your own — for the next person, or sealed until a future date.">
-    <meta property="og:title" content="DEAD DROP">
-    <meta property="og:description" content="Leave a message buried where you stand. Read what strangers left here. Seal a note for the future.">
+    <title>WORLD RADIO — the whole planet, one dial</title>
+    <meta name="description" content="A 3D flip phone that tunes thousands of live radio stations from around the world. No accounts, no signup — just flip it open and press play.">
+    <meta property="og:title" content="WORLD RADIO">
+    <meta property="og:description" content="Tune thousands of live stations from around the world on a 3D flip phone.">
     <link rel="stylesheet" href="style.css">
     <script type="importmap">
     {
@@ -25,7 +25,7 @@
 </head>
     <body>
     <header class="site-header">
-        <a class="brand" href="/">DEAD<span>DROP</span></a>
+        <a class="brand" href="/">WORLD<span>RADIO</span></a>
         <nav class="site-nav">
             <a class="ghost" href="#how">How it works</a>
         </nav>
@@ -36,31 +36,31 @@
         <canvas id="scene"></canvas>
 
         <div class="hero-copy">
-            <p class="eyebrow">Anonymous · location-pinned</p>
-            <h1>Leave a message where you stand.</h1>
+            <p class="eyebrow">Live · worldwide · free</p>
+            <h1>The whole planet, one dial.</h1>
             <p class="sub">
-                Bury a note at this exact place for whoever comes next —
-                or seal it until a future date. Reading is free. Leaving one costs a buck.
+                Thousands of live radio stations from every corner of the world,
+                tuned on a 3D flip phone. Flip it open, pick a genre, press play.
             </p>
-            <p class="microcopy">Drag to spin · tap to flip · type on the phone</p>
+            <p class="microcopy">Drag to spin · tap to flip · ◄ ► genre · ▲ ▼ station · OK plays</p>
         </div>
 
         <div class="hero-controls">
             <div class="dpad">
-                <button id="upBtn" class="key" aria-label="up">▲</button>
+                <button id="upBtn" class="key" aria-label="previous station">▲</button>
                 <div class="dpad-mid">
-                    <button id="backBtn" class="key" aria-label="back">‹</button>
-                    <button id="okBtn" class="key ok" aria-label="ok">OK</button>
-                    <button id="downBtn" class="key" aria-label="down">▼</button>
+                    <button id="leftBtn" class="key" aria-label="previous genre">◄</button>
+                    <button id="okBtn" class="key ok" aria-label="play / pause">▶</button>
+                    <button id="rightBtn" class="key" aria-label="next genre">►</button>
                 </div>
+                <button id="downBtn" class="key" aria-label="next station">▼</button>
             </div>
             <div class="actions">
-                <button id="leaveBtn" class="btn primary">✚ Leave a drop</button>
                 <button id="flipBtn" class="flip-btn"><span class="dot"></span> Open / Close</button>
             </div>
         </div>
 
-        <div id="loader" class="loader">Tuning in…</div>
+        <div id="loader" class="loader">Warming up the tubes…</div>
     </section>
 
     <script type="module" src="js/main.js"></script>

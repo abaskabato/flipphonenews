@@ -1,7 +1,7 @@
 {
-  "name": "DEAD DROP",
-  "short_name": "DEAD DROP",
-  "description": "Leave an anonymous message buried where you stand. Read what strangers left here. Seal a note for the future.",
+  "name": "WORLD RADIO",
+  "short_name": "WORLD RADIO",
+  "description": "Tune thousands of live radio stations from around the world on a 3D flip phone. No accounts, no signup.",
   "start_url": "/",
   "display": "standalone",
   "orientation": "portrait",
