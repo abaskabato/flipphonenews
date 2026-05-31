@@ -146,5 +146,5 @@ export function buildPhone({ screenTex, keypadTex, extScreenTex, sponsorTex }) {
     }
     setOpenAmount(0);
 
-    return { group, hinge, base, lid, screen, extScreen, sponsorPanel, sponsorMat, bodyMat, setOpenAmount };
+    return { group, hinge, base, lid, screen, keypad, extScreen, sponsorPanel, sponsorMat, bodyMat, setOpenAmount };
 }
