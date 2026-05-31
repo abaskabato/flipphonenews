@@ -69,6 +69,7 @@ const phone = buildPhone({
     screenTex: screenC.tex, keypadTex: keypadC.tex,
     extScreenTex: extC.tex, sponsorTex: sponsorC.tex,
 });
+phone.group.position.y = -0.28; // sit lower so the hero copy band stays clear of the screen
 scene.add(phone.group);
 
 // ---------- controls ----------
