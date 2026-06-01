@@ -9,7 +9,7 @@
     --line: rgba(255,255,255,0.12);
 }
 
-html { scroll-behavior: smooth; overscroll-behavior: none; }
+html { scroll-behavior: smooth; overscroll-behavior: none; height: 100%; -webkit-text-size-adjust: 100%; }
 body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
     color: var(--ink);
@@ -17,13 +17,17 @@ body {
     line-height: 1.5;
     overflow: hidden;
     height: 100%;
+    -webkit-tap-highlight-color: transparent;
 }
 
 /* ===== sticky header ===== */
 .site-header {
     position: fixed; top: 0; left: 0; right: 0; z-index: 20;
-    display: flex; align-items: center; justify-content: space-between;
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
     padding: 14px 24px;
+    padding-top: max(14px, env(safe-area-inset-top));
+    padding-left: max(24px, env(safe-area-inset-left));
+    padding-right: max(24px, env(safe-area-inset-right));
     background: rgba(8,8,15,0.55);
     backdrop-filter: blur(10px);
     border-bottom: 1px solid var(--line);
@@ -50,12 +54,14 @@ body {
 /* ===== hero ===== */
 .hero {
     position: relative;
-    height: 100vh;
-    min-height: 620px;
+    height: 100vh;          /* fallback for browsers without dvh */
+    height: 100dvh;         /* tracks mobile address-bar show/hide */
     overflow: hidden;
     background: radial-gradient(circle at 50% 30%, #2b2b52 0%, var(--bg1) 45%, var(--bg0) 100%);
 }
-#scene { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: pan-y; }
+/* the canvas owns all pointer gestures (rotate / tap-to-flip); there's nothing
+   to scroll, so claim them all for crisp dragging on touch devices */
+#scene { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; }
 
 .hero-copy {
     position: absolute; z-index: 6;
@@ -90,7 +96,9 @@ body {
 
 /* bottom-centred phone controls */
 .hero-controls {
-    position: absolute; z-index: 6; bottom: 22px; left: 50%; transform: translateX(-50%);
+    position: absolute; z-index: 6; left: 50%; transform: translateX(-50%);
+    bottom: max(22px, env(safe-area-inset-bottom));
+    width: max-content; max-width: 94vw;
     display: flex; flex-direction: column; align-items: center; gap: 14px;
 }
 
@@ -136,15 +144,38 @@ body {
 @media (max-width: 880px) {
     .site-nav a:not(.ghost) { display: none; }
 }
+
 /* narrow screens: no room for the paragraph above the phone — keep just the
    headline up top and drop the rest so the LCD stays fully visible */
 @media (max-width: 640px) {
-    .hero-copy { top: 66px; }
+    .hero-copy { top: max(66px, calc(env(safe-area-inset-top) + 54px)); }
     .hero-copy .sub,
     .hero-copy .microcopy { display: none; }
+    .credit { font-size: 12px; padding: 6px 10px; }
+    .brand { font-size: 15px; }
 }
-/* short / landscape screens: same idea, by height */
+
+/* very narrow phones: tighten the controls so they never overflow the width */
+@media (max-width: 380px) {
+    .band { padding: 8px 12px; font-size: 12px; }
+    .btn { padding: 12px 16px; font-size: 14px; }
+    .flip-btn { padding: 10px 16px; font-size: 13px; }
+    .actions { gap: 8px; }
+}
+
+/* short / landscape screens: drop the copy and compact the controls so the
+   phone, header and controls all stay on screen at once */
 @media (max-height: 560px) {
     .hero-copy .sub,
     .hero-copy .microcopy { display: none; }
+    .site-header { padding-top: max(8px, env(safe-area-inset-top)); padding-bottom: 8px; }
+    .hero-controls { gap: 8px; }
+}
+@media (max-height: 430px) {
+    .hero-copy .eyebrow { display: none; }
+    .hero-copy h1 { font-size: 16px; }
+    /* lay the controls out in a single compact row to reclaim vertical space */
+    .hero-controls { flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 8px; bottom: max(10px, env(safe-area-inset-bottom)); }
+    .band { padding: 7px 12px; }
+    .btn, .flip-btn { padding: 9px 14px; }
 }
