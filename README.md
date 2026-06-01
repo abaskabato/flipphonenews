@@ -1,12 +1,12 @@
-# WORLD RADIO
+# FLIPCAST
 
-**The whole planet, one dial.**
+**Flip it open. Tune the world.**
 
-WORLD RADIO is a 3D flip phone in your browser that tunes thousands of live radio stations from around the world. Flip it open, pick a genre, press play. No accounts, no signup, no backend — and it's never empty, because somewhere on Earth a station is always live.
+FLIPCAST is a 3D flip phone in your browser that tunes thousands of live radio stations and podcasts from around the world. Flip it open, pick a genre or show, press play. No accounts, no signup, no backend — and it's never empty, because somewhere on Earth a station is always live.
 
 Two **bands** share the phone: live **Radio** and on-demand **Podcasts**. Tap the Radio / Podcasts toggle (or press Tab) to switch. In the Podcasts band, browse top shows by category or search, open a show, then play any episode with a scrubbable progress bar (◄◄ / ►► seek 30s).
 
-## Why a radio
+## Why a radio (and podcasts)
 
 It's the opposite of a cold-start problem: a radio doesn't need other users to be worth using. The moment you open it there's real, live content playing — talk from Tokyo, lo-fi from Berlin, a jazz station in New Orleans — so it's useful to a single visitor on day one.
 

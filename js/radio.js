@@ -1,5 +1,5 @@
-// WORLD RADIO — tune across thousands of live internet stations on the phone's
-// LCD. Stations come from the free, public Radio-Browser API (no key, no
+// FLIPCAST · RADIO band — tune across thousands of live internet stations on
+// the phone's LCD. Stations come from the free, public Radio-Browser API (no key, no
 // backend). A curated fallback list keeps the radio playing even if the API is
 // unreachable, so the experience is never empty.
 import {
@@ -272,7 +272,7 @@ export class Radio {
         const ctx = this.ctx, W = this.canvas.width, H = this.canvas.height;
         lcdBackground(ctx, W, H);
         const live = this.status === 'live';
-        headerBar(ctx, W, 'WORLD RADIO', this.mode === 'search' ? 'SEARCH' : signalBars(live ? 4 : (this.status === 'tuning' ? 2 : 1)));
+        headerBar(ctx, W, 'RADIO', this.mode === 'search' ? 'SEARCH' : signalBars(live ? 4 : (this.status === 'tuning' ? 2 : 1)));
 
         // genre tab OR search bar
         if (this.mode === 'search') {

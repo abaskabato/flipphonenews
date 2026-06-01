@@ -1,4 +1,4 @@
-// WORLD RADIO — PODCASTS band. On-demand shows and episodes, tuned on the same
+// FLIPCAST · PODCASTS band. On-demand shows and episodes, tuned on the same
 // flip-phone LCD as the live radio. Data comes from Apple's public iTunes
 // Search/Lookup APIs (no key, no backend, CORS-enabled): browse top shows by
 // category, search by name, then drill into a show's episodes and play them
