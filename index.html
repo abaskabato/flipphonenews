@@ -40,18 +40,13 @@
                 Thousands of live radio stations from every corner of the world,
                 tuned on a 3D flip phone. Flip it open, pick a genre, press play.
             </p>
-            <p class="microcopy">Tap the keypad to dial · ◄ ► genre · ▲ ▼ station · OK plays · SEND to search</p>
+            <p class="microcopy">Radio or Podcasts · ◄ ► genre · ▲ ▼ pick · OK plays · SEND to search</p>
         </div>
 
         <div class="hero-controls">
-            <div class="dpad">
-                <button id="upBtn" class="key" aria-label="previous station">▲</button>
-                <div class="dpad-mid">
-                    <button id="leftBtn" class="key" aria-label="previous genre">◄</button>
-                    <button id="okBtn" class="key ok" aria-label="play / pause">▶</button>
-                    <button id="rightBtn" class="key" aria-label="next genre">►</button>
-                </div>
-                <button id="downBtn" class="key" aria-label="next station">▼</button>
+            <div class="band-toggle" role="tablist" aria-label="listening band">
+                <button id="bandRadio" class="band on" role="tab" aria-pressed="true">📻 Radio</button>
+                <button id="bandPods" class="band" role="tab" aria-pressed="false">🎙 Podcasts</button>
             </div>
             <div class="actions">
                 <button id="searchBtn" class="btn primary">🔍 Search</button>

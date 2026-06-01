@@ -4,6 +4,7 @@
 // unreachable, so the experience is never empty.
 import {
     NEON, NEON_DIM, lcdBackground, headerBar, footerBar, crt, roundRect, glow, mulberry32,
+    marquee, signalBars, clip,
 } from './lcd.js';
 
 const API_HOSTS = [
@@ -52,16 +53,17 @@ export class Radio {
         this._eqSeed = mulberry32(7);
         this._marquee = 0;
         this._hls = null;
+        this.active = true;         // false while another band owns the shared audio
         this.onSearchOpen = null;   // hook so the shell can pop the mobile keyboard
     }
 
     setAudio(el) {
         this.audio = el;
-        el.addEventListener('playing', () => { this.status = 'live'; this.draw(); });
-        el.addEventListener('waiting', () => { this.status = 'tuning'; this.draw(); });
-        el.addEventListener('stalled', () => { this.status = 'tuning'; this.draw(); });
-        el.addEventListener('error', () => { if (this.audio.src) { this.status = 'error'; this.statusMsg = 'STREAM OFFLINE'; this.draw(); } });
-        el.addEventListener('pause', () => { if (this.status === 'live') { this.status = 'idle'; this.draw(); } });
+        el.addEventListener('playing', () => { if (!this.active) return; this.status = 'live'; this.draw(); });
+        el.addEventListener('waiting', () => { if (!this.active) return; this.status = 'tuning'; this.draw(); });
+        el.addEventListener('stalled', () => { if (!this.active) return; this.status = 'tuning'; this.draw(); });
+        el.addEventListener('error', () => { if (this.active && this.audio.src) { this.status = 'error'; this.statusMsg = 'STREAM OFFLINE'; this.draw(); } });
+        el.addEventListener('pause', () => { if (this.active && this.status === 'live') { this.status = 'idle'; this.draw(); } });
     }
 
     get genre() { return GENRES[this.genreIdx]; }
@@ -431,18 +433,3 @@ function drawEQ(ctx, W, top, bottom, live, t, rng) {
     ctx.beginPath(); ctx.moveTo(pad, bottom + 1); ctx.lineTo(W - pad, bottom + 1); ctx.stroke();
 }
 
-function marquee(ctx, text, x, y, maxW, offset) {
-    const w = ctx.measureText(text).width;
-    if (w <= maxW) { ctx.textAlign = 'left'; ctx.fillText(text, x, y); return; }
-    const span = w + 60;
-    const o = offset % span;
-    ctx.save();
-    ctx.beginPath(); ctx.rect(x, y - 24, maxW, 48); ctx.clip();
-    ctx.textAlign = 'left';
-    ctx.fillText(text, x - o, y);
-    ctx.fillText(text, x - o + span, y);
-    ctx.restore();
-}
-
-function signalBars(level) { return '▮'.repeat(level) + '▯'.repeat(4 - level); }
-function clip(s, n) { s = String(s || '').replace(/\s+/g, ' ').trim(); return s.length > n ? s.slice(0, n - 1) + '…' : s; }

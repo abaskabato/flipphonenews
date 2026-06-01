@@ -4,6 +4,8 @@
 
 WORLD RADIO is a 3D flip phone in your browser that tunes thousands of live radio stations from around the world. Flip it open, pick a genre, press play. No accounts, no signup, no backend — and it's never empty, because somewhere on Earth a station is always live.
 
+Two **bands** share the phone: live **Radio** and on-demand **Podcasts**. Tap the Radio / Podcasts toggle (or press Tab) to switch. In the Podcasts band, browse top shows by category or search, open a show, then play any episode with a scrubbable progress bar (◄◄ / ►► seek 30s).
+
 ## Why a radio
 
 It's the opposite of a cold-start problem: a radio doesn't need other users to be worth using. The moment you open it there's real, live content playing — talk from Tokyo, lo-fi from Berlin, a jazz station in New Orleans — so it's useful to a single visitor on day one.
@@ -22,8 +24,10 @@ Flip open      → ◄ ► switch genre · ▲ ▼ pick a station · OK plays
 ## Controls
 
 - **Drag** to spin the phone · **tap** the phone (or **Open / Close**) to flip
-- **◄ ►** change genre · **▲ ▼** change station · **OK / ▶** play & pause
-- Keyboard: arrow keys + **Enter**/**Space** to play, **Esc** to stop
+- **◄ ►** change genre/category · **▲ ▼** pick station/show/episode · **OK / ▶** play & pause
+- **Radio / Podcasts** toggle switches bands (keyboard: **Tab**)
+- Podcasts: **OK** opens a show's episodes; **END** goes back; **◄ ►** seek ±30s while playing
+- Keyboard: arrow keys + **Enter**/**Space** to play, **Esc** to stop / go back
 
 ## Local development
 

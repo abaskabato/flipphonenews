@@ -94,6 +94,27 @@ export function wrapText(ctx, text, maxW) {
     return lines;
 }
 
+// draw `text` at (x,y); if it's wider than maxW, scroll it horizontally by
+// `offset` pixels (used for long station / episode names while playing).
+export function marquee(ctx, text, x, y, maxW, offset) {
+    const w = ctx.measureText(text).width;
+    if (w <= maxW) { ctx.textAlign = 'left'; ctx.fillText(text, x, y); return; }
+    const span = w + 60;
+    const o = offset % span;
+    ctx.save();
+    ctx.beginPath(); ctx.rect(x, y - 24, maxW, 48); ctx.clip();
+    ctx.textAlign = 'left';
+    ctx.fillText(text, x - o, y);
+    ctx.fillText(text, x - o + span, y);
+    ctx.restore();
+}
+
+// 4-segment signal meter string, e.g. ▮▮▯▯
+export function signalBars(level) { return '▮'.repeat(level) + '▯'.repeat(4 - level); }
+
+// collapse whitespace and ellipsize `s` to at most `n` chars
+export function clip(s, n) { s = String(s || '').replace(/\s+/g, ' ').trim(); return s.length > n ? s.slice(0, n - 1) + '…' : s; }
+
 // small seeded PRNG so two players get the same food sequence
 export function mulberry32(seed) {
     let a = seed >>> 0;
