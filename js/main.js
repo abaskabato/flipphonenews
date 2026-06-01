@@ -271,13 +271,29 @@ function animate() {
 }
 animate();
 
+// The PerspectiveCamera's fov is vertical, so only narrow / portrait viewports
+// risk clipping the phone left and right. Keep at least MIN_VIEW_W world units
+// visible across by pulling the camera straight back when needed — desktop and
+// landscape keep the tuned BASE_DIST framing untouched.
+const BASE_DIST = 4.6;
+const MIN_VIEW_W = 1.5;     // phone body is ~0.98 wide; leave breathing room
 function sizeToStage() {
     const w = stage.clientWidth, h = stage.clientHeight;
+    if (!w || !h) return;
     camera.aspect = w / h;
+    const viewH = 2 * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * BASE_DIST;
+    const viewW = viewH * camera.aspect;
+    const dist = viewW < MIN_VIEW_W ? BASE_DIST * (MIN_VIEW_W / viewW) : BASE_DIST;
+    controls.maxDistance = Math.max(7, dist + 0.5);
+    // change the orbit radius without disturbing the user's current angle
+    const off = camera.position.clone().sub(controls.target).setLength(dist);
+    camera.position.copy(controls.target).add(off);
     camera.updateProjectionMatrix();
     renderer.setSize(w, h);
 }
+sizeToStage();
 addEventListener('resize', sizeToStage);
+addEventListener('orientationchange', sizeToStage);
 new ResizeObserver(sizeToStage).observe(stage);
 
 // ---------- back-of-lid printed panel ----------
