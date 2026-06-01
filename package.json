@@ -1,9 +1,9 @@
 {
-  "name": "world-radio",
+  "name": "flipcast",
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "WORLD RADIO — a 3D WebGL flip phone that tunes thousands of live internet radio stations from around the world. No accounts, no backend.",
+  "description": "FLIPCAST — a 3D WebGL flip phone that tunes thousands of live internet radio stations and podcasts from around the world. No accounts, no backend.",
   "scripts": {
     "dev": "python3 -m http.server 8080",
     "start": "python3 -m http.server 8080"

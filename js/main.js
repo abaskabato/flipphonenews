@@ -289,12 +289,12 @@ function drawBackPanel(ctx, W, H) {
     ctx.shadowColor = 'rgba(57,255,20,0.6)'; ctx.shadowBlur = 12;
     ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
     ctx.font = "bold 50px 'Courier New', monospace";
-    ctx.fillText('WORLD', W / 2, H * 0.34);
-    ctx.fillText('RADIO', W / 2, H * 0.56);
+    ctx.fillText('FLIP', W / 2, H * 0.34);
+    ctx.fillText('CAST', W / 2, H * 0.56);
     ctx.shadowBlur = 0;
     ctx.fillStyle = 'rgba(255,255,255,0.45)';
     ctx.font = "20px 'Courier New', monospace";
-    ctx.fillText('the whole planet, one dial', W / 2, H * 0.82);
+    ctx.fillText('flip it open · tune the world', W / 2, H * 0.82);
 }
 
 // debug/test hook
