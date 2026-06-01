@@ -6,6 +6,7 @@ import { buildPhone } from './phone.js';
 import { drawKeypad, drawExtMessage } from './faces.js';
 import { playFlip } from './audio.js';
 import { Radio } from './radio.js';
+import { Podcasts } from './podcasts.js';
 
 // ---------- renderer / scene ----------
 const canvasEl = document.getElementById('scene');
@@ -89,17 +90,46 @@ let grabbed = false;
 // ---------- audio + the one app ----------
 const audioEl = document.createElement('audio');
 audioEl.id = 'radio-audio';
-audioEl.crossOrigin = 'anonymous';
+// no crossOrigin: nothing reads the audio buffer (the EQ is synthesized), and
+// most podcast CDNs / radio streams don't send CORS headers, so requesting
+// them anonymously would block playback.
 audioEl.preload = 'none';
 document.body.appendChild(audioEl);
 
-const app = new Radio(screenC.canvas);
-app.setAudio(audioEl);
+// Two "bands" share one screen + one <audio>: live RADIO and on-demand PODCASTS.
+const radio = new Radio(screenC.canvas);
+const podcasts = new Podcasts(screenC.canvas);
+radio.setAudio(audioEl);
+podcasts.setAudio(audioEl);
+let app = radio;            // the active band
+let band = 'radio';
+radio.active = true;
+podcasts.active = false;
+
+function setBand(name) {
+    const next = name === 'podcast' ? podcasts : radio;
+    if (next === app) return;
+    app.exit();             // stops playback on the band we're leaving
+    app.active = false;
+    app = next;
+    band = name;
+    app.active = true;
+    app.enter();
+    updateBandUI();
+    refreshExternal();
+}
+function updateBandUI() {
+    bandRadioBtn?.classList.toggle('on', band === 'radio');
+    bandPodsBtn?.classList.toggle('on', band === 'podcast');
+    bandRadioBtn?.setAttribute('aria-pressed', String(band === 'radio'));
+    bandPodsBtn?.setAttribute('aria-pressed', String(band === 'podcast'));
+}
 
 // ---------- external display ----------
 function refreshExternal() {
     const playing = app.status === 'live';
-    drawExtMessage(extC.ctx, extC.W, extC.H, 'RADIO', playing ? '● ON AIR' : app.genre.toUpperCase());
+    const title = band === 'podcast' ? 'PODCAST' : 'RADIO';
+    drawExtMessage(extC.ctx, extC.W, extC.H, title, playing ? '● ON AIR' : app.genre.toUpperCase());
     extC.tex.needsUpdate = true;
 }
 refreshExternal();
@@ -165,6 +195,7 @@ function keyAtUV(u, v) {
 addEventListener('keydown', (e) => {
     if (e.target.tagName === 'TEXTAREA' || (e.target.tagName === 'INPUT' && e.target !== hiddenInput)) return;
     if (open < 0.5) return; // controls only matter when the phone is open
+    if (e.key === 'Tab') { setBand(band === 'radio' ? 'podcast' : 'radio'); e.preventDefault(); return; }
     app.handleKey(e);
 });
 
@@ -195,19 +226,13 @@ renderer.domElement.addEventListener('pointerdown', () => {
 
 // ---------- on-screen controls ----------
 const hud = {
-    up: document.getElementById('upBtn'),
-    down: document.getElementById('downBtn'),
-    left: document.getElementById('leftBtn'),
-    right: document.getElementById('rightBtn'),
-    ok: document.getElementById('okBtn'),
     search: document.getElementById('searchBtn'),
 };
+const bandRadioBtn = document.getElementById('bandRadio');
+const bandPodsBtn = document.getElementById('bandPods');
+bandRadioBtn?.addEventListener('click', () => { ensureOpen(); setBand('radio'); });
+bandPodsBtn?.addEventListener('click', () => { ensureOpen(); setBand('podcast'); });
 function ensureOpen() { if (openTarget < 0.5) setOpenTarget(1); }
-hud.up?.addEventListener('click', () => { ensureOpen(); app.nav('up'); });
-hud.down?.addEventListener('click', () => { ensureOpen(); app.nav('down'); });
-hud.left?.addEventListener('click', () => { ensureOpen(); app.nav('left'); });
-hud.right?.addEventListener('click', () => { ensureOpen(); app.nav('right'); });
-hud.ok?.addEventListener('click', () => { ensureOpen(); app.primary(); });
 hud.search?.addEventListener('click', () => {
     ensureOpen();
     if (app.mode === 'search') app.submitSearch(); else app.openSearch();
@@ -273,4 +298,7 @@ function drawBackPanel(ctx, W, H) {
 }
 
 // debug/test hook
-window.DD = { app, audio: audioEl, phone, setOpen: (v) => setOpenTarget(v), stopIdle: () => { grabbed = true; } };
+window.DD = {
+    get app() { return app; }, radio, podcasts, audio: audioEl, phone,
+    setBand, setOpen: (v) => setOpenTarget(v), stopIdle: () => { grabbed = true; },
+};
