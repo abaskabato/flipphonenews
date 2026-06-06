@@ -271,7 +271,7 @@ button {
     z-index: 6;
     left: 50%;
     transform: translateX(-50%);
-    top: max(108px, calc(env(safe-area-inset-top) + 82px));
+    top: max(125px, calc(env(safe-area-inset-top) + 98px));
     display: inline-flex;
     gap: 2px;
     padding: 3px;
@@ -439,7 +439,7 @@ button {
 @media (max-width: 640px) {
     .hero-copy { top: max(60px, calc(env(safe-area-inset-top) + 40px)); }
     .hero-copy h1 { font-size: clamp(13px, 3.4vw, 19px); }
-    .band-toggle { top: max(102px, calc(env(safe-area-inset-top) + 78px)); }
+    .band-toggle { top: max(118px, calc(env(safe-area-inset-top) + 94px)); }
     .hero-controls { gap: 6px; bottom: max(14px, env(safe-area-inset-bottom)); }
     .actions { gap: 8px; }
     .band { font-size: 12px; padding: 7px 14px; }
@@ -462,7 +462,7 @@ button {
 @media (max-height: 560px) {
     .hero-copy { top: max(54px, calc(env(safe-area-inset-top) + 36px)); }
     .hero-copy h1 { font-size: 14px; }
-    .band-toggle { top: max(92px, calc(env(safe-area-inset-top) + 70px)); }
+    .band-toggle { top: max(108px, calc(env(safe-area-inset-top) + 86px)); }
     .site-header { padding-top: max(8px, env(safe-area-inset-top)); padding-bottom: 8px; }
     .hero-controls { gap: 6px; }
 }
@@ -470,7 +470,7 @@ button {
     .hero-copy .eyebrow { display: none; }
     .hero-copy h1 { font-size: 12px; }
     .hero-copy { top: max(50px, calc(env(safe-area-inset-top) + 34px)); }
-    .band-toggle { top: max(80px, calc(env(safe-area-inset-top) + 60px)); }
+    .band-toggle { top: max(96px, calc(env(safe-area-inset-top) + 76px)); }
     .hero-controls { flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 6px; bottom: max(10px, env(safe-area-inset-bottom)); }
     .band { padding: 6px 10px; font-size: 11px; }
     .btn, .flip-btn { padding: 8px 12px; font-size: 12px; }
