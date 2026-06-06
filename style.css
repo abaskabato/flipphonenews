@@ -96,13 +96,13 @@ body {
     position: absolute; z-index: 6;
     left: 50%; transform: translateX(-50%);
     bottom: max(18px, env(safe-area-inset-bottom));
-    display: flex; flex-direction: column; gap: 10px;
+    display: flex; flex-direction: column; gap: 0;
     align-items: center;
 }
 
 /* band toggle: live Radio vs on-demand Podcasts */
 .band-toggle {
-    display: inline-flex; gap: 4px; padding: 4px;
+    display: inline-flex; gap: 3px; padding: 3px;
     border-radius: 999px; border: 1px solid var(--line);
     background: rgba(0,0,0,0.4); backdrop-filter: blur(6px);
 }
