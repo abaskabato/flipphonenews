@@ -89,8 +89,8 @@ let grabbed = false;
 
 // ---------- stick / lock phone position ----------
 let stuck = false;
-const INIT_CAM_POS = new THREE.Vector3(0.1, 0.25, 4.6);
-const INIT_TARGET = new THREE.Vector3(0, -0.05, 0);
+const INIT_CAM_POS = new THREE.Vector3(0, -0.15, 4.0);
+const INIT_TARGET = new THREE.Vector3(0, 0.1, 0);
 const stickBtn = document.getElementById('stickBtn');
 stickBtn?.addEventListener('click', () => {
     stuck = !stuck;
