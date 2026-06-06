@@ -61,7 +61,7 @@ body::before {
     top: 0; left: 0; right: 0;
     z-index: 20;
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: space-between;
     gap: 12px;
     padding: 12px 22px;
@@ -73,6 +73,14 @@ body::before {
     -webkit-backdrop-filter: blur(16px) saturate(140%);
     border-bottom: 1px solid var(--line);
     box-shadow: 0 1px 0 rgba(255, 255, 255, 0.04) inset, 0 8px 24px rgba(0, 0, 0, 0.25);
+}
+
+.header-left {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex: 1;
+    min-width: 0;
 }
 
 .brand {
@@ -98,6 +106,58 @@ body::before {
     50% { text-shadow: 0 0 14px rgba(57, 255, 20, 0.8), 0 0 28px rgba(57, 255, 20, 0.4); }
 }
 
+.hero-copy {
+    position: relative;
+    z-index: 6;
+    width: 100%;
+    max-width: 600px;
+    text-align: left;
+    text-shadow: 0 2px 24px rgba(0, 0, 0, 0.85), 0 0 1px rgba(0, 0, 0, 0.5);
+    pointer-events: none;
+    animation: fadeInDown 0.8s var(--ease) 0.2s both;
+}
+
+.hero-copy .sub,
+.hero-copy .microcopy { display: none; }
+
+.eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--neon);
+    margin-bottom: 4px;
+    padding: 4px 12px;
+    border-radius: var(--radius-pill);
+    background: rgba(57, 255, 20, 0.08);
+    border: 1px solid rgba(57, 255, 20, 0.2);
+    box-shadow: 0 0 16px rgba(57, 255, 20, 0.12);
+}
+.eyebrow::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--neon);
+    box-shadow: 0 0 8px var(--neon);
+    animation: blink 2s ease-in-out infinite;
+}
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+}
+
+.hero-copy h1 {
+    font-size: clamp(13px, 2.6vw, 20px);
+    line-height: 1.15;
+    font-weight: 800;
+    letter-spacing: -0.2px;
+    color: #fff;
+}
+
 .credit {
     color: var(--ink-soft);
     text-decoration: none;
@@ -108,6 +168,8 @@ body::before {
     border: 1px solid var(--line);
     background: rgba(255, 255, 255, 0.02);
     transition: color 0.18s var(--ease), background 0.18s var(--ease), border-color 0.18s var(--ease);
+    flex-shrink: 0;
+    margin-top: 4px;
 }
 .credit:hover {
     color: #fff;
@@ -271,7 +333,7 @@ button {
     z-index: 6;
     left: 50%;
     transform: translateX(-50%);
-    top: max(125px, calc(env(safe-area-inset-top) + 98px));
+    top: max(95px, calc(env(safe-area-inset-top) + 70px));
     display: inline-flex;
     gap: 2px;
     padding: 3px;
@@ -437,9 +499,8 @@ button {
 
 /* narrow screens: tighten up */
 @media (max-width: 640px) {
-    .hero-copy { top: max(60px, calc(env(safe-area-inset-top) + 40px)); }
-    .hero-copy h1 { font-size: clamp(13px, 3.4vw, 19px); }
-    .band-toggle { top: max(118px, calc(env(safe-area-inset-top) + 94px)); }
+    .hero-copy h1 { font-size: clamp(12px, 3.2vw, 17px); }
+    .band-toggle { top: max(90px, calc(env(safe-area-inset-top) + 66px)); }
     .hero-controls { gap: 6px; bottom: max(14px, env(safe-area-inset-bottom)); }
     .actions { gap: 8px; }
     .band { font-size: 12px; padding: 7px 14px; }
@@ -460,17 +521,15 @@ button {
 
 /* short / landscape screens: compact everything */
 @media (max-height: 560px) {
-    .hero-copy { top: max(54px, calc(env(safe-area-inset-top) + 36px)); }
-    .hero-copy h1 { font-size: 14px; }
-    .band-toggle { top: max(108px, calc(env(safe-area-inset-top) + 86px)); }
+    .hero-copy h1 { font-size: 13px; }
+    .band-toggle { top: max(84px, calc(env(safe-area-inset-top) + 62px)); }
     .site-header { padding-top: max(8px, env(safe-area-inset-top)); padding-bottom: 8px; }
     .hero-controls { gap: 6px; }
 }
 @media (max-height: 430px) {
     .hero-copy .eyebrow { display: none; }
-    .hero-copy h1 { font-size: 12px; }
-    .hero-copy { top: max(50px, calc(env(safe-area-inset-top) + 34px)); }
-    .band-toggle { top: max(96px, calc(env(safe-area-inset-top) + 76px)); }
+    .hero-copy h1 { font-size: 11px; }
+    .band-toggle { top: max(72px, calc(env(safe-area-inset-top) + 52px)); }
     .hero-controls { flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 6px; bottom: max(10px, env(safe-area-inset-bottom)); }
     .band { padding: 6px 10px; font-size: 11px; }
     .btn, .flip-btn { padding: 8px 12px; font-size: 12px; }
