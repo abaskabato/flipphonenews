@@ -89,12 +89,19 @@ let grabbed = false;
 
 // ---------- stick / lock phone position ----------
 let stuck = false;
+const INIT_CAM_POS = new THREE.Vector3(0.1, 0.25, 4.6);
+const INIT_TARGET = new THREE.Vector3(0, -0.05, 0);
 const stickBtn = document.getElementById('stickBtn');
 stickBtn?.addEventListener('click', () => {
     stuck = !stuck;
     controls.enabled = !stuck;
     stickBtn.classList.toggle('on', stuck);
     stickBtn.textContent = stuck ? '📌 Stuck' : '📌 Stick';
+    if (stuck) {
+        camera.position.copy(INIT_CAM_POS);
+        controls.target.copy(INIT_TARGET);
+        controls.update();
+    }
 });
 
 // ---------- audio + the one app ----------

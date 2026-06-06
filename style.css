@@ -65,7 +65,8 @@ body {
 
 .hero-copy {
     position: absolute; z-index: 6;
-    top: 62px; left: 50%; transform: translateX(-50%);
+    left: 50%; transform: translateX(-50%);
+    bottom: 110px;
     width: min(760px, 94vw);
     text-align: center;
     text-shadow: 0 2px 20px rgba(0,0,0,0.7);
@@ -146,10 +147,9 @@ body {
     .site-nav a:not(.ghost) { display: none; }
 }
 
-/* narrow screens: no room for the paragraph above the phone — keep just the
-   headline up top and drop the rest so the LCD stays fully visible */
+/* narrow screens: no room for the paragraph — keep just the headline */
 @media (max-width: 640px) {
-    .hero-copy { top: max(66px, calc(env(safe-area-inset-top) + 54px)); }
+    .hero-copy { bottom: max(100px, calc(env(safe-area-inset-bottom) + 80px)); }
     .hero-copy .sub,
     .hero-copy .microcopy { display: none; }
     .credit { font-size: 12px; padding: 6px 10px; }
@@ -164,17 +164,18 @@ body {
     .actions { gap: 8px; }
 }
 
-/* short / landscape screens: drop the copy and compact the controls so the
-   phone, header and controls all stay on screen at once */
+/* short / landscape screens: drop verbose copy and compact the controls */
 @media (max-height: 560px) {
     .hero-copy .sub,
     .hero-copy .microcopy { display: none; }
+    .hero-copy { bottom: 90px; }
     .site-header { padding-top: max(8px, env(safe-area-inset-top)); padding-bottom: 8px; }
     .hero-controls { gap: 8px; }
 }
 @media (max-height: 430px) {
     .hero-copy .eyebrow { display: none; }
     .hero-copy h1 { font-size: 16px; }
+    .hero-copy { bottom: 75px; }
     /* lay the controls out in a single compact row to reclaim vertical space */
     .hero-controls { flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 8px; bottom: max(10px, env(safe-area-inset-bottom)); }
     .band { padding: 7px 12px; }
