@@ -66,7 +66,7 @@ body {
 .hero-copy {
     position: absolute; z-index: 6;
     left: 50%; transform: translateX(-50%);
-    bottom: 105px;
+    top: 58px;
     width: min(600px, 80vw);
     text-align: center;
     text-shadow: 0 2px 20px rgba(0,0,0,0.7);
@@ -75,10 +75,10 @@ body {
 .hero-copy .sub,
 .hero-copy .microcopy { display: none; }
 .eyebrow {
-    text-transform: uppercase; letter-spacing: 3px; font-size: 11px;
-    color: var(--neon); margin-bottom: 4px;
+    text-transform: uppercase; letter-spacing: 3px; font-size: 10px;
+    color: var(--neon); margin-bottom: 2px;
 }
-.hero-copy h1 { font-size: clamp(14px, 2.5vw, 20px); line-height: 1.2; font-weight: 700; }
+.hero-copy h1 { font-size: clamp(12px, 2vw, 18px); line-height: 1.15; font-weight: 700; }
 
 .btn {
     display: inline-flex; align-items: center; justify-content: center;
@@ -146,8 +146,8 @@ body {
 
 /* narrow screens: tighten up */
 @media (max-width: 640px) {
-    .hero-copy { bottom: 95px; }
-    .hero-copy h1 { font-size: clamp(13px, 3.5vw, 18px); }
+    .hero-copy { top: max(56px, calc(env(safe-area-inset-top) + 44px)); }
+    .hero-copy h1 { font-size: clamp(11px, 3vw, 16px); }
     .hero-controls { gap: 8px; bottom: max(14px, env(safe-area-inset-bottom)); }
     .actions { gap: 8px; }
     .band { font-size: 12px; padding: 7px 14px; }
@@ -163,20 +163,19 @@ body {
     .btn { padding: 10px 14px; font-size: 13px; }
     .flip-btn { padding: 8px 14px; font-size: 12px; }
     .actions { gap: 6px; }
-    .hero-copy { bottom: 85px; }
 }
 
 /* short / landscape screens: compact everything */
 @media (max-height: 560px) {
-    .hero-copy { bottom: 85px; }
-    .hero-copy h1 { font-size: 15px; }
+    .hero-copy { top: max(52px, calc(env(safe-area-inset-top) + 40px)); }
+    .hero-copy h1 { font-size: 14px; }
     .site-header { padding-top: max(8px, env(safe-area-inset-top)); padding-bottom: 8px; }
     .hero-controls { gap: 6px; }
 }
 @media (max-height: 430px) {
     .hero-copy .eyebrow { display: none; }
-    .hero-copy h1 { font-size: 13px; }
-    .hero-copy { bottom: 75px; }
+    .hero-copy h1 { font-size: 12px; }
+    .hero-copy { top: max(48px, calc(env(safe-area-inset-top) + 36px)); }
     .hero-controls { flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 6px; bottom: max(10px, env(safe-area-inset-bottom)); }
     .band { padding: 6px 10px; font-size: 11px; }
     .btn, .flip-btn { padding: 8px 12px; font-size: 12px; }
