@@ -26,7 +26,7 @@
     <body>
     <header class="site-header">
         <div class="header-left">
-            <a class="brand" href="/">FLIP<span>CAST</span></a>
+            <a class="brand" href="/"><img class="brand-mark" src="/icon.svg" alt="" width="24" height="24">FLIP<span>CAST</span></a>
             <div class="hero-copy">
                 <p class="eyebrow">Live · worldwide · free</p>
                 <h1>Flip it open. Tune the world.</h1>
@@ -40,6 +40,7 @@
         <canvas id="scene"></canvas>
 
         <div class="band-toggle" role="tablist" aria-label="listening band">
+            <span class="band-slider" aria-hidden="true"></span>
             <button id="bandRadio" class="band on" role="tab" aria-pressed="true">📻 Radio</button>
             <button id="bandPods" class="band" role="tab" aria-pressed="false">🎙 Podcasts</button>
         </div>

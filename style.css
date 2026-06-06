@@ -95,6 +95,18 @@ body::before {
     transition: opacity 0.2s var(--ease);
 }
 .brand:hover { opacity: 0.85; }
+.brand-mark {
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+    flex-shrink: 0;
+    box-shadow: 0 0 12px rgba(57, 255, 20, 0.25), 0 2px 6px rgba(0, 0, 0, 0.4);
+    transition: transform 0.2s var(--ease), box-shadow 0.2s var(--ease);
+}
+.brand:hover .brand-mark {
+    transform: translateY(-1px) rotate(-3deg);
+    box-shadow: 0 0 18px rgba(57, 255, 20, 0.4), 0 4px 10px rgba(0, 0, 0, 0.5);
+}
 .brand span {
     color: var(--neon);
     text-shadow: 0 0 10px rgba(57, 255, 20, 0.6), 0 0 20px rgba(57, 255, 20, 0.25);
@@ -114,7 +126,11 @@ body::before {
     text-align: left;
     text-shadow: 0 2px 24px rgba(0, 0, 0, 0.85), 0 0 1px rgba(0, 0, 0, 0.5);
     pointer-events: none;
-    animation: fadeInDown 0.8s var(--ease) 0.2s both;
+    animation: heroCopyIn 0.7s var(--ease) 0.2s both;
+}
+@keyframes heroCopyIn {
+    from { opacity: 0; transform: translateY(-6px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 .hero-copy .sub,
@@ -210,63 +226,9 @@ body::before {
     touch-action: none;
 }
 
-/* ===== hero copy (top tagline) ===== */
-.hero-copy {
-    position: absolute;
-    z-index: 6;
-    left: 50%;
-    transform: translateX(-50%);
-    top: max(64px, calc(env(safe-area-inset-top) + 38px));
-    width: min(600px, 84vw);
-    text-align: center;
-    text-shadow: 0 2px 24px rgba(0, 0, 0, 0.85), 0 0 1px rgba(0, 0, 0, 0.5);
-    pointer-events: none;
-    animation: fadeInDown 0.8s var(--ease) 0.2s both;
-}
 @keyframes fadeInDown {
     from { opacity: 0; transform: translate(-50%, -8px); }
     to { opacity: 1; transform: translate(-50%, 0); }
-}
-
-.hero-copy .sub,
-.hero-copy .microcopy { display: none; }
-
-.eyebrow {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    text-transform: uppercase;
-    letter-spacing: 3px;
-    font-size: 10px;
-    font-weight: 700;
-    color: var(--neon);
-    margin-bottom: 6px;
-    padding: 4px 12px;
-    border-radius: var(--radius-pill);
-    background: rgba(57, 255, 20, 0.08);
-    border: 1px solid rgba(57, 255, 20, 0.2);
-    box-shadow: 0 0 16px rgba(57, 255, 20, 0.12);
-}
-.eyebrow::before {
-    content: "";
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: var(--neon);
-    box-shadow: 0 0 8px var(--neon);
-    animation: blink 2s ease-in-out infinite;
-}
-@keyframes blink {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.3; }
-}
-
-.hero-copy h1 {
-    font-size: clamp(15px, 2.8vw, 22px);
-    line-height: 1.2;
-    font-weight: 800;
-    letter-spacing: -0.2px;
-    color: #fff;
 }
 
 /* ===== buttons: shared ===== */
@@ -297,7 +259,8 @@ button {
     outline-offset: 2px;
 }
 .btn:active,
-.flip-btn:active {
+.flip-btn:active,
+.band:active {
     transform: translateY(1px) scale(0.98);
 }
 
@@ -349,6 +312,7 @@ button {
 .band {
     appearance: none;
     border: none;
+    z-index: 1;
     font-size: 13px;
     font-weight: 700;
     color: var(--ink-soft);
@@ -358,14 +322,33 @@ button {
     letter-spacing: 0.2px;
 }
 .band:hover { color: #fff; }
+.band:not(.on):hover { background: rgba(255, 255, 255, 0.06); }
 .band.on {
     color: #06140a;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+/* sliding highlight pill — JS sets its width/offset to match the active tab */
+.band-slider {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 0;
+    width: 0;
+    height: 0;
+    border-radius: var(--radius-pill);
     background: linear-gradient(180deg, var(--neon-bright) 0%, var(--neon-dim) 100%);
     box-shadow:
         0 0 0 1px rgba(57, 255, 20, 0.4),
         0 4px 14px rgba(57, 255, 20, 0.35),
         inset 0 1px 0 rgba(255, 255, 255, 0.25);
-    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.15);
+    pointer-events: none;
+}
+.band-toggle.slider-ready .band-slider {
+    transition:
+        transform 0.34s var(--ease),
+        width 0.34s var(--ease),
+        height 0.34s var(--ease);
 }
 
 /* ===== primary action button (search) ===== */

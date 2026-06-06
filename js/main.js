@@ -151,6 +151,16 @@ function updateBandUI() {
     bandPodsBtn?.classList.toggle('on', band === 'podcast');
     bandRadioBtn?.setAttribute('aria-pressed', String(band === 'radio'));
     bandPodsBtn?.setAttribute('aria-pressed', String(band === 'podcast'));
+    positionBandSlider();
+}
+
+// slide the highlight pill to sit exactly under the active band tab
+function positionBandSlider() {
+    const activeBtn = band === 'radio' ? bandRadioBtn : bandPodsBtn;
+    if (!bandSliderEl || !activeBtn || !activeBtn.offsetWidth) return;
+    bandSliderEl.style.width = activeBtn.offsetWidth + 'px';
+    bandSliderEl.style.height = activeBtn.offsetHeight + 'px';
+    bandSliderEl.style.transform = `translate(${activeBtn.offsetLeft}px, ${activeBtn.offsetTop}px)`;
 }
 
 // ---------- external display ----------
@@ -258,8 +268,19 @@ const hud = {
 };
 const bandRadioBtn = document.getElementById('bandRadio');
 const bandPodsBtn = document.getElementById('bandPods');
+const bandSliderEl = document.querySelector('.band-slider');
+const bandToggleEl = document.querySelector('.band-toggle');
 bandRadioBtn?.addEventListener('click', () => { ensureOpen(); setBand('radio'); });
 bandPodsBtn?.addEventListener('click', () => { ensureOpen(); setBand('podcast'); });
+
+// place the pill on first paint without animating, then enable the slide
+requestAnimationFrame(() => {
+    positionBandSlider();
+    requestAnimationFrame(() => bandToggleEl?.classList.add('slider-ready'));
+});
+addEventListener('resize', positionBandSlider);
+addEventListener('orientationchange', positionBandSlider);
+addEventListener('load', positionBandSlider); // re-measure once emoji/fonts settle
 function ensureOpen() { if (openTarget < 0.5) setOpenTarget(1); }
 hud.search?.addEventListener('click', () => {
     ensureOpen();
