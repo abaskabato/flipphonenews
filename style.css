@@ -102,6 +102,9 @@ body {
 
 /* band toggle: live Radio vs on-demand Podcasts */
 .band-toggle {
+    position: absolute; z-index: 6;
+    left: 50%; transform: translateX(-50%);
+    top: max(105px, calc(env(safe-area-inset-top) + 80px));
     display: inline-flex; gap: 3px; padding: 3px;
     border-radius: 999px; border: 1px solid var(--line);
     background: rgba(0,0,0,0.4); backdrop-filter: blur(6px);
@@ -148,6 +151,7 @@ body {
 @media (max-width: 640px) {
     .hero-copy { top: max(58px, calc(env(safe-area-inset-top) + 38px)); }
     .hero-copy h1 { font-size: clamp(14px, 3.5vw, 20px); }
+    .band-toggle { top: max(100px, calc(env(safe-area-inset-top) + 76px)); }
     .hero-controls { gap: 8px; bottom: max(14px, env(safe-area-inset-bottom)); }
     .actions { gap: 8px; }
     .band { font-size: 12px; padding: 7px 14px; }
@@ -169,6 +173,7 @@ body {
 @media (max-height: 560px) {
     .hero-copy { top: max(54px, calc(env(safe-area-inset-top) + 36px)); }
     .hero-copy h1 { font-size: 15px; }
+    .band-toggle { top: max(92px, calc(env(safe-area-inset-top) + 70px)); }
     .site-header { padding-top: max(8px, env(safe-area-inset-top)); padding-bottom: 8px; }
     .hero-controls { gap: 6px; }
 }
@@ -176,6 +181,7 @@ body {
     .hero-copy .eyebrow { display: none; }
     .hero-copy h1 { font-size: 13px; }
     .hero-copy { top: max(50px, calc(env(safe-area-inset-top) + 34px)); }
+    .band-toggle { top: max(80px, calc(env(safe-area-inset-top) + 60px)); }
     .hero-controls { flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 6px; bottom: max(10px, env(safe-area-inset-bottom)); }
     .band { padding: 6px 10px; font-size: 11px; }
     .btn, .flip-btn { padding: 8px 12px; font-size: 12px; }
