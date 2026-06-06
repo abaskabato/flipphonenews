@@ -91,6 +91,9 @@ let grabbed = false;
 let stuck = false;
 const INIT_CAM_POS = new THREE.Vector3(0, -0.35, 3.5);
 const INIT_TARGET = new THREE.Vector3(0, 0.15, 0);
+let savedCamPos = null;
+let savedTarget = null;
+let savedPhoneRotY = 0;
 const stickBtn = document.getElementById('stickBtn');
 stickBtn?.addEventListener('click', () => {
     stuck = !stuck;
@@ -98,8 +101,16 @@ stickBtn?.addEventListener('click', () => {
     stickBtn.classList.toggle('on', stuck);
     stickBtn.textContent = stuck ? '📌 Stuck' : '📌 Stick';
     if (stuck) {
+        savedCamPos = camera.position.clone();
+        savedTarget = controls.target.clone();
+        savedPhoneRotY = phone.group.rotation.y;
         camera.position.copy(INIT_CAM_POS);
         controls.target.copy(INIT_TARGET);
+        controls.update();
+    } else if (savedCamPos && savedTarget) {
+        camera.position.copy(savedCamPos);
+        controls.target.copy(savedTarget);
+        phone.group.rotation.y = savedPhoneRotY;
         controls.update();
     }
 });
