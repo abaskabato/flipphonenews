@@ -296,7 +296,9 @@ button {
     z-index: 6;
     left: 50%;
     transform: translateX(-50%);
-    top: max(95px, calc(env(safe-area-inset-top) + 70px));
+    /* sit just below the header; --header-h is measured in JS so the toggle
+       always clears the (variable-height) header banner */
+    top: calc(var(--header-h, 104px) + 14px);
     display: inline-flex;
     gap: 2px;
     padding: 3px;
@@ -483,7 +485,6 @@ button {
 /* narrow screens: tighten up */
 @media (max-width: 640px) {
     .hero-copy h1 { font-size: clamp(12px, 3.2vw, 17px); }
-    .band-toggle { top: max(90px, calc(env(safe-area-inset-top) + 66px)); }
     .hero-controls { gap: 6px; bottom: max(14px, env(safe-area-inset-bottom)); }
     .actions { gap: 8px; }
     .band { font-size: 12px; padding: 7px 14px; }
@@ -505,14 +506,12 @@ button {
 /* short / landscape screens: compact everything */
 @media (max-height: 560px) {
     .hero-copy h1 { font-size: 13px; }
-    .band-toggle { top: max(84px, calc(env(safe-area-inset-top) + 62px)); }
     .site-header { padding-top: max(8px, env(safe-area-inset-top)); padding-bottom: 8px; }
     .hero-controls { gap: 6px; }
 }
 @media (max-height: 430px) {
     .hero-copy .eyebrow { display: none; }
     .hero-copy h1 { font-size: 11px; }
-    .band-toggle { top: max(72px, calc(env(safe-area-inset-top) + 52px)); }
     .hero-controls { flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 6px; bottom: max(10px, env(safe-area-inset-bottom)); }
     .band { padding: 6px 10px; font-size: 11px; }
     .btn, .flip-btn { padding: 8px 12px; font-size: 12px; }

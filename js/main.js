@@ -281,6 +281,20 @@ requestAnimationFrame(() => {
 addEventListener('resize', positionBandSlider);
 addEventListener('orientationchange', positionBandSlider);
 addEventListener('load', positionBandSlider); // re-measure once emoji/fonts settle
+
+// publish the (variable-height) header's height so the band toggle can sit
+// just below it instead of being hidden under the banner
+const headerEl = document.querySelector('.site-header');
+function syncHeaderHeight() {
+    if (!headerEl) return;
+    document.documentElement.style.setProperty('--header-h', headerEl.offsetHeight + 'px');
+    positionBandSlider();
+}
+syncHeaderHeight();
+addEventListener('resize', syncHeaderHeight);
+addEventListener('orientationchange', syncHeaderHeight);
+addEventListener('load', syncHeaderHeight);
+if (headerEl) new ResizeObserver(syncHeaderHeight).observe(headerEl);
 function ensureOpen() { if (openTarget < 0.5) setOpenTarget(1); }
 hud.search?.addEventListener('click', () => {
     ensureOpen();
