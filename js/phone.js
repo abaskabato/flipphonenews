@@ -78,8 +78,11 @@ export function buildPhone({ screenTex, keypadTex, extScreenTex, sponsorTex }) {
     lid.castShadow = true; lid.receiveShadow = true;
     hinge.add(lid);
 
-    // inner LCD (news) on the lid front
-    const screenMat = lcdMat(screenTex);
+    // inner LCD (news) on the lid front — high emissive to cut through reflections
+    const screenMat = new THREE.MeshStandardMaterial({
+        map: screenTex, emissive: 0xffffff, emissiveMap: screenTex, emissiveIntensity: 2.5,
+        roughness: 0.7, metalness: 0.0,
+    });
     const screen = new THREE.Mesh(new THREE.PlaneGeometry(W - 0.16, H - 0.34), screenMat);
     screen.position.set(0, 0.05, D / 2 + EPS);
     lid.add(screen);

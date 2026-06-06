@@ -65,27 +65,25 @@ body {
 
 .hero-copy {
     position: absolute; z-index: 6;
-    left: 24px; top: 50%; transform: translateY(-50%);
-    width: auto; max-width: 200px;
-    text-align: left;
+    left: 50%; transform: translateX(-50%);
+    bottom: 105px;
+    width: min(600px, 80vw);
+    text-align: center;
     text-shadow: 0 2px 20px rgba(0,0,0,0.7);
-    pointer-events: none; /* let drags pass through to the phone */
+    pointer-events: none;
 }
+.hero-copy .sub,
+.hero-copy .microcopy { display: none; }
 .eyebrow {
     text-transform: uppercase; letter-spacing: 3px; font-size: 11px;
-    color: var(--neon); margin-bottom: 6px;
+    color: var(--neon); margin-bottom: 4px;
 }
-.hero-copy h1 { font-size: clamp(15px, 2vw, 22px); line-height: 1.2; font-weight: 700; }
-.hero-copy .sub {
-    margin: 6px 0 0; color: rgba(255,255,255,0.6); font-size: 11px;
-    display: none; /* hidden on side layout */
-}
-.microcopy { margin-top: 6px; font-size: 10px; letter-spacing: 1px; color: rgba(255,255,255,0.35); }
+.hero-copy h1 { font-size: clamp(14px, 2.5vw, 20px); line-height: 1.2; font-weight: 700; }
 
 .btn {
     display: inline-flex; align-items: center; justify-content: center;
-    font-size: 13px; font-weight: 700; cursor: pointer;
-    padding: 10px 16px; border-radius: 10px; border: none; text-decoration: none;
+    font-size: 14px; font-weight: 700; cursor: pointer;
+    padding: 12px 18px; border-radius: 12px; border: none; text-decoration: none;
     transition: transform .12s, filter .12s, background .15s;
 }
 .btn.primary { background: linear-gradient(180deg, #5dff3c, #28c40f); color: #06140a; box-shadow: 0 10px 28px rgba(40,196,15,0.32); }
@@ -93,24 +91,25 @@ body {
 .btn.ghost { background: rgba(255,255,255,0.06); color: #fff; border: 1px solid var(--line); }
 .btn.ghost:hover { background: rgba(255,255,255,0.14); }
 
-/* side phone controls */
+/* bottom-centred phone controls */
 .hero-controls {
     position: absolute; z-index: 6;
-    right: 16px; top: 50%; transform: translateY(-50%);
-    display: flex; flex-direction: column; gap: 8px;
-    align-items: stretch;
+    left: 50%; transform: translateX(-50%);
+    bottom: max(18px, env(safe-area-inset-bottom));
+    display: flex; flex-direction: column; gap: 10px;
+    align-items: center;
 }
 
 /* band toggle: live Radio vs on-demand Podcasts */
 .band-toggle {
-    display: inline-flex; gap: 4px; padding: 3px;
+    display: inline-flex; gap: 4px; padding: 4px;
     border-radius: 999px; border: 1px solid var(--line);
     background: rgba(0,0,0,0.4); backdrop-filter: blur(6px);
 }
 .band {
     appearance: none; border: none; cursor: pointer;
-    font-size: 12px; font-weight: 700; color: var(--muted);
-    padding: 6px 14px; border-radius: 999px; background: transparent;
+    font-size: 13px; font-weight: 700; color: var(--muted);
+    padding: 8px 16px; border-radius: 999px; background: transparent;
     transition: background .15s, color .15s;
 }
 .band:hover { color: #fff; }
@@ -120,15 +119,15 @@ body {
     box-shadow: 0 0 14px rgba(57,255,20,0.4);
 }
 
-.actions { display: flex; flex-direction: column; gap: 6px; }
+.actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; justify-content: center; }
 .flip-btn {
-    display: inline-flex; align-items: center; gap: 7px;
-    font-size: 13px; font-weight: 600; color: #0c0c14;
+    display: inline-flex; align-items: center; gap: 9px;
+    font-size: 14px; font-weight: 600; color: #0c0c14;
     background: linear-gradient(180deg, #fff, #d6d6d6); border: none;
-    padding: 9px 16px; border-radius: 999px; cursor: pointer;
+    padding: 11px 20px; border-radius: 999px; cursor: pointer;
     box-shadow: 0 8px 24px rgba(0,0,0,0.45);
 }
-.flip-btn .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--neon); box-shadow: 0 0 8px rgba(57,255,20,0.9); }
+.flip-btn .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--neon); box-shadow: 0 0 8px rgba(57,255,20,0.9); }
 .flip-btn.on { background: linear-gradient(180deg, #5dff3c, #28c40f); color: #06140a; }
 
 .loader {
@@ -145,54 +144,40 @@ body {
     .site-nav a:not(.ghost) { display: none; }
 }
 
-/* narrow screens: switch from side to bottom layout */
-@media (max-width: 767px) {
-    .hero-copy {
-        left: 50%; top: auto; bottom: 100px;
-        transform: translateX(-50%);
-        width: min(760px, 94vw); max-width: none;
-        text-align: center;
-    }
-    .hero-copy h1 { font-size: clamp(16px, 3.5vw, 22px); }
-    .hero-copy .sub,
-    .hero-copy .microcopy { display: none; }
-    .hero-controls {
-        left: 50%; right: auto; top: auto;
-        bottom: max(22px, env(safe-area-inset-bottom));
-        transform: translateX(-50%);
-        width: max-content; max-width: 94vw;
-        flex-direction: column; gap: 12px;
-        align-items: center;
-    }
-    .actions { flex-direction: row; gap: 10px; }
-    .actions .btn { padding: 12px 18px; font-size: 14px; }
-    .actions .flip-btn { padding: 10px 18px; font-size: 13px; }
-    .band { font-size: 13px; padding: 7px 15px; }
+/* narrow screens: tighten up */
+@media (max-width: 640px) {
+    .hero-copy { bottom: 95px; }
+    .hero-copy h1 { font-size: clamp(13px, 3.5vw, 18px); }
+    .hero-controls { gap: 8px; bottom: max(14px, env(safe-area-inset-bottom)); }
+    .actions { gap: 8px; }
+    .band { font-size: 12px; padding: 7px 14px; }
+    .btn { padding: 11px 16px; font-size: 13px; }
+    .flip-btn { padding: 10px 18px; font-size: 13px; }
     .credit { font-size: 12px; padding: 6px 10px; }
     .brand { font-size: 15px; }
 }
 
-/* very narrow phones: tighten controls */
+/* very narrow phones: tighter still */
 @media (max-width: 380px) {
     .band { padding: 6px 10px; font-size: 11px; }
     .btn { padding: 10px 14px; font-size: 13px; }
     .flip-btn { padding: 8px 14px; font-size: 12px; }
     .actions { gap: 6px; }
-    .hero-copy { bottom: 90px; }
+    .hero-copy { bottom: 85px; }
 }
 
 /* short / landscape screens: compact everything */
 @media (max-height: 560px) {
-    .hero-copy .sub,
-    .hero-copy .microcopy { display: none; }
-    .hero-copy h1 { font-size: 16px; }
+    .hero-copy { bottom: 85px; }
+    .hero-copy h1 { font-size: 15px; }
     .site-header { padding-top: max(8px, env(safe-area-inset-top)); padding-bottom: 8px; }
+    .hero-controls { gap: 6px; }
 }
 @media (max-height: 430px) {
     .hero-copy .eyebrow { display: none; }
-    .hero-copy h1 { font-size: 14px; }
-    .hero-controls { flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 6px; }
-    .actions { flex-direction: row; gap: 6px; }
-    .band { padding: 5px 10px; font-size: 11px; }
-    .btn, .flip-btn { padding: 7px 12px; font-size: 12px; }
+    .hero-copy h1 { font-size: 13px; }
+    .hero-copy { bottom: 75px; }
+    .hero-controls { flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 6px; bottom: max(10px, env(safe-area-inset-bottom)); }
+    .band { padding: 6px 10px; font-size: 11px; }
+    .btn, .flip-btn { padding: 8px 12px; font-size: 12px; }
 }
