@@ -14,20 +14,20 @@ export function drawKeypad(ctx, W, H) {
     const cx = W / 2;
 
     // ----- D-pad -----
-    const dY = 110, dR = 78;
+    const dY = 110, dR = 90;
     ringButton(ctx, cx, dY, dR, '#5a5d63', '#2c2e33');
     // OK center
-    circle(ctx, cx, dY, 30, '#2f6fb0', '#1b3f70');
+    circle(ctx, cx, dY, 40, '#2f6fb0', '#1b3f70');
     ctx.fillStyle = '#dcebff';
     ctx.fillStyle = '#d9ecff';
-    ctx.font = "bold 22px Arial"; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.font = "bold 28px Arial"; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
     ctx.fillText('OK', cx, dY + 1);
     // arrows
     ctx.fillStyle = '#e7e9ec';
-    arrow(ctx, cx, dY - dR + 18, 'up');
-    arrow(ctx, cx, dY + dR - 18, 'down');
-    arrow(ctx, cx - dR + 18, dY, 'left');
-    arrow(ctx, cx + dR - 18, dY, 'right');
+    arrow(ctx, cx, dY - dR + 24, 'up');
+    arrow(ctx, cx, dY + dR - 24, 'down');
+    arrow(ctx, cx - dR + 24, dY, 'left');
+    arrow(ctx, cx + dR - 24, dY, 'right');
 
     // ----- soft keys -----
     softKey(ctx, 40, 60, 92, 40);
@@ -143,7 +143,7 @@ function circle(ctx, cx, cy, r, c1, c2) {
 }
 
 function arrow(ctx, x, y, dir) {
-    const s = 9;
+    const s = 16;
     ctx.beginPath();
     if (dir === 'up') { ctx.moveTo(x, y - s); ctx.lineTo(x - s, y + s); ctx.lineTo(x + s, y + s); }
     if (dir === 'down') { ctx.moveTo(x, y + s); ctx.lineTo(x - s, y - s); ctx.lineTo(x + s, y - s); }

@@ -87,6 +87,16 @@ controls.target.set(0, -0.05, 0);
 controls.addEventListener('start', () => { grabbed = true; });
 let grabbed = false;
 
+// ---------- stick / lock phone position ----------
+let stuck = false;
+const stickBtn = document.getElementById('stickBtn');
+stickBtn?.addEventListener('click', () => {
+    stuck = !stuck;
+    controls.enabled = !stuck;
+    stickBtn.classList.toggle('on', stuck);
+    stickBtn.textContent = stuck ? '📌 Stuck' : '📌 Stick';
+});
+
 // ---------- audio + the one app ----------
 const audioEl = document.createElement('audio');
 audioEl.id = 'radio-audio';
@@ -172,9 +182,9 @@ renderer.domElement.addEventListener('pointerup', (e) => {
 function keyAtUV(u, v) {
     const W = 540, H = 760, cx = W / 2;
     const x = u * W, y = (1 - v) * H;
-    const dY = 110, dR = 78;
+    const dY = 110, dR = 90;
     const dx = x - cx, dy = y - dY, dist = Math.hypot(dx, dy);
-    if (dist <= 34) return 'OK';
+    if (dist <= 44) return 'OK';
     if (dist <= dR + 8) return Math.abs(dy) >= Math.abs(dx) ? (dy < 0 ? 'UP' : 'DOWN') : (dx < 0 ? 'LEFT' : 'RIGHT');
     const callY = dY + dR + 28;
     if (y >= callY && y <= callY + 46) {
@@ -253,9 +263,11 @@ function animate() {
     if (Math.abs(openTarget - open) < 0.001) open = openTarget;
     phone.setOpenAmount(open);
 
-    // idle spin only while closed; once open (in use / playing) settle facing
-    // front so the screen stays readable and the keypad stays tappable
-    if (open < 0.5) {
+    // when stuck, keep the phone facing forward; otherwise idle spin while
+    // closed or settle front when open
+    if (stuck) {
+        phone.group.rotation.y += (0 - phone.group.rotation.y) * Math.min(1, 5 * dt);
+    } else if (open < 0.5) {
         if (!grabbed) phone.group.rotation.y += dt * 0.18;
     } else {
         phone.group.rotation.y += (0 - phone.group.rotation.y) * Math.min(1, 5 * dt);
