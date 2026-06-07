@@ -482,25 +482,45 @@ button {
     .site-nav a:not(.ghost) { display: none; }
 }
 
-/* narrow screens: tighten up */
+/* phones: reclaim vertical space so the phone's screen has a clear zone.
+   The header collapses to a slim single-row bar (brand + credit) and the
+   marketing hero copy is dropped — the 3D phone is the star on small screens. */
 @media (max-width: 640px) {
-    .hero-copy h1 { font-size: clamp(12px, 3.2vw, 17px); }
+    .site-header {
+        align-items: center;
+        gap: 8px;
+        padding: 8px 14px;
+        padding-top: max(8px, env(safe-area-inset-top));
+        padding-left: max(14px, env(safe-area-inset-left));
+        padding-right: max(14px, env(safe-area-inset-right));
+    }
+    .header-left { flex-direction: row; align-items: center; gap: 8px; }
+    .hero-copy { display: none; }
+    .brand { font-size: 15px; }
+    .credit {
+        font-size: 11px;
+        padding: 5px 10px;
+        margin-top: 0;
+        max-width: 46vw;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
     .hero-controls { gap: 6px; bottom: max(14px, env(safe-area-inset-bottom)); }
     .actions { gap: 8px; }
     .band { font-size: 12px; padding: 7px 14px; }
     .btn { padding: 11px 16px; font-size: 13px; }
     .flip-btn { padding: 10px 18px; font-size: 13px; }
-    .credit { font-size: 11px; padding: 5px 10px; }
-    .brand { font-size: 14px; }
 }
 
 /* very narrow phones: tighter still */
 @media (max-width: 380px) {
+    .credit { max-width: 40vw; }
     .band { padding: 6px 10px; font-size: 11px; }
     .btn { padding: 10px 14px; font-size: 13px; }
     .flip-btn { padding: 8px 14px; font-size: 12px; }
     .actions { gap: 6px; }
-    .eyebrow { font-size: 9px; padding: 3px 10px; }
 }
 
 /* short / landscape screens: compact everything */

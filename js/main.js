@@ -70,7 +70,14 @@ const phone = buildPhone({
     screenTex: screenC.tex, keypadTex: keypadC.tex,
     extScreenTex: extC.tex, sponsorTex: sponsorC.tex,
 });
-phone.group.position.y = -0.28; // sit lower so the hero copy band stays clear of the screen
+// The phone's vertical position tracks the open amount so both states stay
+// centred: a folded clamshell is only ~half as tall as an open one, so without
+// this it would sink to the bottom of the frame. Closed → raised & centred;
+// open → lowered so the upright lid/screen sits in the clear zone below the
+// header. Lerped each frame in the render loop.
+const Y_CLOSED = 0.5;
+const Y_OPEN = -0.28;
+phone.group.position.y = Y_CLOSED;
 scene.add(phone.group);
 
 // ---------- controls ----------
@@ -315,6 +322,8 @@ function animate() {
     open += (openTarget - open) * Math.min(1, 9 * dt);
     if (Math.abs(openTarget - open) < 0.001) open = openTarget;
     phone.setOpenAmount(open);
+    // keep the handset vertically centred as it folds/unfolds
+    phone.group.position.y = THREE.MathUtils.lerp(Y_CLOSED, Y_OPEN, open);
 
     // when stuck, keep the phone facing forward; otherwise idle spin while
     // closed or settle front when open
