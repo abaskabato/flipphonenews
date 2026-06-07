@@ -218,6 +218,19 @@ export class Radio {
 
     back() { this.stop(); this.draw(); }
 
+    // Land on a station carried in by a share link: drop it in as a one-item
+    // list and tune it (autoplay may be blocked until the visitor taps OK).
+    playShared(station) {
+        if (!station || !station.url) return;
+        this.mode = 'browse';
+        this.stations = [station];
+        this.sel = 0;
+        this._marquee = 0;
+        this.status = 'idle';
+        this.draw();
+        this.tune(station);
+    }
+
     tune(station) {
         if (!this.audio || !station) return;
         this.status = 'tuning';
@@ -286,7 +299,7 @@ export class Radio {
             glow(ctx, false);
         } else {
             ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-            ctx.fillStyle = NEON_DIM; ctx.font = "16px 'Courier New', monospace";
+            ctx.fillStyle = NEON_DIM; ctx.font = "bold 20px 'Courier New', monospace";
             ctx.fillText('◄  ' + this.genre.toUpperCase() + '  ►', W / 2, 86);
         }
 
@@ -308,28 +321,28 @@ export class Radio {
 
         // station name (marquee if long)
         glow(ctx, live);
-        ctx.fillStyle = NEON; ctx.font = "bold 28px 'Courier New', monospace";
+        ctx.fillStyle = NEON; ctx.font = "bold 34px 'Courier New', monospace";
         ctx.textAlign = 'left';
         marquee(ctx, st.name, 20, 138, W - 40, live ? this._marquee : 0);
         glow(ctx, false);
         ctx.textAlign = 'center';
-        ctx.fillStyle = NEON_DIM; ctx.font = "15px 'Courier New', monospace";
+        ctx.fillStyle = NEON_DIM; ctx.font = "bold 18px 'Courier New', monospace";
         const meta = [st.country, (st.tags || '').split(',')[0], st.bitrate ? st.bitrate + 'k' : '']
             .filter(Boolean).join('  ·  ');
-        ctx.fillText(meta || 'live stream', W / 2, 166);
+        ctx.fillText(meta || 'live stream', W / 2, 168);
 
         drawEQ(ctx, W, 188, 296, live, this._t, this._eqSeed);
 
         ctx.textAlign = 'center';
         if (live) { glow(ctx, true); ctx.fillStyle = NEON; } else ctx.fillStyle = NEON_DIM;
-        ctx.font = "bold 18px 'Courier New', monospace";
+        ctx.font = "bold 22px 'Courier New', monospace";
         const label = live ? '● ON AIR' : this.status === 'tuning' ? 'TUNING' + '.'.repeat(1 + (Math.floor(this._t * 2) % 3))
             : this.status === 'error' ? this.statusMsg : '⏸ PRESS OK TO TUNE IN';
         ctx.fillText(label, W / 2, 318);
         glow(ctx, false);
 
         // station list
-        const top = 348, rowH = 36, bottom = H - 52;
+        const top = 350, rowH = 40, bottom = H - 52;
         const rows = Math.floor((bottom - top) / rowH);
         const n = this.stations.length;
         const start = Math.max(0, Math.min(this.sel - (rows >> 1), n - rows));
@@ -343,8 +356,8 @@ export class Radio {
                 roundRect(ctx, 14, y - rowH / 2 + 3, W - 28, rowH - 6, 7); ctx.fill(); ctx.stroke();
             }
             ctx.fillStyle = on ? NEON : NEON_DIM;
-            ctx.font = (on ? 'bold ' : '') + "16px 'Courier New', monospace";
-            ctx.fillText((on ? '▸ ' : '  ') + clip(s.name, 30), 22, y);
+            ctx.font = "bold " + (on ? '19' : '18') + "px 'Courier New', monospace";
+            ctx.fillText((on ? '▸ ' : '  ') + clip(s.name, 28), 22, y);
         }
 
         footerBar(ctx, W, H,

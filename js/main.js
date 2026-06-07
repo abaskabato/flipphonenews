@@ -7,6 +7,7 @@ import { drawKeypad, drawExtMessage } from './faces.js';
 import { playFlip } from './audio.js';
 import { Radio } from './radio.js';
 import { Podcasts } from './podcasts.js';
+import { parseShareParams, applyShareParams, buildShareURL } from './share.js';
 
 // ---------- renderer / scene ----------
 const canvasEl = document.getElementById('scene');
@@ -96,8 +97,7 @@ let grabbed = false;
 
 // ---------- stick / lock phone position ----------
 let stuck = false;
-const INIT_CAM_POS = new THREE.Vector3(0, -0.35, 3.5);
-const INIT_TARGET = new THREE.Vector3(0, 0.15, 0);
+const PIN_TARGET = new THREE.Vector3(0, -0.05, 0); // matches the default framing
 let savedCamPos = null;
 let savedTarget = null;
 let savedPhoneRotY = 0;
@@ -106,13 +106,18 @@ stickBtn?.addEventListener('click', () => {
     stuck = !stuck;
     controls.enabled = !stuck;
     stickBtn.classList.toggle('on', stuck);
-    stickBtn.textContent = stuck ? '📌 Stuck' : '📌 Stick';
+    stickBtn.textContent = stuck ? '📌 Unpin' : '📌 Pin';
     if (stuck) {
         savedCamPos = camera.position.clone();
         savedTarget = controls.target.clone();
         savedPhoneRotY = phone.group.rotation.y;
-        camera.position.copy(INIT_CAM_POS);
-        controls.target.copy(INIT_TARGET);
+        // Snap to a clean, face-on view at the SAME distance the responsive
+        // framing already uses (don't zoom in) so the whole open phone —
+        // including the SEND/END keys — stays clear of the on-screen controls
+        // on every device instead of being covered by them.
+        const dist = camera.position.distanceTo(controls.target);
+        controls.target.copy(PIN_TARGET);
+        camera.position.set(0, PIN_TARGET.y + 0.12, PIN_TARGET.z + dist);
         controls.update();
     } else if (savedCamPos && savedTarget) {
         camera.position.copy(savedCamPos);
@@ -153,6 +158,21 @@ function setBand(name) {
     updateBandUI();
     refreshExternal();
 }
+// Switch the active band without triggering its default load — used when a
+// share link is injecting its own station/episode that must not be overwritten.
+function activateSharedBand(name) {
+    const next = name === 'podcast' ? podcasts : radio;
+    if (next !== app) {
+        app.exit();
+        app.active = false;
+        app = next;
+        band = name;
+        app.active = true;
+    }
+    updateBandUI();
+    refreshExternal();
+}
+
 function updateBandUI() {
     bandRadioBtn?.classList.toggle('on', band === 'radio');
     bandPodsBtn?.classList.toggle('on', band === 'podcast');
@@ -309,8 +329,39 @@ hud.search?.addEventListener('click', () => {
     hiddenInput.focus();
 });
 
+// ---------- share: copy / native-share a link to what's playing ----------
+const shareBtn = document.getElementById('shareBtn');
+const SHARE_LABEL = '🔗 Share';
+let shareFlashT = null;
+function flashShare(msg) {
+    if (!shareBtn) return;
+    shareBtn.textContent = msg;
+    clearTimeout(shareFlashT);
+    shareFlashT = setTimeout(() => { shareBtn.textContent = SHARE_LABEL; }, 1600);
+}
+shareBtn?.addEventListener('click', async () => {
+    const url = buildShareURL(app, band);
+    if (!url) { flashShare('Nothing to share yet'); return; }
+    const name = app.current?.name || 'FLIPCAST';
+    // mobile: hand off to the OS share sheet (WhatsApp/iMessage/etc.) — the loop
+    if (navigator.share) {
+        try { await navigator.share({ title: 'FLIPCAST', text: name + ' · on FLIPCAST', url }); return; }
+        catch (e) { if (e && e.name === 'AbortError') return; } // user dismissed
+    }
+    try { await navigator.clipboard.writeText(url); flashShare('🔗 Link copied!'); }
+    catch { window.prompt('Copy this link:', url); }
+});
+
 // ---------- boot ----------
-app.enter();
+const shared = parseShareParams(location.search);
+if (shared) {
+    applyShareParams(shared, { radio, podcasts, activate: activateSharedBand });
+    ensureOpen();                       // open the phone so the screen shows the shared track
+    // tidy the address bar so a re-share starts from a clean URL
+    history.replaceState(null, '', location.origin + location.pathname);
+} else {
+    app.enter();
+}
 
 // ---------- render loop ----------
 const clock = new THREE.Clock();

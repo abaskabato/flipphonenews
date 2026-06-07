@@ -1,7 +1,9 @@
 // Shared retro-LCD drawing helpers used by the screen "apps".
 
-export const NEON = '#39ff14';
-export const NEON_DIM = 'rgba(57,255,20,0.30)';
+export const NEON = '#5dff3c';
+// secondary text / borders — kept readable (the old 0.30 alpha was nearly
+// invisible on the small phone-sized screen)
+export const NEON_DIM = 'rgba(90,255,60,0.62)';
 
 export function lcdBackground(ctx, W, H) {
     const g = ctx.createLinearGradient(0, 0, 0, H);
@@ -20,10 +22,10 @@ export function headerBar(ctx, W, left, right, h = 56) {
     glow(ctx, true);
     ctx.fillStyle = NEON;
     ctx.textBaseline = 'middle';
-    ctx.font = "bold 26px 'Courier New', monospace";
+    ctx.font = "bold 32px 'Courier New', monospace";
     ctx.textAlign = 'left';
     ctx.fillText(left, 22, h / 2);
-    ctx.font = "bold 20px 'Courier New', monospace";
+    ctx.font = "bold 22px 'Courier New', monospace";
     ctx.textAlign = 'right';
     ctx.fillText(right, W - 20, h / 2);
     glow(ctx, false);
@@ -38,7 +40,7 @@ export function footerBar(ctx, W, H, left, right, h = 44) {
     ctx.lineWidth = 2;
     hline(ctx, 16, H - h, W - 16);
     ctx.fillStyle = NEON;
-    ctx.font = "bold 19px 'Courier New', monospace";
+    ctx.font = "bold 22px 'Courier New', monospace";
     ctx.textBaseline = 'middle';
     ctx.textAlign = 'left';
     ctx.fillText(left, 22, H - h / 2);
@@ -47,13 +49,13 @@ export function footerBar(ctx, W, H, left, right, h = 44) {
 }
 
 export function crt(ctx, W, H) {
-    ctx.globalAlpha = 0.10;
+    ctx.globalAlpha = 0.06;
     ctx.fillStyle = '#000';
     for (let y = 0; y < H; y += 4) ctx.fillRect(0, y, W, 2);
     ctx.globalAlpha = 1;
     const vig = ctx.createRadialGradient(W / 2, H / 2, H * 0.2, W / 2, H / 2, H * 0.78);
     vig.addColorStop(0, 'rgba(0,0,0,0)');
-    vig.addColorStop(1, 'rgba(0,0,0,0.45)');
+    vig.addColorStop(1, 'rgba(0,0,0,0.26)');
     ctx.fillStyle = vig;
     ctx.fillRect(0, 0, W, H);
 }

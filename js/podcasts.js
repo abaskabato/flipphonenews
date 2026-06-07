@@ -267,12 +267,38 @@ export class Podcasts {
 
     back() { this.view === 'episodes' ? this.backToShows() : this.stop(); this.draw(); }
 
+    // Land on an episode carried in by a share link, optionally at a timestamp
+    // ("share the moment"). Shown as a one-item list; autoplay may be blocked
+    // until the visitor taps OK, at which point the seek still applies.
+    playSharedEpisode(ep, showName, seekTo) {
+        if (!ep || !ep.url) return;
+        this.mode = 'browse';
+        this.view = 'episodes';
+        this.show = showName ? { name: showName } : null;
+        this.episodes = [ep];
+        this.epSel = 0;
+        this._marquee = 0;
+        this.status = 'idle';
+        this._seekTo = seekTo || 0;
+        this.draw();
+        this.tune(ep);
+    }
+
     tune(ep) {
         if (!this.audio || !ep || !ep.url) return;
         this.status = 'tuning';
         this.statusMsg = 'LOADING';
         this.playingEp = ep;
         this.cur = 0; this.dur = ep.duration || 0;
+        // honour a pending share-link timestamp once the stream reports duration
+        const seekTo = this._seekTo; this._seekTo = 0;
+        if (seekTo > 0) {
+            const onMeta = () => {
+                try { this.audio.currentTime = seekTo; this.cur = seekTo; } catch { /* noop */ }
+                this.audio.removeEventListener('loadedmetadata', onMeta);
+            };
+            this.audio.addEventListener('loadedmetadata', onMeta);
+        }
         try {
             this.audio.src = ep.url;
             this.audio.load();
@@ -308,11 +334,11 @@ export class Podcasts {
             glow(ctx, false);
         } else if (this.view === 'episodes') {
             ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-            ctx.fillStyle = NEON_DIM; ctx.font = "16px 'Courier New', monospace";
-            ctx.fillText('↩ ' + clip(this.show ? this.show.name : '', 32), W / 2, 86);
+            ctx.fillStyle = NEON_DIM; ctx.font = "bold 19px 'Courier New', monospace";
+            ctx.fillText('↩ ' + clip(this.show ? this.show.name : '', 30), W / 2, 86);
         } else {
             ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-            ctx.fillStyle = NEON_DIM; ctx.font = "16px 'Courier New', monospace";
+            ctx.fillStyle = NEON_DIM; ctx.font = "bold 20px 'Courier New', monospace";
             ctx.fillText('◄  ' + this.category.toUpperCase() + '  ►', W / 2, 86);
         }
 
@@ -339,15 +365,15 @@ export class Podcasts {
             return;
         }
         glow(ctx, false);
-        ctx.fillStyle = NEON; ctx.font = "bold 26px 'Courier New', monospace"; ctx.textAlign = 'left';
+        ctx.fillStyle = NEON; ctx.font = "bold 32px 'Courier New', monospace"; ctx.textAlign = 'left';
         marquee(ctx, st.name, 20, 138, W - 40, this._marquee);
         ctx.textAlign = 'center';
-        ctx.fillStyle = NEON_DIM; ctx.font = "15px 'Courier New', monospace";
-        ctx.fillText(clip(st.artist || 'podcast', 40), W / 2, 168);
-        ctx.fillStyle = NEON; ctx.font = "bold 17px 'Courier New', monospace";
-        ctx.fillText('▸ OK FOR EPISODES', W / 2, 206);
+        ctx.fillStyle = NEON_DIM; ctx.font = "bold 18px 'Courier New', monospace";
+        ctx.fillText(clip(st.artist || 'podcast', 38), W / 2, 168);
+        ctx.fillStyle = NEON; ctx.font = "bold 20px 'Courier New', monospace";
+        ctx.fillText('▸ OK FOR EPISODES', W / 2, 208);
 
-        this._drawList(ctx, W, H, this.shows, this.showSel, 244, (s) => s.name);
+        this._drawList(ctx, W, H, this.shows, this.showSel, 248, (s) => s.name);
         footerBar(ctx, W, H,
             this.mode === 'search' ? 'END exit' : '◄ category ►',
             this.mode === 'search' ? 'SEND find' : '▲▼ show · OK open');
@@ -363,13 +389,13 @@ export class Podcasts {
         }
         const playingThis = this.playingEp === ep;
         glow(ctx, live && playingThis);
-        ctx.fillStyle = NEON; ctx.font = "bold 24px 'Courier New', monospace"; ctx.textAlign = 'left';
+        ctx.fillStyle = NEON; ctx.font = "bold 29px 'Courier New', monospace"; ctx.textAlign = 'left';
         marquee(ctx, ep.name, 20, 134, W - 40, (live && playingThis) ? this._marquee : 0);
         glow(ctx, false);
         ctx.textAlign = 'center';
-        ctx.fillStyle = NEON_DIM; ctx.font = "14px 'Courier New', monospace";
+        ctx.fillStyle = NEON_DIM; ctx.font = "bold 17px 'Courier New', monospace";
         const meta = [ep.date, fmtDur(ep.duration)].filter(Boolean).join('  ·  ');
-        ctx.fillText(meta || 'episode', W / 2, 160);
+        ctx.fillText(meta || 'episode', W / 2, 162);
 
         // progress bar (only meaningful for the loaded episode)
         const shownCur = playingThis ? this.cur : 0;
@@ -378,7 +404,7 @@ export class Podcasts {
 
         ctx.textAlign = 'center';
         if (live && playingThis) { glow(ctx, true); ctx.fillStyle = NEON; } else ctx.fillStyle = NEON_DIM;
-        ctx.font = "bold 18px 'Courier New', monospace";
+        ctx.font = "bold 22px 'Courier New', monospace";
         const label = (playingThis && live) ? '● PLAYING'
             : (playingThis && this.status === 'tuning') ? 'LOADING' + '.'.repeat(1 + (Math.floor(this._t * 2) % 3))
             : (playingThis && this.status === 'error') ? this.statusMsg
@@ -393,7 +419,7 @@ export class Podcasts {
 
     // shared scrolling list (shows or episodes)
     _drawList(ctx, W, H, items, selIdx, top, labelOf) {
-        const rowH = 34, bottom = H - 52;
+        const rowH = 38, bottom = H - 52;
         const rows = Math.floor((bottom - top) / rowH);
         const n = items.length;
         const start = Math.max(0, Math.min(selIdx - (rows >> 1), n - rows));
@@ -407,8 +433,8 @@ export class Podcasts {
                 roundRect(ctx, 14, y - rowH / 2 + 3, W - 28, rowH - 6, 7); ctx.fill(); ctx.stroke();
             }
             ctx.fillStyle = on ? NEON : NEON_DIM;
-            ctx.font = (on ? 'bold ' : '') + "15px 'Courier New', monospace";
-            ctx.fillText((on ? '▸ ' : '  ') + clip(labelOf(it), 31), 22, y);
+            ctx.font = "bold " + (on ? '18' : '17') + "px 'Courier New', monospace";
+            ctx.fillText((on ? '▸ ' : '  ') + clip(labelOf(it), 29), 22, y);
         }
     }
 }
@@ -425,9 +451,9 @@ function drawProgress(ctx, W, y, cur, dur, live) {
     if (frac > 0) { roundRect(ctx, x, y, Math.max(h, w * frac), h, h / 2); ctx.fill(); }
     if (frac > 0) { ctx.beginPath(); ctx.arc(x + w * frac, y + h / 2, 6, 0, Math.PI * 2); ctx.fill(); }
     glow(ctx, false);
-    ctx.fillStyle = NEON_DIM; ctx.font = "13px 'Courier New', monospace"; ctx.textBaseline = 'top';
-    ctx.textAlign = 'left'; ctx.fillText(fmtTime(cur), x, y + 14);
-    ctx.textAlign = 'right'; ctx.fillText(dur > 0 ? fmtTime(dur) : '--:--', x + w, y + 14);
+    ctx.fillStyle = NEON_DIM; ctx.font = "bold 16px 'Courier New', monospace"; ctx.textBaseline = 'top';
+    ctx.textAlign = 'left'; ctx.fillText(fmtTime(cur), x, y + 15);
+    ctx.textAlign = 'right'; ctx.fillText(dur > 0 ? fmtTime(dur) : '--:--', x + w, y + 15);
 }
 
 function fmtTime(sec) {
