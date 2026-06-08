@@ -357,10 +357,39 @@ const shared = parseShareParams(location.search);
 if (shared) {
     applyShareParams(shared, { radio, podcasts, activate: activateSharedBand });
     ensureOpen();                       // open the phone so the screen shows the shared track
-    // tidy the address bar so a re-share starts from a clean URL
     history.replaceState(null, '', location.origin + location.pathname);
 } else {
     app.enter();
+}
+
+// ---------- now-playing bar ----------
+const npEl = document.createElement('div');
+npEl.id = 'nowPlaying';
+npEl.innerHTML = `
+  <div class="np-wave"><span></span><span></span><span></span><span></span><span></span></div>
+  <div class="np-info">
+    <div class="np-title">—</div>
+    <div class="np-sub">Standing by</div>
+  </div>
+`;
+const npTitle = npEl.querySelector('.np-title');
+const npSub = npEl.querySelector('.np-sub');
+document.body.appendChild(npEl);
+
+let lastNpTitle = '';
+function updateNowPlaying() {
+    const live = app.status === 'live';
+    const name = app.current?.name || '';
+    const bandLabel = band === 'podcast' ? 'Podcast' : 'Radio';
+    if (live && name && name !== lastNpTitle) {
+        lastNpTitle = name;
+        npTitle.textContent = name;
+        npSub.textContent = 'Live · ' + bandLabel;
+        npEl.classList.add('visible');
+    } else if (!live) {
+        lastNpTitle = '';
+        npEl.classList.remove('visible');
+    }
 }
 
 // ---------- render loop ----------
@@ -388,6 +417,7 @@ function animate() {
 
     app.update(dt);
     screenC.tex.needsUpdate = true;
+    updateNowPlaying();
 
     controls.update();
     renderer.render(scene, camera);
