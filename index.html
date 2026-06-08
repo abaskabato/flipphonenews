@@ -33,8 +33,28 @@
                 <h1>Flip it open. Tune the world.</h1>
             </div>
         </div>
-        <a class="credit" href="https://abaskabato.github.io/aboutme/" target="_blank" rel="noopener">Made with ♥ in Seattle by abas</a>
-    </header>
+        <div class="header-right">
+            <div id="newsletter" class="newsletter-hdr">
+                <button id="newsletterToggle" class="nl-btn" aria-expanded="false">
+                    <span>📡</span>
+                    <span class="nl-label">Signal</span>
+                </button>
+                <form id="newsletterForm" class="nl-form">
+                    <p class="nl-pitch">One email a week on living with less screen. Flip phones, dumb phone tips, and the art of disconnecting.</p>
+                    <input
+                        type="email"
+                        name="email"
+                        placeholder="your@email.com"
+                        required
+                        autocomplete="email"
+                        class="nl-input"
+                    />
+                    <button type="submit" class="nl-submit">Subscribe</button>
+                    <p class="nl-hint">No spam. Unsubscribe anytime.</p>
+                </form>
+            </div>
+            <a class="credit" href="https://abaskabato.github.io/aboutme/" target="_blank" rel="noopener">Made with ♥ in Seattle by abas</a>
+        </div>
 
     <!-- ===== full-screen 3D flip phone ===== -->
     <section class="hero">
@@ -59,25 +79,6 @@
             <div>Warming up the tubes</div>
         </div>
     </section>
-
-    <div id="newsletter" class="newsletter-pill">
-        <button id="newsletterToggle" class="newsletter-btn" aria-expanded="false">
-            <span class="np-antenna">📡</span>
-            <span class="np-label">Flip phone newsletter</span>
-        </button>
-        <form id="newsletterForm" class="newsletter-form">
-            <input
-                type="email"
-                name="email"
-                placeholder="your@email.com"
-                required
-                autocomplete="email"
-                class="newsletter-input"
-            />
-            <button type="submit" class="newsletter-submit">Join</button>
-            <p class="newsletter-hint">No spam. Unsubscribe anytime.</p>
-        </form>
-    </div>
 
     <script type="module" src="js/main.js"></script>
     <script type="module" src="js/site.js"></script>

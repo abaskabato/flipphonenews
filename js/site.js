@@ -31,13 +31,22 @@
 (function () {
     const toggle = document.getElementById('newsletterToggle');
     const form = document.getElementById('newsletterForm');
-    const input = form?.querySelector('.newsletter-input');
+    const input = form?.querySelector('.nl-input');
     if (!toggle || !form || !input) return;
 
     toggle.addEventListener('click', () => {
         const open = form.classList.toggle('open');
         toggle.setAttribute('aria-expanded', String(open));
-        if (open) setTimeout(() => input.focus(), 350);
+        if (open) setTimeout(() => input.focus(), 250);
+    });
+
+    // Close on click outside
+    document.addEventListener('click', (e) => {
+        const nl = document.getElementById('newsletter');
+        if (nl && !nl.contains(e.target)) {
+            form.classList.remove('open');
+            toggle.setAttribute('aria-expanded', 'false');
+        }
     });
 
     form.addEventListener('submit', async (e) => {
@@ -45,7 +54,7 @@
         const email = input.value.trim();
         if (!email) return;
 
-        const btn = form.querySelector('.newsletter-submit');
+        const btn = form.querySelector('.nl-submit');
         const orig = btn.textContent;
         btn.textContent = 'Sending…';
         btn.disabled = true;
@@ -57,11 +66,10 @@
                 body: JSON.stringify({ email }),
             });
             if (!res.ok) throw new Error('Failed');
-            // Show success
             const fb = document.createElement('p');
-            fb.className = 'newsletter-feedback';
+            fb.className = 'nl-feedback';
             fb.textContent = 'You\'re in. No spam, ever.';
-            form.querySelector('.newsletter-hint')?.replaceWith(fb);
+            form.querySelector('.nl-hint')?.replaceWith(fb);
             input.value = '';
             input.style.display = 'none';
             btn.textContent = 'Done';
