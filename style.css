@@ -21,6 +21,7 @@
     --radius-md: 14px;
     --radius-sm: 8px;
     --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+    --header-h: 104px;
 }
 
 html {
@@ -42,7 +43,6 @@ body {
     -moz-osx-font-smoothing: grayscale;
 }
 
-/* Subtle animated grain overlay for visual depth */
 body::before {
     content: "";
     position: fixed;
@@ -53,6 +53,11 @@ body::before {
         radial-gradient(circle at 20% 30%, rgba(57, 255, 20, 0.04) 0%, transparent 40%),
         radial-gradient(circle at 80% 70%, rgba(80, 80, 220, 0.05) 0%, transparent 40%);
     opacity: 0.8;
+}
+
+::selection {
+    background: rgba(57, 255, 20, 0.25);
+    color: var(--ink);
 }
 
 /* ===== sticky header ===== */
@@ -205,7 +210,7 @@ body::before {
 .site-nav a:hover { color: #fff; background: rgba(255, 255, 255, 0.06); }
 .site-nav a.ghost { border: 1px solid var(--line); }
 
-/* ===== hero ===== */
+/* ===== hero (3D phone container) ===== */
 .hero {
     position: relative;
     height: 100vh;
@@ -290,14 +295,12 @@ button {
     justify-content: center;
 }
 
-/* ===== band toggle: radio / podcasts (near the phone) ===== */
+/* ===== band toggle: radio / podcasts ===== */
 .band-toggle {
     position: absolute;
     z-index: 6;
     left: 50%;
     transform: translateX(-50%);
-    /* sit just below the header; --header-h is measured in JS so the toggle
-       always clears the (variable-height) header banner */
     top: calc(var(--header-h, 104px) + 14px);
     display: inline-flex;
     gap: 2px;
@@ -330,7 +333,6 @@ button {
     text-shadow: 0 1px 0 rgba(255, 255, 255, 0.15);
 }
 
-/* sliding highlight pill — JS sets its width/offset to match the active tab */
 .band-slider {
     position: absolute;
     top: 0;
@@ -477,14 +479,73 @@ button {
     30% { transform: translateY(-6px); opacity: 1; }
 }
 
+/* ===== now-playing bar (shown when a stream is active) ===== */
+#nowPlaying {
+    position: absolute;
+    z-index: 7;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: calc(max(18px, env(safe-area-inset-bottom)) + 72px);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 18px;
+    border-radius: var(--radius-pill);
+    border: 1px solid var(--line-strong);
+    background: rgba(6, 6, 13, 0.7);
+    backdrop-filter: blur(14px) saturate(140%);
+    -webkit-backdrop-filter: blur(14px) saturate(140%);
+    box-shadow: var(--shadow-md);
+    animation: fadeInUp 0.5s var(--ease) both;
+    pointer-events: auto;
+    white-space: nowrap;
+}
+#nowPlaying .np-info {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    text-align: left;
+    line-height: 1.2;
+}
+#nowPlaying .np-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+}
+#nowPlaying .np-sub {
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--ink-soft);
+    letter-spacing: 0.5px;
+}
+#nowPlaying .np-wave {
+    display: inline-flex;
+    align-items: flex-end;
+    gap: 2px;
+    height: 16px;
+}
+#nowPlaying .np-wave span {
+    display: block;
+    width: 3px;
+    background: var(--neon);
+    border-radius: 999px;
+    animation: waveAnim 0.6s ease-in-out infinite alternate;
+}
+#nowPlaying .np-wave span:nth-child(1) { height: 6px; animation-delay: 0s; }
+#nowPlaying .np-wave span:nth-child(2) { height: 12px; animation-delay: 0.1s; }
+#nowPlaying .np-wave span:nth-child(3) { height: 8px; animation-delay: 0.2s; }
+#nowPlaying .np-wave span:nth-child(4) { height: 14px; animation-delay: 0.05s; }
+#nowPlaying .np-wave span:nth-child(5) { height: 7px; animation-delay: 0.15s; }
+@keyframes waveAnim {
+    from { transform: scaleY(0.5); opacity: 0.6; }
+    to { transform: scaleY(1); opacity: 1; }
+}
+
 /* ===== responsive ===== */
 @media (max-width: 880px) {
     .site-nav a:not(.ghost) { display: none; }
 }
 
-/* phones: reclaim vertical space so the phone's screen has a clear zone.
-   The header collapses to a slim single-row bar (brand + credit) and the
-   marketing hero copy is dropped — the 3D phone is the star on small screens. */
 @media (max-width: 640px) {
     .site-header {
         align-items: center;
@@ -514,7 +575,6 @@ button {
     .flip-btn { padding: 10px 18px; font-size: 13px; }
 }
 
-/* very narrow phones: tighter still */
 @media (max-width: 380px) {
     .credit { max-width: 40vw; }
     .band { padding: 6px 10px; font-size: 11px; }
@@ -523,7 +583,6 @@ button {
     .actions { gap: 6px; }
 }
 
-/* short / landscape screens: compact everything */
 @media (max-height: 560px) {
     .hero-copy h1 { font-size: 13px; }
     .site-header { padding-top: max(8px, env(safe-area-inset-top)); padding-bottom: 8px; }
@@ -537,7 +596,6 @@ button {
     .btn, .flip-btn { padding: 8px 12px; font-size: 12px; }
 }
 
-/* prefers-reduced-motion: tone down animations */
 @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after {
         animation-duration: 0.01ms !important;
