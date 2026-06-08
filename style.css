@@ -494,6 +494,7 @@ body::before {
 /* ===== hero (3D phone container) ===== */
 .hero {
     position: relative;
+    z-index: 2;
     height: 100vh;
     height: 100dvh;
     overflow: hidden;
