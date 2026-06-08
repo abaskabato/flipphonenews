@@ -26,3 +26,51 @@
     document.addEventListener('touchstart', enterFS);
     document.addEventListener('touchstart', collapseBar);
 })();
+
+// ---------- newsletter signup ----------
+(function () {
+    const toggle = document.getElementById('newsletterToggle');
+    const form = document.getElementById('newsletterForm');
+    const input = form?.querySelector('.newsletter-input');
+    if (!toggle || !form || !input) return;
+
+    toggle.addEventListener('click', () => {
+        const open = form.classList.toggle('open');
+        toggle.setAttribute('aria-expanded', String(open));
+        if (open) setTimeout(() => input.focus(), 350);
+    });
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = input.value.trim();
+        if (!email) return;
+
+        const btn = form.querySelector('.newsletter-submit');
+        const orig = btn.textContent;
+        btn.textContent = 'Sending…';
+        btn.disabled = true;
+
+        try {
+            const res = await fetch('/api/newsletter', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email }),
+            });
+            if (!res.ok) throw new Error('Failed');
+            // Show success
+            const fb = document.createElement('p');
+            fb.className = 'newsletter-feedback';
+            fb.textContent = 'You\'re in. No spam, ever.';
+            form.querySelector('.newsletter-hint')?.replaceWith(fb);
+            input.value = '';
+            input.style.display = 'none';
+            btn.textContent = 'Done';
+            btn.disabled = true;
+            btn.style.opacity = '0.6';
+        } catch {
+            btn.textContent = 'Try again';
+            btn.disabled = false;
+            input.focus();
+        }
+    });
+})();

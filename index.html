@@ -60,6 +60,25 @@
         </div>
     </section>
 
+    <div id="newsletter" class="newsletter-pill">
+        <button id="newsletterToggle" class="newsletter-btn" aria-expanded="false">
+            <span class="np-antenna">📡</span>
+            <span class="np-label">Flip phone newsletter</span>
+        </button>
+        <form id="newsletterForm" class="newsletter-form">
+            <input
+                type="email"
+                name="email"
+                placeholder="your@email.com"
+                required
+                autocomplete="email"
+                class="newsletter-input"
+            />
+            <button type="submit" class="newsletter-submit">Join</button>
+            <p class="newsletter-hint">No spam. Unsubscribe anytime.</p>
+        </form>
+    </div>
+
     <script type="module" src="js/main.js"></script>
     <script type="module" src="js/site.js"></script>
 </body>
