@@ -186,31 +186,6 @@ body::before {
     color: #fff;
 }
 
-.credit {
-    color: var(--ink-soft);
-    text-decoration: none;
-    font-size: 12px;
-    font-weight: 500;
-    padding: 6px 14px;
-    border-radius: var(--radius-pill);
-    border: 1px solid var(--line);
-    background: rgba(255, 255, 255, 0.02);
-    transition: color 0.2s var(--ease), background 0.2s var(--ease), border-color 0.2s var(--ease), box-shadow 0.2s var(--ease);
-    flex-shrink: 0;
-    margin-top: 4px;
-    animation: creditIn 0.6s var(--ease) 0.5s both;
-}
-@keyframes creditIn {
-    from { opacity: 0; transform: translateY(-4px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-.credit:hover {
-    color: #fff;
-    background: rgba(255, 255, 255, 0.06);
-    border-color: var(--line-strong);
-    box-shadow: 0 0 20px rgba(255, 255, 255, 0.03);
-}
-
 .header-right {
     display: flex;
     align-items: center;
@@ -875,16 +850,6 @@ button {
     .header-left { flex-direction: row; align-items: center; gap: 8px; }
     .hero-copy { display: none; }
     .brand { font-size: 15px; }
-    .credit {
-        font-size: 11px;
-        padding: 5px 10px;
-        margin-top: 0;
-        max-width: 46vw;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-
     .hero-controls { gap: 6px; bottom: max(14px, env(safe-area-inset-bottom)); }
     .actions { gap: 8px; }
     .band { font-size: 12px; padding: 7px 14px; }
@@ -901,7 +866,6 @@ button {
 }
 
 @media (max-width: 380px) {
-    .credit { max-width: 40vw; }
     .band { padding: 6px 10px; font-size: 11px; }
     .btn { padding: 10px 14px; font-size: 13px; }
     .flip-btn { padding: 8px 14px; font-size: 12px; }
@@ -919,6 +883,154 @@ button {
     .hero-controls { flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 6px; bottom: max(10px, env(safe-area-inset-bottom)); }
     .band { padding: 6px 10px; font-size: 11px; }
     .btn, .flip-btn { padding: 8px 12px; font-size: 12px; }
+}
+
+/* ===== Tools Panel (pomodoro + scratch) ===== */
+.tools-panel {
+    position: absolute;
+    z-index: 7;
+    left: 50%;
+    transform: translateX(-50%) translateY(12px);
+    bottom: calc(max(18px, env(safe-area-inset-bottom)) + 72px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s var(--ease), transform 0.3s var(--ease);
+}
+.tools-panel.open {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+    pointer-events: auto;
+}
+.tools-inner {
+    display: flex;
+    gap: 12px;
+    padding: 14px 18px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--line-strong);
+    background: linear-gradient(180deg, rgba(10, 10, 22, 0.92) 0%, rgba(6, 6, 13, 0.9) 100%);
+    backdrop-filter: blur(16px) saturate(140%);
+    -webkit-backdrop-filter: blur(16px) saturate(140%);
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.04) inset, 0 12px 40px rgba(0, 0, 0, 0.6);
+}
+
+.tool-pomo {
+    text-align: center;
+    min-width: 140px;
+    font-family: 'Courier New', monospace;
+}
+.pomo-display {
+    font-size: 28px;
+    color: var(--neon);
+    letter-spacing: 3px;
+    font-weight: bold;
+    text-shadow: 0 0 8px rgba(57, 255, 20, 0.3);
+}
+.pomo-status {
+    font-size: 10px;
+    color: var(--neon);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    opacity: 0.6;
+    margin: 2px 0 8px;
+}
+.pomo-controls {
+    display: flex;
+    gap: 6px;
+    justify-content: center;
+}
+.pomo-btn {
+    font-family: 'Courier New', monospace;
+    font-size: 10px;
+    font-weight: bold;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 5px 12px;
+    border: 1px solid var(--neon);
+    border-radius: 4px;
+    background: transparent;
+    color: var(--neon);
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+}
+.pomo-btn:hover {
+    background: var(--neon);
+    color: #000;
+}
+.pomo-btn:active {
+    transform: scale(0.95);
+}
+
+.tool-scratch {
+    min-width: 180px;
+    flex: 1;
+}
+.tool-scratch textarea {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius-sm);
+    color: var(--ink-soft);
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    padding: 8px;
+    resize: vertical;
+    outline: none;
+    line-height: 1.4;
+}
+.tool-scratch textarea::placeholder {
+    color: var(--muted);
+}
+.tool-scratch textarea:focus {
+    border-color: rgba(57, 255, 20, 0.3);
+}
+
+/* ===== Footer ===== */
+.site-footer {
+    position: fixed;
+    z-index: 5;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    text-align: center;
+    padding: 8px 20px;
+    padding-bottom: max(8px, env(safe-area-inset-bottom));
+    pointer-events: none;
+}
+.site-footer a {
+    font-family: 'Courier New', monospace;
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.1);
+    text-decoration: none;
+    letter-spacing: 2px;
+    transition: color 0.3s;
+    pointer-events: auto;
+}
+.site-footer a:hover {
+    color: rgba(255, 255, 255, 0.3);
+}
+
+@media (max-width: 640px) {
+    .tools-inner {
+        flex-direction: column;
+        gap: 14px;
+        padding: 14px;
+    }
+    .tool-pomo { min-width: 0; }
+    .tool-scratch { min-width: 0; }
+    .tool-scratch textarea { font-size: 11px; }
+    .pomo-display { font-size: 24px; }
+}
+
+@media (max-width: 380px) {
+    .tools-panel {
+        left: 10px;
+        right: 10px;
+        transform: translateY(12px);
+        bottom: calc(max(18px, env(safe-area-inset-bottom)) + 68px);
+    }
+    .tools-panel.open {
+        transform: translateY(0);
+    }
 }
 
 @media (prefers-reduced-motion: reduce) {

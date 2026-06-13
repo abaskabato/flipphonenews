@@ -54,7 +54,6 @@
                 </form>
             </div>
             <button id="shopBtn" class="nl-btn">📱 Picks</button>
-            <a class="credit" href="https://abaskabato.github.io/aboutme/" target="_blank" rel="noopener">Made with ♥ in Seattle by abas</a>
         </div>
     </header>
 
@@ -73,6 +72,23 @@
                 <button id="shareBtn" class="flip-btn" title="Copy a link to what's playing">🔗 Share</button>
                 <button id="stickBtn" class="flip-btn" title="Pin the phone in place">📌 Pin</button>
                 <button id="flipBtn" class="flip-btn"><span class="dot"></span> Open / Close</button>
+                <button id="toolsBtn" class="flip-btn">🧰 Tools</button>
+            </div>
+        </div>
+
+        <div id="toolsPanel" class="tools-panel">
+            <div class="tools-inner">
+                <div class="tool-pomo">
+                    <div class="pomo-display" id="pomoDisplay">25:00</div>
+                    <div class="pomo-status" id="pomoStatus">WORK</div>
+                    <div class="pomo-controls">
+                        <button class="pomo-btn" id="pomoStart">START</button>
+                        <button class="pomo-btn" id="pomoReset">RESET</button>
+                    </div>
+                </div>
+                <div class="tool-scratch">
+                    <textarea id="scratchArea" placeholder="quick notes..." rows="3"></textarea>
+                </div>
             </div>
         </div>
 
@@ -138,7 +154,50 @@
         </div>
     </div>
 
+    <footer class="site-footer">
+        <a href="https://abaskabato.github.io" target="_blank" rel="noopener">abaskabato.github.io</a>
+    </footer>
+
     <script type="module" src="js/main.js"></script>
     <script type="module" src="js/site.js"></script>
+    <script>
+        // ===== Pomodoro Timer =====
+        const WORK = 25 * 60, BREAK = 5 * 60;
+        let t = WORK, running = false, interval = null, phase = 'work';
+        const d = document.getElementById('pomoDisplay');
+        const s = document.getElementById('pomoStatus');
+        const b = document.getElementById('pomoStart');
+        const r = document.getElementById('pomoReset');
+
+        function fmt(sec) {
+            return String(Math.floor(sec / 60)).padStart(2, '0') + ':' + String(sec % 60).padStart(2, '0');
+        }
+        function upd() { d.textContent = fmt(t); s.textContent = phase === 'work' ? 'WORK' : 'BREAK'; }
+        function tick() {
+            if (t <= 0) { phase = phase === 'work' ? 'break' : 'work'; t = phase === 'work' ? WORK : BREAK; upd(); return; }
+            t--; upd();
+        }
+        function toggle() {
+            if (running) { clearInterval(interval); running = false; b.textContent = 'START'; }
+            else { interval = setInterval(tick, 1000); running = true; b.textContent = 'PAUSE'; }
+        }
+        function reset() { clearInterval(interval); running = false; phase = 'work'; t = WORK; b.textContent = 'START'; upd(); }
+        b.addEventListener('click', toggle);
+        r.addEventListener('click', reset);
+
+        // ===== Scratch Pad =====
+        const ta = document.getElementById('scratchArea');
+        const saved = localStorage.getItem('flipnotes');
+        if (saved) ta.value = saved;
+        ta.addEventListener('input', function () { localStorage.setItem('flipnotes', this.value); });
+
+        // ===== Tools Panel Toggle =====
+        const toolsBtn = document.getElementById('toolsBtn');
+        const toolsPanel = document.getElementById('toolsPanel');
+        toolsBtn.addEventListener('click', function () {
+            toolsPanel.classList.toggle('open');
+            this.classList.toggle('on');
+        });
+    </script>
 </body>
 </html>
